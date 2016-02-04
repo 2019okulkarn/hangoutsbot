@@ -9,7 +9,7 @@ def _initialise():
 
 
 def lcps(bot, event, *args):
-'''This command checks for school closings in the Loudon County Public Schools area. Data taken from NBC.'''    
+    '''This command checks for school closings in the Loudon County Public Schools area. Data taken from NBC.'''    
     try:
         r = get('http://www.nbcwashington.com/weather/school-closings/')
         html = r.text
@@ -31,7 +31,7 @@ def lcps(bot, event, *args):
         yield from bot.coro_send_message(CONTROL, msg)
 
 def fcps(bot, event, *args):
-'''This command checks for closings in the Fairfax County Public Schools Area. Data taken from TJHSST.'''
+    '''This command checks for closings in the Fairfax County Public Schools Area. Data taken from TJHSST.'''
     try:
         page = get('https://ion.tjhsst.edu/api/emerg?format=json')
         data = json.loads(page.text)
