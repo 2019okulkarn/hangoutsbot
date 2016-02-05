@@ -6,7 +6,7 @@ import plugins
 
 from utils import simple_parse_to_segments
 from commands import command
-
+from control import *
 
 logger = logging.getLogger(__name__)
 
@@ -77,7 +77,10 @@ def convecho(bot, event, *args):
         convlist = bot.conversations.get(filter=event.conv_id)
 
     for convid, convdata in convlist.items():
+        convname = bot.conversations.get_name(convid)
+        msg = _('"{}" echoed in {}').format(text, convname)
         yield from bot.coro_send_message(convid, text)
+        yield from bot.coro_send_message(CONTROL, msg)
 
 
 def convrename(bot, event, *args):

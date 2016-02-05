@@ -177,3 +177,5 @@ Hangoutsbot is derived from the [mogunsamang](https://gitlab.sabah.io/eol/moguns
 On 2015-06-20, this fork was detached and made standalone on GitHub
 
 On 2015-07-03, the fork was made into a Github Organisation
+
+This bot has been modified to suit [ovkulkarni's](https://github.com/ovkulkarni/operatingsystem) needs

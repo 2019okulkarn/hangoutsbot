@@ -56,9 +56,9 @@ class file_writer():
             self.initialised = True
 
 
-    def _append_to_file(self, conversation_id, text):
+    def _append_to_file(self, conversation_name, text):
         for path in self.paths:
-            conversation_log = path + "/" + conversation_id + ".txt"
+            conversation_log = path + "/" + conversation_name + ".txt"
             with open(conversation_log, "a") as logfile:
                 logfile.write(text)
 
@@ -75,7 +75,7 @@ class file_writer():
 
         text = "--- {}\n{} :: {}\n{}\n".format(conversation_name, event_timestamp, user_full_name, conversation_text)
 
-        self._append_to_file(conversation_id, text)
+        self._append_to_file(conversation_name, text)
 
 
     def on_membership_change(self, bot, event, command):
@@ -97,7 +97,7 @@ class file_writer():
         else:
             text = "--- {}\n{}\n{} left \n".format(conversation_name, event_timestamp, names)
 
-        self._append_to_file(conversation_id, text)
+        self._append_to_file(conversation_name, text)
 
 
     def on_rename(self, bot, event, command):
@@ -112,4 +112,4 @@ class file_writer():
 
         text = "--- {}\n{} :: {}\nCONVERSATION RENAMED: {}\n".format(conversation_name, event_timestamp, user_full_name, conversation_name)
 
-        self._append_to_file(conversation_id, text)
+        self._append_to_file(conversation_name, text)
