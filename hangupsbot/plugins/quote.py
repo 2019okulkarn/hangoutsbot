@@ -37,11 +37,16 @@ def quote(bot, event, *args):
     '''Retrieves quote from bot's memory. Format is /bot quote <person>'''
     try:
         if args:
-            user = ' '.join(args).lower()
+            if args[-1].isdigit():
+                user = ' '.join(args[:-1]).lower()
+                num = args[-1]
+            else:
+                user = ' '.join(args).lower()
+                num = None
             listofquotes = bot.memory.get_by_path([user])
             if ',' in str(listofquotes):
                 quotelist = str(listofquotes).split(',')
-                chosenquote = choice(quotelist)
+                chosenquote = choice(quotelist) if not num else quotelist[num]
                 chosenquotelist = chosenquote.split(':')
                 quotetoshow = chosenquotelist[1]
                 quotecheck = list(quotetoshow)
