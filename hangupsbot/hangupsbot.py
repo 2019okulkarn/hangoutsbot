@@ -694,15 +694,21 @@ class HangupsBot(object):
             segments = []
         elif "parser" in context and context["parser"] is False and isinstance(message, str):
             message = re.sub('fuck', 'fsck', message, flags=re.I)
-            message = re.sub('nigga','n***a', message, flags=re.I)
+            message = re.sub('nigga|nigger','n***a', message, flags=re.I)
+            message = re.sub('bitch', 'b***h', message, flags=re.I)
+            message = re.sub('whore', 'w***e', message, flags=re.I)
             segments = [hangups.ChatMessageSegment(message)]
         elif isinstance(message, str):
             message = re.sub('fuck', 'fsck', message, flags=re.I)
-            message = re.sub('nigga', 'n***a', message, flags=re.I)
+            message = re.sub('nigga|nigger', 'n***a', message, flags=re.I)
+            message = re.sub('bitch', 'b***h', message, flags=re.I)
+            message = re.sub('whore', 'w***e', message, flags=re.I)
             segments = simple_parse_to_segments(message)
         elif isinstance(message, list):
             message = [re.sub('fuck', 'fsck', seg, flags=re.I) for seg in message]
-            message = [re.sub('nigga', 'n***a', seg, flags=re.I) for seg in message]
+            message = [re.sub('nigga|nigger', 'n***a', seg, flags=re.I) for seg in message]
+            message = [re.sub('bitch', 'b***h', seg, flags=re.I) for seg in message]
+            message = [re.sub('whore', 'w***e', seg, flags=re.I) for seg in message]
             segments = message
         else:
             raise TypeError("unknown message type supplied")
