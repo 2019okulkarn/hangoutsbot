@@ -19,7 +19,7 @@ def _initialise():
 def _watch_image_link(bot, event, command):
     try:
         # Don't handle events caused by the bot himself
-        if event.user.is_self:
+        if event.user.is_self or event.user_id.chat_id == '115110051182090060444':
             return
 
         probable_image_link = False

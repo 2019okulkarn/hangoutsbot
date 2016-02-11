@@ -40,15 +40,15 @@ def forecast(bot, event, *args):
         yield from bot.coro_send_message(event.conv, _("No location given; defaulting to Chantilly, VA"))
     weather_com_result = pywapi.get_weather_from_weather_com(location_id , units = 'imperial' )
     place = weather_com_result['location']['name']
-    high = weather_com_result['forecasts'][0]['high']
-    low = weather_com_result['forecasts'][0]['low']
-    day = weather_com_result['forecasts'][0]['day']['text']
+    high = weather_com_result['forecasts'][1]['high']
+    low = weather_com_result['forecasts'][1]['low']
+    day = weather_com_result['forecasts'][1]['day']['text']
     if day == '':
         day = 'N/A'
-    night = weather_com_result['forecasts'][0]['night']['text']
+    night = weather_com_result['forecasts'][1]['night']['text']
     if night == '':
         night = 'N/A'
-    date = weather_com_result['forecasts'][0]['date']
+    date = weather_com_result['forecasts'][1]['date']
     url = links.shorten('http://www.weather.com/weather/today/l/' + location_id)
     msg=_("<b>Forecast for {} on {}:</b><br>Conditions: Day - {}; Night - {}<br>High: {}<br>Low: {}<br>For more information visit {}").format(place, date, day, night, high, low, url)
     yield from bot.coro_send_message(event.conv, msg)
