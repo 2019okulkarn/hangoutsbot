@@ -26,13 +26,14 @@ def search(term):
             'link': link
         }
 
-def imagesearch(term, num=0):
+def imagesearch(term, num=1):
     r = get('https://www.googleapis.com/customsearch/v1', params={'key': gapi, 'cx': image, 'q': term, 'defaultToImageSearch': 'True'})
+    print(r.url)
     data = json.loads(r.text)
     if 'items' not in data:
         return 'No Images Found'
     else:
-        link = data['items'][0]['pagemap']['cse_image'][1]['src']
+        link = data['items'][num - 1]['pagemap']['cse_image'][0]['src']
         return link
 
 def google(bot, event, *args):
@@ -47,12 +48,12 @@ def google(bot, event, *args):
                 yield from bot.coro_send_message(event.conv, msg)
             else:
                 if args[-1].isdigit():
-                    num = args[-1]
-                    term = ' '.join(args[:-1])
+                    num = int(args[-1])
+                    term = ' '.join(args[1:-1])
                     yield from bot.coro_send_message(event.conv, _("num: %s, term: %s" % (num, term)))
                 else:
-                    num = 0
-                    term =  ' '.join(args[1:-1])
+                    num = 1
+                    term =  ' '.join(args[1:])
                     yield from bot.coro_send_message(event.conv, _("num: %s, term: %s" % (num, term)))
                 s = imagesearch(term, num)
                 if s == "No Images Found":
@@ -79,7 +80,45 @@ def google(bot, event, *args):
 
 
 def g(bot, event, *args):
-    google(bot, event, args)
+    try:
+        if args:
+            if not args[0] == '-i':
+                s = search(str(' '.join(args)))
+                if s == "Google couldn't find anything":
+                    msg = _(s)
+                else:
+                    msg = _('Google says:<br>**{}**<br>{}').format(s['title'], s['link'])
+                yield from bot.coro_send_message(event.conv, msg)
+            else:
+                if args[-1].isdigit():
+                    num = int(args[-1])
+                    term = ' '.join(args[1:-1])
+                    yield from bot.coro_send_message(event.conv, _("num: %s, term: %s" % (num, term)))
+                else:
+                    num = 1
+                    term =  ' '.join(args[1:])
+                    yield from bot.coro_send_message(event.conv, _("num: %s, term: %s" % (num, term)))
+                s = imagesearch(term, num)
+                if s == "No Images Found":
+                    msg = _(s)
+                    yield from bot.coro_send_message(event.conv, msg)
+                else:
+                    link_image = s
+                    filename = os.path.basename(link_image)
+                    r = yield from aiohttp.request('get', link_image)
+                    raw = yield from r.read()
+                    image_data = io.BytesIO(raw)
+
+                    image_id = yield from bot._client.upload_image(image_data, filename=filename)
+
+                    yield from bot.coro_send_message(event.conv.id_, None, image_id=image_id)               
+        else:
+            msg = _('What should I ask Google to answer?')
+            yield from bot.coro_send_message(event.conv, msg)
+    except:
+        tb = traceback.format_exc()
+        msg = _('{} -- {}').format(tb, event.text)
+        yield from bot.coro_send_message(CONTROL, msg)
     
 def lmgtfy(bot, event, *args):
     '''Returns an lmgtfy link from http://lmgtfy.com/ Format is /bot lmgtfy <what to google>'''
