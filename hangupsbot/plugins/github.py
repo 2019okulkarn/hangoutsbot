@@ -122,6 +122,7 @@ def source(bot, event, *args):
 def pull(bot, event, *args):
     try:
         g = git.cmd.Git(git_dir)
+        checkout = g.checkout("master")
         status = g.pull()
         msg = _('{}').format(status)
         yield from bot.coro_send_message(event.conv, msg)
