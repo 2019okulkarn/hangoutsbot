@@ -79,39 +79,8 @@ def google(bot, event, *args):
 
 
 def g(bot, event, *args):
-    try:
-        if args:
-            if not args[0] == '-i':
-                s = search(str(' '.join(args)))
-                if s == "Google couldn't find anything":
-                    msg = _(s)
-                else:
-                    msg = _('Google says:<br>**{}**<br>{}').format(s['title'], s['link'])
-                yield from bot.coro_send_message(event.conv, msg)
-            else:
-                term = ' '.join(args[1:])
-                s = imagesearch(term)
-                if s == "No Images Found":
-                    msg = _(s)
-                    yield from bot.coro_send_message(event.conv, msg)
-                else:
-                    link_image = s
-                    filename = os.path.basename(link_image)
-                    r = yield from aiohttp.request('get', link_image)
-                    raw = yield from r.read()
-                    image_data = io.BytesIO(raw)
-
-                    image_id = yield from bot._client.upload_image(image_data, filename=filename)
-
-                    yield from bot.coro_send_message(event.conv.id_, None, image_id=image_id)               
-        else:
-            msg = _('What should I ask Google to answer?')
-            yield from bot.coro_send_message(event.conv, msg)
-    except:
-        tb = traceback.format_exc()
-        msg = _('{} -- {}').format(tb, event.text)
-        yield from bot.coro_send_message(CONTROL, msg)
-        yield from bot.coro_send_message(event.conv, _('An Error Occured'))
+    google(bot, event, args)
+    
 def lmgtfy(bot, event, *args):
     '''Returns an lmgtfy link from http://lmgtfy.com/ Format is /bot lmgtfy <what to google>'''
     try:
