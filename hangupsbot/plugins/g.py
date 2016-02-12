@@ -50,7 +50,7 @@ def google(bot, event, *args):
                     num = args[-1]
                     term = ' '.join(args[:-1])
                     yield from bot.coro_send_message(event.conv, "num: %s, term: %s" % (num, term))
-                else
+                else:
                     num = 0
                     term =  ' '.join(args[1:])
                     yield from bot.coro_send_message(event.conv, "num: %s, term: %s" % (num, term))
