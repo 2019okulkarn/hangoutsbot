@@ -52,7 +52,7 @@ def google(bot, event, *args):
                     yield from bot.coro_send_message(event.conv, _("num: %s, term: %s" % (num, term)))
                 else:
                     num = 0
-                    term =  ' '.join(args[1:])
+                    term =  ' '.join(args[1:-1])
                     yield from bot.coro_send_message(event.conv, _("num: %s, term: %s" % (num, term)))
                 s = imagesearch(term, num)
                 if s == "No Images Found":
