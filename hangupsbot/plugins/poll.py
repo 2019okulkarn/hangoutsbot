@@ -40,7 +40,7 @@ def vote(bot, event, *args):
     try:
         spl = ' '.join(args).split(' - ')
         if len(spl) == 2:  
-            vote = spl[0]
+            vote = str(spl[0]).lower()
             poll = spl[1]
             path = bot.memory.get_by_path(['polls', poll])
             path[event.user.first_name] = vote
