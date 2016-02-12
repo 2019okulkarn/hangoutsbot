@@ -32,7 +32,7 @@ def imagesearch(term, num=0):
     if 'items' not in data:
         return 'No Images Found'
     else:
-        link = data['items'][0]['pagemap']['cse_image'][0]['src']
+        link = data['items'][0]['pagemap']['cse_image'][1]['src']
         return link
 
 def google(bot, event, *args):
@@ -49,11 +49,11 @@ def google(bot, event, *args):
                 if args[-1].isdigit():
                     num = args[-1]
                     term = ' '.join(args[:-1])
-                    yield from bot.coro_send_message(event.conv, "num: %s, term: %s" % (num, term))
+                    yield from bot.coro_send_message(event.conv, _("num: %s, term: %s" % (num, term)))
                 else:
                     num = 0
                     term =  ' '.join(args[1:])
-                    yield from bot.coro_send_message(event.conv, "num: %s, term: %s" % (num, term))
+                    yield from bot.coro_send_message(event.conv, _("num: %s, term: %s" % (num, term)))
                 s = imagesearch(term, num)
                 if s == "No Images Found":
                     msg = _(s)
