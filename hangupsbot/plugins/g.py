@@ -26,7 +26,7 @@ def search(term):
             'link': link
         }
 
-def imagesearch(term):
+def imagesearch(term, num=0):
     r = get('https://www.googleapis.com/customsearch/v1', params={'key': gapi, 'cx': image, 'q': term, 'defaultToImageSearch': 'True'})
     data = json.loads(r.text)
     if 'items' not in data:
@@ -46,8 +46,15 @@ def google(bot, event, *args):
                     msg = _('Google says:<br>**{}**<br>{}').format(s['title'], s['link'])
                 yield from bot.coro_send_message(event.conv, msg)
             else:
-                term = ' '.join(args[1:])
-                s = imagesearch(term)
+                if args[-1].isdigit():
+                    num = args[-1]
+                    term = ' '.join(args[:-1])
+                    yield from bot.coro_send_message(event.conv, "num: %s, term: %s" % (num, term))
+                else
+                    num = 0
+                    term =  ' '.join(args[1:])
+                    yield from bot.coro_send_message(event.conv, "num: %s, term: %s" % (num, term))
+                s = imagesearch(term, num)
                 if s == "No Images Found":
                     msg = _(s)
                     yield from bot.coro_send_message(event.conv, msg)
