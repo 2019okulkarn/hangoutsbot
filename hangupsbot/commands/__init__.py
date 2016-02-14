@@ -1,4 +1,6 @@
-import asyncio, logging, time
+import asyncio
+import logging
+import time
 
 import plugins
 
@@ -8,6 +10,7 @@ logger = logging.getLogger(__name__)
 
 class CommandDispatcher(object):
     """Register commands and run them"""
+
     def __init__(self):
         self.bot = None
         self.commands = {}
@@ -25,7 +28,8 @@ class CommandDispatcher(object):
         self.tracking = tracking
 
     def get_admin_commands(self, bot, conv_id):
-        logger.warning("[DEPRECATED] command.get_admin_commands(), use command.get_available_commands() instead")
+        logger.warning(
+            "[DEPRECATED] command.get_admin_commands(), use command.get_available_commands() instead")
         """Get list of admin-only commands (set by plugins or in config.json)
         list of commands is determined via one of two methods:
             default mode allows individual plugins to make the determination for admin and user
@@ -34,14 +38,15 @@ class CommandDispatcher(object):
               commands which are explicitly defined in this config key to be executed by users.
               note: overriding default behaviour makes all commands admin-only by default
         """
-        whitelisted_commands = bot.get_config_suboption(conv_id, 'commands_user') or []
+        whitelisted_commands = bot.get_config_suboption(
+            conv_id, 'commands_user') or []
         if whitelisted_commands:
             admin_command_list = self.commands.keys() - whitelisted_commands
         else:
-            commands_admin = bot.get_config_suboption(conv_id, 'commands_admin') or []
+            commands_admin = bot.get_config_suboption(
+                conv_id, 'commands_admin') or []
             admin_command_list = commands_admin + self.admin_commands
         return list(set(admin_command_list))
-
 
     def register_tags(self, command, tagsets):
         if command not in self.command_tagsets:
@@ -52,15 +57,16 @@ class CommandDispatcher(object):
 
         self.command_tagsets[command] = self.command_tagsets[command] | tagsets
 
-
     @property
     def deny_prefix(self):
-        config_tags_deny_prefix = self.bot.get_config_option('commands.tags.deny-prefix') or "!"
+        config_tags_deny_prefix = self.bot.get_config_option(
+            'commands.tags.deny-prefix') or "!"
         return config_tags_deny_prefix
 
     @property
     def escalate_tagged(self):
-        config_tags_escalate = self.bot.get_config_option('commands.tags.escalate') or False
+        config_tags_escalate = self.bot.get_config_option(
+            'commands.tags.escalate') or False
         return config_tags_escalate
 
     def get_available_commands(self, bot, chat_id, conv_id):
@@ -74,13 +80,16 @@ class CommandDispatcher(object):
         if chat_id in config_admins:
             is_admin = True
 
-        commands_admin = bot.get_config_suboption(conv_id, 'commands_admin') or []
-        commands_user = bot.get_config_suboption(conv_id, 'commands_user') or []
-        commands_tagged = bot.get_config_suboption(conv_id, 'commands_tagged') or {}
+        commands_admin = bot.get_config_suboption(
+            conv_id, 'commands_admin') or []
+        commands_user = bot.get_config_suboption(
+            conv_id, 'commands_user') or []
+        commands_tagged = bot.get_config_suboption(
+            conv_id, 'commands_tagged') or {}
 
         # convert commands_tagged tag list into a set of (frozen)sets
-        commands_tagged = { key: set([ frozenset(value if isinstance(value, list) else [value])
-            for value in values ]) for key, values in commands_tagged.items() }
+        commands_tagged = {key: set([frozenset(value if isinstance(value, list) else [value])
+                                     for value in values]) for key, values in commands_tagged.items()}
         # combine any plugin-determined tags with the config.json defined ones
         if self.command_tagsets:
             for command, tagsets in self.command_tagsets.items():
@@ -120,7 +129,8 @@ class CommandDispatcher(object):
 
             for command, tags in commands_tagged.items():
                 if command not in all_commands:
-                    # optimisation: don't check commands that aren't loaded into framework
+                    # optimisation: don't check commands that aren't loaded
+                    # into framework
                     continue
 
                 # raise tagged command access level if escalation required
@@ -129,10 +139,12 @@ class CommandDispatcher(object):
 
                 # is tagged command generally available (in user_commands)?
                 # admins always get access, other users need appropriate tag(s)
-                # XXX: optimisation: check admin_commands to avoid unnecessary scanning
-                if command not in user_commands|admin_commands:
+                # XXX: optimisation: check admin_commands to avoid unnecessary
+                # scanning
+                if command not in user_commands | admin_commands:
                     for _match in tags:
-                        _set_allow = set([_match] if isinstance(_match, str) else _match)
+                        _set_allow = set([_match] if isinstance(
+                            _match, str) else _match)
                         if is_admin or _set_allow <= _set_user_tags:
                             admin_commands.update([command])
                             break
@@ -140,24 +152,26 @@ class CommandDispatcher(object):
             if not is_admin:
                 # tagged commands can be explicitly denied
                 _denied = set()
-                for command in user_commands|admin_commands:
+                for command in user_commands | admin_commands:
                     if command in commands_tagged:
                         tags = commands_tagged[command]
                         for _match in tags:
-                            _set_allow = set([_match] if isinstance(_match, str) else _match)
-                            _set_deny = { config_tags_deny_prefix + x for x in _set_allow }
+                            _set_allow = set([_match] if isinstance(
+                                _match, str) else _match)
+                            _set_deny = {
+                                config_tags_deny_prefix + x for x in _set_allow}
                             if _set_deny <= _set_user_tags:
                                 _denied.update([command])
                                 break
                 admin_commands = admin_commands - _denied
                 user_commands = user_commands - _denied
 
-        user_commands = user_commands - admin_commands # ensure no overlap
+        user_commands = user_commands - admin_commands  # ensure no overlap
 
         interval = time.time() - start_time
         logger.debug("get_available_commands() - {}".format(interval))
 
-        return { "admin": list(admin_commands), "user": list(user_commands) }
+        return {"admin": list(admin_commands), "user": list(user_commands)}
 
     @asyncio.coroutine
     def run(self, bot, event, *args, **kwds):
@@ -183,7 +197,7 @@ class CommandDispatcher(object):
             yield from self.bot.coro_send_message(
                 event.conv,
                 "<b><pre>{0}</pre></b> <pre>{1}</pre>: <em><pre>{2}</pre></em>".format(
-                    func.__name__, type(e).__name__, str(e)) )
+                    func.__name__, type(e).__name__, str(e)))
 
     def register(self, *args, admin=False, tags=None, final=False):
         """Decorator for registering command"""
@@ -200,9 +214,9 @@ class CommandDispatcher(object):
 
             else:
                 # just register and return the same function
-                plugins.tracking.register_command( "admin" if admin else "user",
-                                                   [func_name],
-                                                   tags=tags )
+                plugins.tracking.register_command("admin" if admin else "user",
+                                                  [func_name],
+                                                  tags=tags)
 
             return func
 

@@ -6,7 +6,8 @@ import plugins
 
 
 def _initialise(bot):
-    plugins.register_admin_command(["rememberme", "whatme", "forgetme", "rememberchat", "whatchat", "forgetchat"])
+    plugins.register_admin_command(
+        ["rememberme", "whatme", "forgetme", "rememberchat", "whatchat", "forgetchat"])
 
 
 def rememberme(bot, event, *args):
@@ -16,7 +17,8 @@ def rememberme(bot, event, *args):
 
     text = bot.user_memory_get(event.user.id_.chat_id, 'test_memory')
     if text is None:
-        bot.user_memory_set(event.user.id_.chat_id, 'test_memory', ' '.join(args))
+        bot.user_memory_set(event.user.id_.chat_id,
+                            'test_memory', ' '.join(args))
         yield from bot.coro_send_message(
             event.conv,
             _("<b>{}</b>, remembered!").format(
@@ -63,6 +65,7 @@ def forgetme(bot, event, *args):
 
 """conversation memory"""
 
+
 def rememberchat(bot, event, *args):
     """remember value for current conversation, memory must be empty.
     use /bot forgetchat to clear previous storage
@@ -70,7 +73,8 @@ def rememberchat(bot, event, *args):
 
     text = bot.conversation_memory_get(event.conv_id, 'test_memory')
     if text is None:
-        bot.conversation_memory_set(event.conv_id, 'test_memory', ' '.join(args))
+        bot.conversation_memory_set(
+            event.conv_id, 'test_memory', ' '.join(args))
         yield from bot.coro_send_message(
             event.conv,
             _("<b>{}</b>, remembered for this conversation").format(

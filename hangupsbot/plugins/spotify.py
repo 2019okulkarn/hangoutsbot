@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 
 
 class SpotifyTrack:
+
     def __init__(self, track_id, track_name, track_artist):
         self.id = track_id
         self.name = track_name
@@ -33,6 +34,7 @@ class SpotifyTrack:
 
 
 class SpotifyPlaylist:
+
     def __init__(self, playlist_owner, playlist_id, playlist_url):
         self.owner = playlist_owner
         self.id = playlist_id
@@ -59,15 +61,17 @@ def _watch_for_music_link(bot, event, command):
         return
 
     links = extract_music_links(event.text)
-    if not links: return
+    if not links:
+        return
 
     for link in links:
         logger.info("Music link: {}".format(link))
 
         if "spotify" in link:
-            sp = spotipy.Spotify() # track info doesn't require user auth
+            sp = spotipy.Spotify()  # track info doesn't require user auth
             tr = sp.track(link)
-            track = SpotifyTrack(tr["id"], tr["name"], tr["artists"][0]["name"])
+            track = SpotifyTrack(tr["id"], tr["name"], tr[
+                                 "artists"][0]["name"])
             success = add_to_playlist(bot, event, track)
         else:
             if "youtube" in link or "youtu.be" in link:
@@ -174,7 +178,8 @@ def search_spotify(query):
 
     gs = _clean(query)
     result = _search(gs)
-    if result: return result
+    if result:
+        return result
 
     # Discard hashtags and mentions.
     gs[:] = [" ".join(re.sub("(@[A-Za-z0-9]+)|(#[A-Za-z0-9]+)",
@@ -184,14 +189,16 @@ def search_spotify(query):
     for b in bl_following:
         gs[:] = [re.split(b, g, flags=re.IGNORECASE)[0] for g in gs]
     result = _search(gs)
-    if result: return result
+    if result:
+        return result
 
     # Discard certain words.
     for b in bl_remove:
         match = re.compile(re.escape(b), re.IGNORECASE)
         gs[:] = [match.sub("", g) for g in gs]
     result = _search(gs)
-    if result: return result
+    if result:
+        return result
 
     # Aggressively discard groups.
     gs[:] = [g for g in gs if not any(b in g.lower() for b in bl_contains)]
@@ -231,7 +238,7 @@ def _clean(query):
 
 def _search(groups):
     try:
-        sp = spotipy.Spotify() # search doesn't require user auth
+        sp = spotipy.Spotify()  # search doesn't require user auth
         query = " ".join(filter(None, groups))
         logger.info("Searching Spotify for '{}'".format(query))
         results = sp.search(query)
@@ -288,7 +295,8 @@ def chat_playlist(bot, event):
                                                "spotify_playlist_url")
     if not playlist_id:
         playlist_name = bot.conversations.get_name(event.conv_id)
-        if not playlist_name: playlist_name = event.conv_id
+        if not playlist_name:
+            playlist_name = event.conv_id
 
         playlist = spotify_client(bot).user_playlist_create(
             spotify_user, playlist_name)

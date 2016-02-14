@@ -8,26 +8,30 @@ from links import *
 from control import *
 from urllib.parse import quote as sanitize
 
+
 def _initialise():
     plugins.register_admin_command(['pull', 'issue', 'commit'])
-    plugins.register_user_command(['gh' , 'source'])
+    plugins.register_user_command(['gh', 'source'])
 
 # helpers
+
 
 def postissue(event, url, args):
     if str(args[0]).isdigit():
         try:
             i = getissue(int(args[0]))
-            msg = _('{} ({}) State: {}<br>{}').format(i["title"], i["number"], i["state"], i["link"])
+            msg = _('{} ({}) State: {}<br>{}').format(
+                i["title"], i["number"], i["state"], i["link"])
         except:
             msg = _('Invalid Issue Number')
     elif str(args[0]) == '--search':
         query = sanitize(' '.join(args[1:]))
         s = search(query)
-        msg = _('Total Results: {}<br>First Result: {} ({})<br>State: {}<br>{}').format(s['total'], s['title'], s['number'], s['state'], s['link'])
+        msg = _('Total Results: {}<br>First Result: {} ({})<br>State: {}<br>{}').format(
+            s['total'], s['title'], s['number'], s['state'], s['link'])
     else:
         session = requests.Session()
-        session.auth=(USERNAME, PASSWORD)
+        session.auth = (USERNAME, PASSWORD)
         # Create our issue
         text = ' '.join(args).split(' -d ')
         if len(text) == 2:
@@ -48,13 +52,15 @@ def postissue(event, url, args):
         else:
             msg = _('Could not create issue.<br>Response: {}').format(r.content)
     return msg
-    
+
+
 def getsource():
     url = 'https://github.com/2019okulkarn/sodabot'
     short = shorten(url)
     title = get_title(url)
     msg = _('** {} ** - {}').format(title, short)
     return msg
+
 
 def getopenissue(num, url):
     get = requests.get(url)
@@ -67,8 +73,10 @@ def getopenissue(num, url):
             "link": link,
             "number": number}
 
+
 def getissue(num):
-    issuesurl = 'https://api.github.com/repos/{}/{}/issues/{}'.format(REPO_OWNER, REPO_NAME, num)
+    issuesurl = 'https://api.github.com/repos/{}/{}/issues/{}'.format(
+        REPO_OWNER, REPO_NAME, num)
     get = requests.get(issuesurl)
     data = json.loads(get.text)
     link = shorten(str(data[u'html_url']))
@@ -79,8 +87,11 @@ def getissue(num):
             "link": link,
             "number": number,
             "state": state}
+
+
 def search(term):
-    searchurl = 'https://api.github.com/search/issues?q=user:{}+repo:{}+{}'.format(REPO_OWNER, REPO_NAME, term)
+    searchurl = 'https://api.github.com/search/issues?q=user:{}+repo:{}+{}'.format(
+        REPO_OWNER, REPO_NAME, term)
     g = requests.get(searchurl)
     data = json.loads(g.text)
     first = data[u'items'][0]
@@ -96,16 +107,20 @@ def search(term):
             "total": total}
 
 # begin commands
+
+
 def gh(bot, event, *args):
     '''Retrieves link to source code of bot. Format is /bot gh'''
     msg = getsource()
     yield from bot.coro_send_message(event.conv, msg)
 
+
 def source(bot, event, *args):
     try:
         '''Retrieves link to source code of bot. Format is /bot source [command]'''
         if len(args) == 1:
-            url = 'https://github.com/2019okulkarn/sodabot/tree/master/hangupsbot/plugins/' + args[0] + '.py'
+            url = 'https://github.com/2019okulkarn/sodabot/tree/master/hangupsbot/plugins/' + \
+                args[0] + '.py'
             link = shorten(url)
             title = get_title(url)
             msg = _('** {} ** - {}').format(title, link)
@@ -117,8 +132,10 @@ def source(bot, event, *args):
         simple = _('Oops! An Error Occurred')
         yield from bot.coro_send_message(event.conv, simple)
         yield from bot.coro_send_message(CONTROL, msg)
-    
+
 # admin only commands
+
+
 def pull(bot, event, *args):
     try:
         g = git.cmd.Git(git_dir)
@@ -129,11 +146,13 @@ def pull(bot, event, *args):
     except BaseException as e:
         msg = _('{} -- {}').format(str(e), event.text)
         yield from bot.coro_send_message(CONTROL, msg)
-        
+
+
 def commit(bot, event, *args):
     '''Get the latest commit on bot repo'''
     try:
-        url = 'https://api.github.com/repos/{}/{}/git/refs/heads/master'.format(REPO_OWNER, REPO_NAME)
+        url = 'https://api.github.com/repos/{}/{}/git/refs/heads/master'.format(
+            REPO_OWNER, REPO_NAME)
         get = requests.get(url)
         data = json.loads(get.text)
         commiturl = data[u'object'][u'url']
@@ -143,7 +162,8 @@ def commit(bot, event, *args):
         committer = str(commitdata[u'committer'][u'name'])
         date = str(commitdata[u'committer'][u'date'])
         message = str(commitdata[u'message'])
-        msg = _('The last commit was "{}" by {} at {}<br>{}').format(message, committer, date, link)
+        msg = _('The last commit was "{}" by {} at {}<br>{}').format(
+            message, committer, date, link)
         yield from bot.coro_send_message(event.conv, msg)
     except BaseException as e:
         msg = _('{} -- {}').format(e, event.text)
@@ -151,9 +171,11 @@ def commit(bot, event, *args):
         yield from bot.coro_send_message(event.conv, simple)
         yield from bot.coro_send_message(CONTROL, msg)
 
+
 def issue(bot, event, *args):
     '''Create an issue on github.com using the given parameters.'''
-    url = 'https://api.github.com/repos/{}/{}/issues'.format(REPO_OWNER, REPO_NAME)
+    url = 'https://api.github.com/repos/{}/{}/issues'.format(
+        REPO_OWNER, REPO_NAME)
     try:
         if args:
             msg = postissue(event, url, args)

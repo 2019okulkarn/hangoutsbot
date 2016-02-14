@@ -14,13 +14,15 @@ import plugins
 logger = logging.getLogger(__name__)
 _internal = {}
 
+
 def _initialize(bot):
     api_key = bot.get_config_option('forecast_api_key')
     if api_key:
         _internal['forecast_api_key'] = api_key
         plugins.register_user_command(['forecast'])
     else:
-        logger.info('not enabled, need forecast.io API key in config["forecast_api_key"]')
+        logger.info(
+            'not enabled, need forecast.io API key in config["forecast_api_key"]')
 
 
 def forecast(bot, event, *args):
@@ -96,7 +98,8 @@ def lookup_address(location):
             'address': results['formatted_address']
         }
     except (IndexError, KeyError):
-        logger.error('unable to parse address return data: %d: %s', resp.status_code, resp.json())
+        logger.error('unable to parse address return data: %d: %s',
+                     resp.status_code, resp.json())
         return None
 
 
@@ -120,10 +123,11 @@ def lookup_weather(coords):
         return _('<em>Unable to parse forecast data.</em>')
 
     unit = _internal.get('unit', 'F')
-    temperature = j['temperature'] if unit == 'F' else to_celsius(j['temperature'])
+    temperature = j['temperature'] if unit == 'F' else to_celsius(j[
+                                                                  'temperature'])
 
     return _('<em>In {}, it is currently {}, {:.0f}{} and {:.0f}% humidity.</em>').format(
-        coords['address'], j['summary'].lower(), round(temperature, 0), unit, j['humidity']*100)
+        coords['address'], j['summary'].lower(), round(temperature, 0), unit, j['humidity'] * 100)
 
 
 def to_celsius(f_temp):

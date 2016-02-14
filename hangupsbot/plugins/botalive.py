@@ -1,4 +1,7 @@
-import asyncio, datetime, logging, time
+import asyncio
+import datetime
+import logging
+import time
 
 import hangups
 
@@ -54,7 +57,8 @@ def _periodic_watermark_update(bot, config_botalive):
             admins = bot.get_config_option('admins')
             for admin in admins:
                 if bot.memory.exists(["user_data", admin, "1on1"]):
-                    conv_id = bot.memory.get_by_path(["user_data", admin, "1on1"])
+                    conv_id = bot.memory.get_by_path(
+                        ["user_data", admin, "1on1"])
                     watermarkUpdater.add(conv_id)
             yield from watermarkUpdater.start()
             last_run[0] = timestamp
@@ -82,7 +86,9 @@ class watermark_updater:
     busy = False
 
     _current_convid = False
-    _critical_errors = 0 # track repeated errors during asyncio.async call, resets when batch finished
+    # track repeated errors during asyncio.async call, resets when batch
+    # finished
+    _critical_errors = 0
 
     def __init__(self, bot):
         self.bot = bot
@@ -90,7 +96,6 @@ class watermark_updater:
     def add(self, conv_id):
         if conv_id not in self.queue:
             self.queue.append(conv_id)
-
 
     @asyncio.coroutine
     def start(self):
@@ -100,7 +105,6 @@ class watermark_updater:
         self.busy = True
 
         yield from self.update_next_conversation()
-
 
     @asyncio.coroutine
     def update_next_conversation(self):
@@ -120,8 +124,8 @@ class watermark_updater:
         self._current_convid = conv_id
 
         try:
-            yield from self.bot._client.updatewatermark( self._current_convid, 
-                                                         datetime.datetime.fromtimestamp(time.time()))
+            yield from self.bot._client.updatewatermark(self._current_convid,
+                                                        datetime.datetime.fromtimestamp(time.time()))
 
             if self._critical_errors > 0:
                 self._critical_errors = self._critical_errors - 1
@@ -130,11 +134,13 @@ class watermark_updater:
             self._critical_errors = self._critical_errors + 1
 
             if self._critical_errors > max(10, len(self.queue) * 2):
-                logger.error("critical error threshold reached, clearing queue")
+                logger.error(
+                    "critical error threshold reached, clearing queue")
                 self.queue = []
 
             else:
-                logger.exception("WATERMARK FAILED FOR {}".format(self._current_convid))
+                logger.exception(
+                    "WATERMARK FAILED FOR {}".format(self._current_convid))
                 self.add(self._current_convid)
 
                 yield from asyncio.sleep(1)

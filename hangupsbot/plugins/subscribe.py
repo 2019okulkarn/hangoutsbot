@@ -1,4 +1,6 @@
-import asyncio, logging, re
+import asyncio
+import logging
+import re
 
 import plugins
 
@@ -7,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 class __internal_vars():
+
     def __init__(self):
         """ Cache to keep track of what keywords are being watched. Listed by user_id """
         self.keywords = {}
@@ -33,7 +36,7 @@ def _handle_keyword(bot, event, command):
             for syncedroom in sync_room_list:
                 if event.conv_id not in syncedroom:
                     users_in_chat += bot.get_users_in_conversation(syncedroom)
-            users_in_chat = list(set(users_in_chat)) # make unique
+            users_in_chat = list(set(users_in_chat))  # make unique
 
     for user in users_in_chat:
         try:
@@ -54,7 +57,8 @@ def _populate_keywords(bot, event):
         for userchatid in bot.memory.get_option("user_data"):
             userkeywords = []
             if bot.memory.exists(["user_data", userchatid, "keywords"]):
-                userkeywords = bot.memory.get_by_path(["user_data", userchatid, "keywords"])
+                userkeywords = bot.memory.get_by_path(
+                    ["user_data", userchatid, "keywords"])
 
             if userkeywords:
                 _internal.keywords[userchatid] = userkeywords
@@ -67,7 +71,8 @@ def _send_notification(bot, event, phrase, user):
     """Alert a user that a keyword that they subscribed to has been used"""
 
     conversation_name = bot.conversations.get_name(event.conv)
-    logger.info("keyword '{}' in '{}' ({})".format(phrase, conversation_name, event.conv.id_))
+    logger.info("keyword '{}' in '{}' ({})".format(
+        phrase, conversation_name, event.conv.id_))
 
     """support for reprocessor
     override the source name by defining event._external_source"""
@@ -82,7 +87,7 @@ def _send_notification(bot, event, phrase, user):
             user_has_dnd = bot.call_shared("dnd.user_check", user.id_.chat_id)
         except KeyError:
             user_has_dnd = False
-        if not user_has_dnd: # shared dnd check
+        if not user_has_dnd:  # shared dnd check
             yield from bot.coro_send_message(
                 conv_1on1,
                 _("<b>{}</b> mentioned '{}' in <i>{}</i>:<br />{}").format(
@@ -90,11 +95,14 @@ def _send_notification(bot, event, phrase, user):
                     phrase,
                     conversation_name,
                     event.text))
-            logger.info("{} ({}) alerted via 1on1 ({})".format(user.full_name, user.id_.chat_id, conv_1on1.id_))
+            logger.info("{} ({}) alerted via 1on1 ({})".format(
+                user.full_name, user.id_.chat_id, conv_1on1.id_))
         else:
-            logger.info("{} ({}) has dnd".format(user.full_name, user.id_.chat_id))
+            logger.info("{} ({}) has dnd".format(
+                user.full_name, user.id_.chat_id))
     else:
-        logger.warning("user {} ({}) could not be alerted via 1on1".format(user.full_name, user.id_.chat_id))
+        logger.warning("user {} ({}) could not be alerted via 1on1".format(
+            user.full_name, user.id_.chat_id))
 
 
 def subscribe(bot, event, *args):
@@ -111,7 +119,7 @@ def subscribe(bot, event, *args):
 
     if not keyword:
         yield from bot.coro_send_message(
-            event.conv,_("Usage: /bot subscribe [keyword]"))
+            event.conv, _("Usage: /bot subscribe [keyword]"))
         if _internal.keywords[event.user.id_.chat_id]:
             yield from bot.coro_send_message(
                 event.conv,
@@ -122,7 +130,7 @@ def subscribe(bot, event, *args):
         if keyword in _internal.keywords[event.user.id_.chat_id]:
             # Duplicate!
             yield from bot.coro_send_message(
-                event.conv,_("Already subscribed to '{}'!").format(keyword))
+                event.conv, _("Already subscribed to '{}'!").format(keyword))
             return
         else:
             # Not a duplicate, proceeding
@@ -141,9 +149,9 @@ def subscribe(bot, event, *args):
             event.conv,
             _("Note: You will not be able to trigger your own subscriptions. To test, please ask somebody else to test this for you."))
 
-
     # Save to file
-    bot.memory.set_by_path(["user_data", event.user.id_.chat_id, "keywords"], _internal.keywords[event.user.id_.chat_id])
+    bot.memory.set_by_path(["user_data", event.user.id_.chat_id,
+                            "keywords"], _internal.keywords[event.user.id_.chat_id])
     bot.memory.save()
 
     yield from bot.coro_send_message(
@@ -159,16 +167,17 @@ def unsubscribe(bot, event, *args):
 
     if not keyword:
         yield from bot.coro_send_message(
-            event.conv,_("Unsubscribing all keywords"))
+            event.conv, _("Unsubscribing all keywords"))
         _internal.keywords[event.user.id_.chat_id] = []
     elif keyword in _internal.keywords[event.user.id_.chat_id]:
         yield from bot.coro_send_message(
-            event.conv,_("Unsubscribing from keyword '{}'").format(keyword))
+            event.conv, _("Unsubscribing from keyword '{}'").format(keyword))
         _internal.keywords[event.user.id_.chat_id].remove(keyword)
     else:
         yield from bot.coro_send_message(
-            event.conv,_("Error: keyword not found"))
+            event.conv, _("Error: keyword not found"))
 
     # Save to file
-    bot.memory.set_by_path(["user_data", event.user.id_.chat_id, "keywords"], _internal.keywords[event.user.id_.chat_id])
+    bot.memory.set_by_path(["user_data", event.user.id_.chat_id,
+                            "keywords"], _internal.keywords[event.user.id_.chat_id])
     bot.memory.save()

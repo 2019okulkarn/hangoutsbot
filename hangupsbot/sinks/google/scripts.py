@@ -1,4 +1,6 @@
-import asyncio, json, logging
+import asyncio
+import json
+import logging
 
 from sinks.base_bot_request_handler import AsyncRequestHandler
 
@@ -14,7 +16,8 @@ class webhookReceiver(AsyncRequestHandler):
         path = path.split("/")
         conv_or_user_id = path[1]
         if conv_or_user_id is None:
-            logger.error("conversation or user id must be provided as part of path")
+            logger.error(
+                "conversation or user id must be provided as part of path")
             return
 
         payload = content
@@ -30,7 +33,6 @@ class webhookReceiver(AsyncRequestHandler):
             return
 
         yield from self.send_actionable_message(conv_or_user_id, payload["message"])
-
 
     @asyncio.coroutine
     def send_actionable_message(self, id, content):

@@ -1,4 +1,8 @@
-import asyncio, re, logging, json, random
+import asyncio
+import re
+import logging
+import json
+import random
 
 import hangups
 
@@ -15,14 +19,17 @@ def _initialise(bot):
 
 
 def _handle_autoreply(bot, event, command):
-    config_autoreplies = bot.get_config_suboption(event.conv.id_, 'autoreplies_enabled')
-    tagged_autoreplies = "autoreplies-enable" in bot.tags.useractive(event.user_id.chat_id, event.conv.id_)
+    config_autoreplies = bot.get_config_suboption(
+        event.conv.id_, 'autoreplies_enabled')
+    tagged_autoreplies = "autoreplies-enable" in bot.tags.useractive(
+        event.user_id.chat_id, event.conv.id_)
 
     if not (config_autoreplies or tagged_autoreplies):
         return
 
     if "autoreplies-disable" in bot.tags.useractive(event.user_id.chat_id, event.conv.id_):
-        logger.debug("explicitly disabled by tag for {} {}".format(event.user_id.chat_id, event.conv.id_))
+        logger.debug("explicitly disabled by tag for {} {}".format(
+            event.user_id.chat_id, event.conv.id_))
         return
 
     """Handle autoreplies to keywords in messages"""
@@ -62,35 +69,36 @@ def _handle_autoreply(bot, event, command):
 
 @asyncio.coroutine
 def send_reply(bot, event, message):
-    values = { "event": event,
-               "conv_title": bot.conversations.get_name( event.conv,
-                                                         fallback_string=_("Unidentified Conversation") )}
+    values = {"event": event,
+              "conv_title": bot.conversations.get_name(event.conv,
+                                                       fallback_string=_("Unidentified Conversation"))}
 
     if "participant_ids" in dir(event.conv_event):
-        values["participants"] = [ event.conv.get_user(user_id)
-                                   for user_id in event.conv_event.participant_ids ]
-        values["participants_namelist"] = ", ".join([ u.full_name for u in values["participants"] ])
+        values["participants"] = [event.conv.get_user(user_id)
+                                  for user_id in event.conv_event.participant_ids]
+        values["participants_namelist"] = ", ".join(
+            [u.full_name for u in values["participants"]])
 
     envelopes = []
 
     if message.startswith(("ONE_TO_ONE:", "HOST_ONE_TO_ONE")):
-        message = message[message.index(":")+1:].strip()
+        message = message[message.index(":") + 1:].strip()
         target_conv = yield from bot.get_1to1(event.user.id_.chat_id)
         if not target_conv:
-            logger.error("1-to-1 unavailable for {} ({})".format( event.user.full_name,
-                                                                  event.user.id_.chat_id ))
+            logger.error("1-to-1 unavailable for {} ({})".format(event.user.full_name,
+                                                                 event.user.id_.chat_id))
             return False
         envelopes.append((target_conv, message.format(**values)))
 
     elif message.startswith("GUEST_ONE_TO_ONE:"):
-        message = message[message.index(":")+1:].strip()
+        message = message[message.index(":") + 1:].strip()
         for guest in values["participants"]:
             target_conv = yield from bot.get_1to1(guest.id_.chat_id)
             if not target_conv:
-                logger.error("1-to-1 unavailable for {} ({})".format( guest.full_name,
-                                                                      guest.id_.chat_id ))
+                logger.error("1-to-1 unavailable for {} ({})".format(guest.full_name,
+                                                                     guest.id_.chat_id))
                 return False
-            values["guest"] = guest # add the guest as extra info
+            values["guest"] = guest  # add the guest as extra info
             envelopes.append((target_conv, message.format(**values)))
 
     else:

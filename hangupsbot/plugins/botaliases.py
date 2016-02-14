@@ -72,7 +72,7 @@ def botalias(bot, event, *args):
 
                 bot._handlers.bot_command = _aliases
 
-            botalias(bot, event) # run with no arguments
+            botalias(bot, event)  # run with no arguments
         else:
             yield from bot.coro_send_message(
                 event.conv,

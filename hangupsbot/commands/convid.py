@@ -1,4 +1,5 @@
-import logging, shlex
+import logging
+import shlex
 
 import hangups
 
@@ -12,7 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 def _initialise(bot):
-    plugins.register_admin_command(["convecho", "convfilter", "convleave", "convrename", "convusers"])
+    plugins.register_admin_command(
+        ["convecho", "convfilter", "convleave", "convrename", "convusers"])
 
 
 def get_posix_args(rawargs):
@@ -29,20 +31,21 @@ def convfilter(bot, event, *args):
 
     if len(posix_args) > 1:
         yield from bot.coro_send_message(event.conv_id,
-            _("<em>1 parameter required, {} supplied - enclose parameter in double-quotes</em>").format(len(posix_args)))
+                                         _("<em>1 parameter required, {} supplied - enclose parameter in double-quotes</em>").format(len(posix_args)))
     elif len(posix_args) <= 0:
         yield from bot.coro_send_message(event.conv_id,
-            _("<em>supply 1 parameter</em>"))
+                                         _("<em>supply 1 parameter</em>"))
     else:
         lines = []
         for convid, convdata in bot.conversations.get(filter=posix_args[0]).items():
-            lines.append("`{}` <b>{}</b> ({})".format(convid, convdata["title"], len(convdata["participants"])))
+            lines.append("`{}` <b>{}</b> ({})".format(convid,
+                                                      convdata["title"], len(convdata["participants"])))
         lines.append(_('<b>Total: {}</b>').format(len(lines)))
         message = '<br />'.join(lines)
 
         yield from bot.coro_send_message(event.conv_id, message)
 
-        return { "api.response" : message }
+        return {"api.response": message}
 
 
 def convecho(bot, event, *args):
@@ -89,7 +92,8 @@ def convrename(bot, event, *args):
 
     if len(posix_args) > 1:
         if not posix_args[0].startswith(("id:", "text:")):
-            # always force explicit search for single conversation on vague user request
+            # always force explicit search for single conversation on vague
+            # user request
             posix_args[0] = "id:" + posix_args[0]
         convlist = bot.conversations.get(filter=posix_args[0])
         title = ' '.join(posix_args[1:])
@@ -112,15 +116,17 @@ def convusers(bot, event, *args):
     posix_args = get_posix_args(args)
 
     if len(posix_args) != 1:
-        message = _("<em>should be 1 parameter, {} supplied</em>".format(len(posix_args)))
+        message = _(
+            "<em>should be 1 parameter, {} supplied</em>".format(len(posix_args)))
     elif not posix_args[0]:
         """don't do it in all conversations - might crash hangups"""
         message = _("<em>retrieving ALL conversations blocked</em>")
     else:
-        chunks = [] # one "chunk" = info for 1 hangout
+        chunks = []  # one "chunk" = info for 1 hangout
         for convid, convdata in bot.conversations.get(filter=posix_args[0]).items():
             lines = []
-            lines.append('<b>{}</b>'.format(convdata["title"], len(convdata["participants"])))
+            lines.append(
+                '<b>{}</b>'.format(convdata["title"], len(convdata["participants"])))
             for chat_id in convdata["participants"]:
                 User = bot.get_hangups_user(chat_id)
                 # name and G+ link
@@ -128,17 +134,19 @@ def convusers(bot, event, *args):
                     User.id_.chat_id, User.full_name)
                 # email from hangups UserList (if available)
                 if User.emails:
-                    _line += '<br />... (<a href="mailto:{0}">{0}</a>)'.format(User.emails[0])
+                    _line += '<br />... (<a href="mailto:{0}">{0}</a>)'.format(
+                        User.emails[0])
                 # user id
-                _line += "<br />... {}".format(User.id_.chat_id) # user id
+                _line += "<br />... {}".format(User.id_.chat_id)  # user id
                 lines.append(_line)
-            lines.append(_('<b>Users: {}</b>').format(len(convdata["participants"])))
+            lines.append(
+                _('<b>Users: {}</b>').format(len(convdata["participants"])))
             chunks.append('<br />'.join(lines))
         message = '<br /><br />'.join(chunks)
 
     yield from bot.coro_send_message(event.conv_id, message)
 
-    return { "api.response" : message }
+    return {"api.response": message}
 
 
 def convleave(bot, event, *args):
@@ -149,14 +157,14 @@ def convleave(bot, event, *args):
         if not posix_args[0]:
             """block leaving ALL conversations"""
             yield from bot.coro_send_message(event.conv_id,
-                _("<em>cannot leave ALL conversations</em>"))
+                                             _("<em>cannot leave ALL conversations</em>"))
             return
         else:
             convlist = bot.conversations.get(filter=posix_args[0])
     else:
         """general error"""
         yield from bot.coro_send_message(event.conv_id,
-            _("<em>required parameters: convfilter</em>"))
+                                         _("<em>required parameters: convfilter</em>"))
         return
 
     for convid, convdata in convlist.items():
@@ -167,12 +175,15 @@ def convleave(bot, event, *args):
             try:
                 yield from bot._client.removeuser(convid)
                 if convid in bot._conv_list._conv_dict:
-                    # replicate hangups behaviour - remove conversation from internal dict
+                    # replicate hangups behaviour - remove conversation from
+                    # internal dict
                     del bot._conv_list._conv_dict[convid]
                 bot.conversations.remove(convid)
 
             except hangups.NetworkError as e:
-                logging.exception("CONVLEAVE: error leaving {} {}".format(convid, convdata["title"]))
+                logging.exception("CONVLEAVE: error leaving {} {}".format(
+                    convid, convdata["title"]))
 
         else:
-            logging.warning("CONVLEAVE: cannot leave {} {} {}".format(convdata["type"], convid, convdata["title"]))
+            logging.warning("CONVLEAVE: cannot leave {} {} {}".format(
+                convdata["type"], convid, convdata["title"]))

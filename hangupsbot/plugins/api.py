@@ -13,7 +13,11 @@ to be able to run admin commands externally
 
 More info: https://github.com/hangoutsbot/hangoutsbot/wiki/API-Plugin
 """
-import asyncio, functools, json, logging, time
+import asyncio
+import functools
+import json
+import logging
+import time
 
 from urllib.parse import unquote
 
@@ -51,7 +55,8 @@ def handle_as_command(bot, event, id):
         event.acknowledge = []
 
     handle_response = functools.partial(response_received, original_id=id)
-    event.acknowledge.append(bot._handlers.register_reprocessor(handle_response))
+    event.acknowledge.append(
+        bot._handlers.register_reprocessor(handle_response))
 
 
 def _start_api(bot):
@@ -65,37 +70,41 @@ def _start_api(bot):
             try:
                 certfile = sinkConfig["certfile"]
                 if not certfile:
-                    logger.error("config.api[{}].certfile must be configured".format(itemNo))
+                    logger.error(
+                        "config.api[{}].certfile must be configured".format(itemNo))
                     continue
                 name = sinkConfig["name"]
                 port = sinkConfig["port"]
             except KeyError as e:
-                logger.error("config.api[{}] missing keyword".format(itemNo), e)
+                logger.error(
+                    "config.api[{}] missing keyword".format(itemNo), e)
                 continue
 
-            aiohttp_start(bot, name, port, certfile, APIRequestHandler, group=__name__)
+            aiohttp_start(bot, name, port, certfile,
+                          APIRequestHandler, group=__name__)
 
 
 class APIRequestHandler(AsyncRequestHandler):
+
     def addroutes(self, router):
         router.add_route("POST", "/", self.adapter_do_POST)
-        router.add_route('GET', '/{api_key}/{id}/{message:.*?}', self.adapter_do_GET)
-
+        router.add_route(
+            'GET', '/{api_key}/{id}/{message:.*?}', self.adapter_do_GET)
 
     @asyncio.coroutine
     def adapter_do_GET(self, request):
-        payload = { "sendto": request.match_info["id"],
-                    "key": request.match_info["api_key"],
-                    "content": unquote(request.match_info["message"]) }
+        payload = {"sendto": request.match_info["id"],
+                   "key": request.match_info["api_key"],
+                   "content": unquote(request.match_info["message"])}
 
-        results = yield from self.process_request( '', # IGNORED
-                                                   '', # IGNORED
-                                                   payload )
+        results = yield from self.process_request('',  # IGNORED
+                                                  '',  # IGNORED
+                                                  payload)
         if results:
-            content_type="text/html"
+            content_type = "text/html"
             results = results.encode("ascii", "xmlcharrefreplace")
         else:
-            content_type="text/plain"
+            content_type = "text/plain"
             results = "OK".encode('utf-8')
 
         return web.Response(body=results, content_type=content_type)
@@ -105,9 +114,11 @@ class APIRequestHandler(AsyncRequestHandler):
         # XXX: bit hacky due to different routes...
         payload = content
         if isinstance(payload, str):
-            # XXX: POST - payload in incoming request BODY (and not yet parsed, do it here)
+            # XXX: POST - payload in incoming request BODY (and not yet parsed,
+            # do it here)
             payload = json.loads(payload)
-        # XXX: else GET - everything in query string (already parsed before it got here)
+        # XXX: else GET - everything in query string (already parsed before it
+        # got here)
 
         api_key = self._bot.get_config_option("api_key")
 
@@ -121,8 +132,8 @@ class APIRequestHandler(AsyncRequestHandler):
     @asyncio.coroutine
     def send_actionable_message(self, id, content):
         """reprocessor: allow message to be intepreted as a command"""
-        reprocessor_context = self._bot._handlers.attach_reprocessor( handle_as_command,
-                                                                      return_as_dict=True )
+        reprocessor_context = self._bot._handlers.attach_reprocessor(handle_as_command,
+                                                                     return_as_dict=True)
         content = content + reprocessor_context["fragment"]
         reprocessor_id = reprocessor_context["id"]
 

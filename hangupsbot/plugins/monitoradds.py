@@ -39,7 +39,8 @@ def _watch_new_adds(bot, event, command):
 
         config_mods = bot.get_config_suboption(event.conv_id, 'mods') or []
         tagged_mods = list(bot.tags.userlist(event.conv_id, "mod").keys())
-        tagged_botkeeper = list(bot.tags.userlist(event.conv_id, "botkeeper").keys())
+        tagged_botkeeper = list(bot.tags.userlist(
+            event.conv_id, "botkeeper").keys())
 
         mods_list = config_mods + tagged_mods + tagged_botkeeper
         try:
@@ -58,6 +59,7 @@ def _watch_new_adds(bot, event, command):
 
         yield from bot.coro_send_message(event.conv, html)
 
+
 def addmod(bot, event, *args):
     """add user id(s) to the whitelist of who can add to a hangout"""
     mod_ids = list(args)
@@ -73,6 +75,7 @@ def addmod(bot, event, *args):
         bot.config.save()
         html_message = _("<i>Moderators updated: {} added</i>")
         yield from bot.coro_send_message(event.conv, html_message.format(args[0]))
+
 
 def delmod(bot, event, *args):
     """remove user id(s) from the whitelist of who can add to a hangout"""

@@ -3,8 +3,10 @@ from urllib.parse import quote_plus
 import plugins
 from apikeys import mashape
 
+
 def _initialise():
     plugins.register_user_command(["yoda"])
+
 
 def yoda(bot, event, *args):
     '''Converts message to yoda speak. Format is /bot yoda <message>'''
@@ -15,6 +17,7 @@ def yoda(bot, event, *args):
     else:
         msg = _("What should yoda say?")
     yield from bot.coro_send_message(event.conv, msg)
+
 
 def convert(input):
     sentence = quote_plus(input)

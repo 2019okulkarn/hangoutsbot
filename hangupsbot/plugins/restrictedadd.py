@@ -1,4 +1,6 @@
-import asyncio, logging, time
+import asyncio
+import logging
+import time
 
 import hangups
 
@@ -9,6 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class __internal_vars():
+
     def __init__(self):
         self.last_verified = {}
 
@@ -41,7 +44,7 @@ def _botkeeper_list(bot, conv_id):
 
     botkeepers = tagged_botkeeper + admins_list + allowbotadd
 
-    botkeepers = list(set(botkeepers) - set([ bot.user_self()["chat_id"] ]))
+    botkeepers = list(set(botkeepers) - set([bot.user_self()["chat_id"]]))
 
     return botkeepers
 
@@ -77,7 +80,8 @@ def _verify_botkeeper_presence(bot, event, command):
         if bot.conversations.catalog[event.conv_id]["type"] != "GROUP":
             return
     except KeyError:
-        logger.warning("{} not found in permanent memory, skipping temporarily")
+        logger.warning(
+            "{} not found in permanent memory, skipping temporarily")
         return
 
     try:
@@ -94,7 +98,8 @@ def _verify_botkeeper_presence(bot, event, command):
 
     for user in event.conv.users:
         if user.id_.chat_id in botkeeper_list:
-            logger.debug("botkeeper found for {}: {}".format(event.conv_id, user.id_.chat_id))
+            logger.debug("botkeeper found for {}: {}".format(
+                event.conv_id, user.id_.chat_id))
             botkeeper = True
             break
 
@@ -133,7 +138,7 @@ def allowbotadd(bot, event, user_id, *args):
     bot.memory["allowbotadd"] = allowbotadd
     bot.memory.save()
 
-    _internal.last_verified = {} # force checks everywhere
+    _internal.last_verified = {}  # force checks everywhere
 
 
 def removebotadd(bot, event, user_id, *args):
@@ -156,7 +161,7 @@ def removebotadd(bot, event, user_id, *args):
         bot.memory["allowbotadd"] = allowbotadd
         bot.memory.save()
 
-        _internal.last_verified = {} # force checks everywhere
+        _internal.last_verified = {}  # force checks everywhere
     else:
         yield from bot.coro_send_message(
             event.conv,

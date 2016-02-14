@@ -1,4 +1,6 @@
-import logging, sys, resource
+import logging
+import sys
+import resource
 
 import plugins
 
@@ -9,7 +11,7 @@ from commands import command
 logger = logging.getLogger(__name__)
 
 
-def _initialise(bot): pass # prevents commands from being automatically added
+def _initialise(bot): pass  # prevents commands from being automatically added
 
 
 @command.register
@@ -25,7 +27,7 @@ def help(bot, event, cmd=None, *args):
     commands_admin = commands["admin"]
     commands_nonadmin = commands["user"]
 
-    if not cmd or (cmd=="impersonate" and event.user.id_.chat_id in admins_list):
+    if not cmd or (cmd == "impersonate" and event.user.id_.chat_id in admins_list):
 
         if cmd == "impersonate":
             if len(args) == 1:
@@ -33,12 +35,13 @@ def help(bot, event, cmd=None, *args):
             elif len(args) == 2:
                 [help_chat_id, help_conv_id] = args
             else:
-                raise ValueError("impersonation: supply chat id and optional conversation id")
+                raise ValueError(
+                    "impersonation: supply chat id and optional conversation id")
 
             help_lines.append(_('<b>Impersonation:</b><br />'
                                 '<b><pre>{}</pre></b><br />'
-                                '<b><pre>{}</pre></b><br />').format( help_chat_id,
-                                                                      help_conv_id ))
+                                '<b><pre>{}</pre></b><br />').format(help_chat_id,
+                                                                     help_conv_id))
 
         if len(commands_nonadmin) > 0:
             help_lines.append(_('<b>User commands:</b>'))
@@ -46,7 +49,8 @@ def help(bot, event, cmd=None, *args):
 
         if link_to_guide:
             help_lines.append('')
-            help_lines.append(_('<i>For more information, please see: {}</i>').format(link_to_guide))
+            help_lines.append(
+                _('<i>For more information, please see: {}</i>').format(link_to_guide))
 
         if len(commands_admin) > 0:
             help_lines.append('')
@@ -61,21 +65,22 @@ def help(bot, event, cmd=None, *args):
             yield from command.unknown_command(bot, event)
             return
 
-        help_lines.append("<b>{}</b>: {}".format(command_fn.__name__, command_fn.__doc__))
+        help_lines.append(
+            "<b>{}</b>: {}".format(command_fn.__name__, command_fn.__doc__))
 
     yield from bot.coro_send_to_user_and_conversation(
         event.user.id_.chat_id,
         event.conv_id,
-        "<br />".join(help_lines), # via private message
-        _("<i>{}, I've sent you some help ;)</i>") # public message
-            .format(event.user.full_name))
+        "<br />".join(help_lines),  # via private message
+        _("<i>{}, I've sent you some help ;)</i>")  # public message
+        .format(event.user.full_name))
 
 
 @command.register(admin=True)
 def locale(bot, event, *args):
     """set bot localisation"""
     if len(args) > 0:
-        if bot.set_locale(args[0], reuse = (False if "reload" in args else True)):
+        if bot.set_locale(args[0], reuse=(False if "reload" in args else True)):
             message = _("locale set to: {}".format(args[0]))
         else:
             message = _("locale unchanged")
@@ -90,7 +95,7 @@ def ping(bot, event, *args):
     """reply to a ping"""
     yield from bot.coro_send_message(event.conv, 'pong')
 
-    return { "api.response": "pong" }
+    return {"api.response": "pong"}
 
 
 @command.register
@@ -107,9 +112,11 @@ def optout(bot, event, *args):
     bot.memory.save()
 
     if optout:
-        message = _('<i>{}, you <b>opted-out</b> from bot private messages</i>').format(event.user.full_name)
+        message = _(
+            '<i>{}, you <b>opted-out</b> from bot private messages</i>').format(event.user.full_name)
     else:
-        message = _('<i>{}, you <b>opted-in</b> for bot private messages</i>').format(event.user.full_name)
+        message = _(
+            '<i>{}, you <b>opted-in</b> for bot private messages</i>').format(event.user.full_name)
 
     yield from bot.coro_send_message(event.conv, message)
 
@@ -139,19 +146,21 @@ def resourcememory(bot, event, *args):
 def unknown_command(bot, event, *args):
     """handle unknown commands"""
     config_silent = bot.get_config_suboption(event.conv.id_, 'silentmode')
-    tagged_silent = "silent" in bot.tags.useractive(event.user_id.chat_id, event.conv.id_)
+    tagged_silent = "silent" in bot.tags.useractive(
+        event.user_id.chat_id, event.conv.id_)
     if not (config_silent or tagged_silent):
 
-        yield from bot.coro_send_message( event.conv,
-                                      _('{}: Unknown Command').format(event.user.full_name) )
+        yield from bot.coro_send_message(event.conv,
+                                         _('{}: Unknown Command').format(event.user.full_name))
 
 
 @command.register_blocked
 def blocked_command(bot, event, *args):
     """handle blocked commands"""
     config_silent = bot.get_config_suboption(event.conv.id_, 'silentmode')
-    tagged_silent = "silent" in bot.tags.useractive(event.user_id.chat_id, event.conv.id_)
+    tagged_silent = "silent" in bot.tags.useractive(
+        event.user_id.chat_id, event.conv.id_)
     if not (config_silent or tagged_silent):
-        
+
         yield from bot.coro_send_message(event.conv, _('{}: Can\'t do that.').format(
-        event.user.full_name))
+            event.user.full_name))

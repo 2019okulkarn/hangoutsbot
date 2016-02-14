@@ -1,4 +1,6 @@
-import re, json, logging
+import re
+import json
+import logging
 
 import hangups
 
@@ -8,8 +10,10 @@ from utils import *
 
 from commands import command
 
+
 def _initialise():
     plugins.register_user_command(["rage"])
+
 
 def rage(bot, event, *args):
     '''Rages at something. Format is /bot rage <something>'''

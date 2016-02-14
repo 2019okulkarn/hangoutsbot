@@ -4,6 +4,7 @@ import re
 from lxml.html import document_fromstring
 from requests import exceptions, get, post
 
+
 def shorten(url):
     try:
         response = get('http://tinyurl.com/api-create.php?url=' + url)
@@ -12,7 +13,9 @@ def shorten(url):
         error = "Could not create shortened link"
         return error
 
-#Code for get_title is borrowed from http://github.com/tjcsl/cslbot/
+# Code for get_title is borrowed from http://github.com/tjcsl/cslbot/
+
+
 def get_title(url):
     title = 'No Title Found'
     # User-Agent is really hard to get right :(
@@ -28,19 +31,19 @@ def get_title(url):
         t = html.find('.//title')
         # FIXME: is there a cleaner way to do this?
         if t is not None and t.text is not None:
-        # Try to handle multiple types of unicode.
+            # Try to handle multiple types of unicode.
             try:
                 title = bytes(map(ord, t.text)).decode('utf-8')
             except (UnicodeDecodeError, ValueError):
                 title = t.text
                 title = ' '.join(title.splitlines()).strip()
-        # If we have no <title> element, but we have a Content-Type, fall back to that
+        # If we have no <title> element, but we have a Content-Type, fall back
+        # to that
         elif ctype is not None:
             title = ctype
         else:
             title = "Title Not Found"
     return title
-
 
 
 def lengthen(url):

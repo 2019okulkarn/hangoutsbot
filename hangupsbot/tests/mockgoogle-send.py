@@ -17,8 +17,10 @@ import json
 import requests
 from datetime import datetime
 
-payload = {"message" : "HELLO FROM **NOT** GOOGLE!!! DATE AND TIME:" + str(datetime.now())}
+payload = {
+    "message": "HELLO FROM **NOT** GOOGLE!!! DATE AND TIME:" + str(datetime.now())}
 headers = {'content-type': 'application/json'}
-r = requests.post(args.url, data = json.dumps(payload), headers = headers, verify=False)
+r = requests.post(args.url, data=json.dumps(
+    payload), headers=headers, verify=False)
 
 print(r)

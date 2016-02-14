@@ -19,7 +19,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument("url", help="url to send the data")
 parser.add_argument("target", help="target conversation id")
 parser.add_argument("apikey", help="api key from config.apikey")
-parser.add_argument("content", help="content to send, quote if it contains spaces")
+parser.add_argument(
+    "content", help="content to send, quote if it contains spaces")
 args = parser.parse_args()
 
 import json
@@ -32,7 +33,8 @@ payload = {
 }
 
 headers = {'content-type': 'application/json'}
-r = requests.post(args.url, data = json.dumps(payload), headers = headers, verify=False)
+r = requests.post(args.url, data=json.dumps(
+    payload), headers=headers, verify=False)
 
 print(r.text)
 print(r)

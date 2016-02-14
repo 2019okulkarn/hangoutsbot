@@ -4,12 +4,13 @@ from requests import get
 from control import *
 from bs4 import BeautifulSoup
 
+
 def _initialise():
     plugins.register_user_command(['fcps', 'lcps'])
 
 
 def lcps(bot, event, *args):
-    '''This command checks for school closings in the Loudon County Public Schools area. Data taken from NBC.'''    
+    '''This command checks for school closings in the Loudon County Public Schools area. Data taken from NBC.'''
     try:
         r = get('http://www.nbcwashington.com/weather/school-closings/')
         html = r.text
@@ -29,6 +30,7 @@ def lcps(bot, event, *args):
         msg = _('{} -- {}').format(str(e), event.text)
         yield from bot.coro_send_message(event.conv, simple)
         yield from bot.coro_send_message(CONTROL, msg)
+
 
 def fcps(bot, event, *args):
     '''This command checks for closings in the Fairfax County Public Schools Area. Data taken from TJHSST.'''

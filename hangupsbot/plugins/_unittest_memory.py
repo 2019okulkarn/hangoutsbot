@@ -5,7 +5,8 @@ all these commands work on memory.json
 * retrieving and setting taint status of memory
 """
 
-import logging, time
+import logging
+import time
 
 import plugins
 
@@ -58,7 +59,7 @@ def memorystatus(bot, event, *args):
 
 
 def memorysave(bot, event, *args):
-    bot.memory.save() 
+    bot.memory.save()
 
 
 def submemoryinit(bot, event, *args):
@@ -76,7 +77,8 @@ def submemoryset(bot, event, *args):
 
 
 def submemoryget(bot, event, *args):
-    logger.info("submemoryget: {}".format(bot.memory["unittest-submemory"]["timestamp"]))
+    logger.info("submemoryget: {}".format(
+        bot.memory["unittest-submemory"]["timestamp"]))
 
 
 def submemorypop(bot, event, *args):

@@ -11,7 +11,10 @@ config.json will have to be configured as follows:
 }]
 
 You can (theoretically) set up as many slack sinks per bot as you like, by extending the list"""
-import asyncio, logging, json, re
+import asyncio
+import logging
+import json
+import re
 
 from html import unescape
 from urllib.parse import parse_qs
@@ -52,15 +55,18 @@ def _start_slack_sinks(bot):
             try:
                 certfile = sinkConfig["certfile"]
                 if not certfile:
-                    logger.error("config.slack[{}].certfile must be configured".format(itemNo))
+                    logger.error(
+                        "config.slack[{}].certfile must be configured".format(itemNo))
                     continue
                 name = sinkConfig["name"]
                 port = sinkConfig["port"]
             except KeyError as e:
-                logger.error("config.slack[{}] missing keyword".format(itemNo), e)
+                logger.error(
+                    "config.slack[{}] missing keyword".format(itemNo), e)
                 continue
 
-            aiohttp_start(bot, name, port, certfile, SlackAsyncListener, group=__name__)
+            aiohttp_start(bot, name, port, certfile,
+                          SlackAsyncListener, group=__name__)
 
     logger.info("{} slack listeners started".format(itemNo + 1))
 
@@ -77,8 +83,9 @@ def _slack_repeater_cleaner(bot, event, id):
 
 
 class SlackAsyncListener(AsyncRequestHandler):
+
     def process_request(self, path, query_string, content):
-        payload  = parse_qs(content)
+        payload = parse_qs(content)
 
         path = path.split("/")
         conversation_id = path[1]
@@ -88,21 +95,24 @@ class SlackAsyncListener(AsyncRequestHandler):
         if "text" in payload:
             try:
                 text = emoji.emojize(str(payload["text"][0]), use_aliases=True)
-            except NameError: # emoji library likely missing
+            except NameError:  # emoji library likely missing
                 text = str(payload["text"][0])
-                
+
             if "user_name" in payload:
                 if "slackbot" not in str(payload["user_name"][0]):
                     text = self._remap_internal_slack_ids(text)
-                    response = "<b>" + str(payload["user_name"][0]) + ":</b> " + unescape(text)
-                    response += self._bot.call_shared("reprocessor.attach_reprocessor", _slack_repeater_cleaner)
+                    response = "<b>" + \
+                        str(payload["user_name"][0]) + \
+                        ":</b> " + unescape(text)
+                    response += self._bot.call_shared(
+                        "reprocessor.attach_reprocessor", _slack_repeater_cleaner)
 
-                    yield from self.send_data( conversation_id, 
-                                               response, 
-                                               context = { 'base': {
-                                                                'tags': ['slack', 'relay'], 
-                                                                'source': 'slack', 
-                                                                'importance': 50 }} )
+                    yield from self.send_data(conversation_id,
+                                              response,
+                                              context={'base': {
+                                                  'tags': ['slack', 'relay'],
+                                                  'source': 'slack',
+                                                  'importance': 50}})
 
     def _remap_internal_slack_ids(self, text):
         text = self._slack_label_users(text)
@@ -145,7 +155,8 @@ class SlackAsyncListener(AsyncRequestHandler):
         label = "UNKNOWN"
         if id in self._slack_cache[type_str]:
             label = self._slack_cache[type_str][id]
-            logger.debug("slack label resolved from cache: {} = {}".format(id, label))
+            logger.debug(
+                "slack label resolved from cache: {} = {}".format(id, label))
         else:
             try:
                 response = urlopen(url)
@@ -154,10 +165,12 @@ class SlackAsyncListener(AsyncRequestHandler):
                 if type_str in data:
                     label = data[type_str]["name"]
                     self._slack_cache[type_str][id] = label
-                    logger.debug("slack label resolved from API: {} = {}".format(id, label))
+                    logger.debug(
+                        "slack label resolved from API: {} = {}".format(id, label))
 
             except Exception as e:
-                logger.exception("FAILED to resolve slack label for {}".format(id))
+                logger.exception(
+                    "FAILED to resolve slack label for {}".format(id))
 
         return prefix + label
 
@@ -183,9 +196,11 @@ def _handle_slackout(bot, event, command):
                     fullname = event.user.full_name
                     response = yield from bot._client.getentitybyid([event.user_id.chat_id])
                     try:
-                        photo_url = "http:" + response.entities[0].properties.photo_url
+                        photo_url = "http:" + \
+                            response.entities[0].properties.photo_url
                     except Exception as e:
-                        logger.exception("FAILED to acquire photo_url for {}".format(fullname))
+                        logger.exception(
+                            "FAILED to acquire photo_url for {}".format(fullname))
                         photo_url = None
 
                     try:
@@ -193,21 +208,22 @@ def _handle_slackout(bot, event, command):
                     except TypeError:
                         client = SlackClient(slackkey)
 
-                    slack_api_params = { 'username': fullname,
-                                         'icon_url': photo_url }
+                    slack_api_params = {'username': fullname,
+                                        'icon_url': photo_url}
 
                     if "link_names" not in sinkConfig or sinkConfig["link_names"]:
                         logger.debug("slack api link_names is active")
                         slack_api_params["link_names"] = 1
 
                     if bot.conversations.catalog[event.conv_id]["history"] or "otr_privacy" not in sinkConfig or not sinkConfig["otr_privacy"]:
-                        client.chat_post_message(channel, event.text, **slack_api_params)
+                        client.chat_post_message(
+                            channel, event.text, **slack_api_params)
 
             except Exception as e:
-                logger.exception( "Could not handle slackout with key {} between {} and {}."
-                                  " Is config.json properly configured?".format( slackkey,
-                                                                                 channel,
-                                                                                 convlist ))
+                logger.exception("Could not handle slackout with key {} between {} and {}."
+                                 " Is config.json properly configured?".format(slackkey,
+                                                                               channel,
+                                                                               convlist))
 
 
 def slackusers(bot, event, *args):
@@ -227,15 +243,16 @@ def slackusers(bot, event, *args):
                 chan_id = client.channel_name_to_id(channel)
                 slack_api_params = {'channel': chan_id}
                 info = client._make_request('channels.info', slack_api_params)
-                msg =  "Slack channel {}: {}".format(info['channel']['name'],
-                                                       info['channel']['topic']['value'])
+                msg = "Slack channel {}: {}".format(info['channel']['name'],
+                                                    info['channel']['topic']['value'])
                 users = {}
                 for uid in info['channel']['members']:
                     slack_api_params = {'user': uid}
                     user = client._make_request('users.info', slack_api_params)
                     if user["ok"] and user['user']:
                         username = user['user']['name']
-                        realname = user['user'].get('real_name', "No real name")
+                        realname = user['user'].get(
+                            'real_name', "No real name")
                         users[username] = realname
 
                 msg += "\n{} members:".format(len(users))

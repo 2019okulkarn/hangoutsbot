@@ -1,4 +1,9 @@
-import aiohttp, asyncio, io, logging, os, time
+import aiohttp
+import asyncio
+import io
+import logging
+import os
+import time
 
 import hangups
 
@@ -9,14 +14,15 @@ logger = logging.getLogger(__name__)
 
 
 class __registers(object):
+
     def __init__(self):
-        self.last_event_id = '' # recorded last event to avoid re-syncing
-        self.last_user_id = '' # recorded last user to allow message compression
-        self.last_chatroom_id = '' # recorded last chat room to prevent room crossover
-        self.last_time_id = 0 # recorded timestamp of last chat to 'expire' chats
+        self.last_event_id = ''  # recorded last event to avoid re-syncing
+        self.last_user_id = ''  # recorded last user to allow message compression
+        self.last_chatroom_id = ''  # recorded last chat room to prevent room crossover
+        self.last_time_id = 0  # recorded timestamp of last chat to 'expire' chats
 
 
-_registers=__registers()
+_registers = __registers()
 
 
 def _initialise(bot):
@@ -24,7 +30,8 @@ def _initialise(bot):
     plugins.register_admin_command(["syncusers"])
     plugins.register_handler(_handle_syncrooms_broadcast, type="sending")
     plugins.register_handler(_handle_incoming_message, type="message")
-    plugins.register_handler(_handle_syncrooms_membership_change, type="membership")
+    plugins.register_handler(
+        _handle_syncrooms_membership_change, type="membership")
 
 
 def _migrate_syncroom_v1(bot):
@@ -41,17 +48,19 @@ def _migrate_syncroom_v1(bot):
                 old_sync_rooms = list(set(old_sync_rooms))
                 old_sync_rooms.sort()
                 ref_key = "-".join(old_sync_rooms)
-                _newdict[ref_key] = old_sync_rooms # prevent duplicates
+                _newdict[ref_key] = old_sync_rooms  # prevent duplicates
 
-                del parameters["sync_rooms"] # remove old config
+                del parameters["sync_rooms"]  # remove old config
                 bot.config.set_by_path(["conversations", conv_id], parameters)
                 write_config = True
 
         if write_config:
             _config2 = list(_newdict.values())
-            bot.config.set_by_path(["sync_rooms"], _config2) # write new config
+            bot.config.set_by_path(
+                ["sync_rooms"], _config2)  # write new config
             bot.config.save()
-            logger.info("_migrate_syncroom_v1(): config-v2 = {}".format(_config2))
+            logger.info(
+                "_migrate_syncroom_v1(): config-v2 = {}".format(_config2))
 
 
 def _handle_syncrooms_broadcast(bot, broadcast_list, context):
@@ -79,7 +88,8 @@ def _handle_syncrooms_broadcast(bot, broadcast_list, context):
                     if origin_conversation_id != other_room_id:
                         broadcast_list.append((other_room_id, response))
 
-                logger.debug("broadcasting to {} room(s)".format(len(broadcast_list)))
+                logger.debug("broadcasting to {} room(s)".format(
+                    len(broadcast_list)))
 
             else:
                 logger.debug("not a sync room".format(origin_conversation_id))
@@ -100,45 +110,48 @@ def _handle_incoming_message(bot, event, command):
     syncouts = bot.get_config_option('sync_rooms')
 
     if not syncouts:
-        return # Sync rooms not configured, returning
+        return  # Sync rooms not configured, returning
 
     if _registers.last_event_id == event.conv_event.id_:
-        return # This event has already been synced
+        return  # This event has already been synced
 
     _registers.last_event_id = event.conv_event.id_
 
     for sync_room_list in syncouts:
         if event.conv_id in sync_room_list:
-            link = 'https://plus.google.com/u/0/{}/about'.format(event.user_id.chat_id)
+            link = 'https://plus.google.com/u/0/{}/about'.format(
+                event.user_id.chat_id)
 
-            ### Deciding how to relay the name across
+            # Deciding how to relay the name across
 
             # Checking that it hasn't timed out since last message
-            timeout_threshold = 30.0 # Number of seconds to allow the timeout
+            timeout_threshold = 30.0  # Number of seconds to allow the timeout
             if time.time() - _registers.last_time_id > timeout_threshold:
                 timeout = True
             else:
                 timeout = False
 
-            # Checking if the user is the same as the one who sent the previous message
+            # Checking if the user is the same as the one who sent the previous
+            # message
             if _registers.last_user_id in event.user_id.chat_id:
                 sameuser = True
             else:
                 sameuser = False
 
-            # Checking if the room is the same as the room where the last message was sent
+            # Checking if the room is the same as the room where the last
+            # message was sent
             if _registers.last_chatroom_id in event.conv_id:
                 sameroom = True
             else:
                 sameroom = False
 
             if (not sameroom or timeout or not sameuser) and \
-                (bot.memory.exists(['user_data', event.user_id.chat_id, "nickname"])):
+                    (bot.memory.exists(['user_data', event.user_id.chat_id, "nickname"])):
                 # Now check if there is a nickname set
 
                 try:
-                    fullname = '{0} ({1})'.format(event.user.full_name.split(' ', 1)[0]
-                        , bot.get_memory_suboption(event.user_id.chat_id, 'nickname'))
+                    fullname = '{0} ({1})'.format(event.user.full_name.split(' ', 1)[
+                        0], bot.get_memory_suboption(event.user_id.chat_id, 'nickname'))
                 except TypeError:
                     fullname = event.user.full_name
             elif sameroom and sameuser and not timeout:
@@ -146,7 +159,8 @@ def _handle_incoming_message(bot, event, command):
             else:
                 fullname = event.user.full_name
 
-            html_identity = '<b><a href="{}">{}</a></b><b>:</b> '.format(link, fullname)
+            html_identity = '<b><a href="{}">{}</a></b><b>:</b> '.format(
+                link, fullname)
 
             source_message = ""
             for segment in event.conv_event.segments:
@@ -164,13 +178,13 @@ def _handle_incoming_message(bot, event, command):
 
                     if not event.text.startswith(("/bot ", "/me ")):
                         _context["autotranslate"] = {
-                            "conv_id" : event.conv_id,
-                            "event_text" : event.text }
+                            "conv_id": event.conv_id,
+                            "event_text": event.text}
 
                     if not event.conv_event.attachments:
-                        yield from bot.coro_send_message ( _conv_id,
-                                                           html_identity + html_message,
-                                                           context=_context)
+                        yield from bot.coro_send_message(_conv_id,
+                                                         html_identity + html_message,
+                                                         context=_context)
 
                     for link in event.conv_event.attachments:
 
@@ -184,15 +198,15 @@ def _handle_incoming_message(bot, event, command):
                             image_id = yield from bot._client.upload_image(image_data, filename=filename)
                             if not html_message:
                                 html_message = "(sent an image)"
-                            yield from bot.coro_send_message( _conv_id,
-                                                              html_identity + html_message,
-                                                              context=_context,
-                                                              image_id=image_id )
+                            yield from bot.coro_send_message(_conv_id,
+                                                             html_identity + html_message,
+                                                             context=_context,
+                                                             image_id=image_id)
 
                         except AttributeError:
-                            yield from bot.coro_send_message( _conv_id,
-                                                              html_identity + html_message + " " + link,
-                                                              context=_context)
+                            yield from bot.coro_send_message(_conv_id,
+                                                             html_identity + html_message + " " + link,
+                                                             context=_context)
 
             _registers.last_user_id = event.user_id.chat_id
             _registers.last_time_id = time.time()
@@ -211,7 +225,7 @@ def _handle_syncrooms_membership_change(bot, event, command):
     syncouts = bot.get_config_option('sync_rooms')
 
     if not syncouts:
-        return # Sync rooms not configured, returning
+        return  # Sync rooms not configured, returning
 
     # are we in a sync room?
     sync_room_list = None
@@ -233,7 +247,8 @@ def _handle_syncrooms_membership_change(bot, event, command):
     if event.conv_event.type_ == hangups.MembershipChangeType.JOIN:
         # JOIN a specific room
 
-        logger.info("{} user(s) added to {}".format(len(event_users), event.conv_id))
+        logger.info("{} user(s) added to {}".format(
+            len(event_users), event.conv_id))
 
         if syncroom_name:
             yield from bot.coro_send_message(event.conv, '<i>{} has added {} to {}</i>'.format(
@@ -243,7 +258,8 @@ def _handle_syncrooms_membership_change(bot, event, command):
     else:
         # LEAVE a specific room
 
-        logger.info("{} user(s) left {}".format(len(event_users), event.conv_id))
+        logger.info("{} user(s) left {}".format(
+            len(event_users), event.conv_id))
 
         if syncroom_name:
             yield from bot.coro_send_message(event.conv, '<i>{} has left {}</i>'.format(
@@ -272,7 +288,7 @@ def syncusers(bot, event, conversation_id=None, *args):
     syncouts = bot.get_config_option('sync_rooms')
 
     if not syncouts:
-        return # Sync rooms not configured, returning
+        return  # Sync rooms not configured, returning
 
     _lines = []
 
@@ -281,7 +297,8 @@ def syncusers(bot, event, conversation_id=None, *args):
     for _rooms in syncouts:
         if conversation_id in _rooms:
             sync_room_list = _rooms
-            _lines.append(_("<b>Sync Rooms: {}</b>").format(len(sync_room_list)))
+            _lines.append(
+                _("<b>Sync Rooms: {}</b>").format(len(sync_room_list)))
             break
     if sync_room_list is None:
         sync_room_list = [conversation_id]
@@ -310,7 +327,7 @@ def syncusers(bot, event, conversation_id=None, *args):
             _lines.append(_line_room)
         list_users = all_users[room_id]
         for User in list_users:
-            _line_user = '{}'.format(User.full_name);
+            _line_user = '{}'.format(User.full_name)
             if User.emails:
                 _line_user = _line_user + ' ({})'.format(User.emails[0])
             _lines.append(_line_user)

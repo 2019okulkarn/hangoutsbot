@@ -42,7 +42,7 @@ class UrbanDictParser(HTMLParser):
 
     def handle_endtag(self, tag):
         if tag == 'div':
-            #NOTE: assume there is no nested <div> in the known sections
+            # NOTE: assume there is no nested <div> in the known sections
             self._section = None
 
     def handle_data(self, data):
@@ -90,9 +90,11 @@ def urban(bot, event, *args):
         the_definition = urbanDictParser.translations[0]
         html_text += '<b>"' + the_definition["word"] + '"</b><br /><br />'
         if "def" in the_definition:
-            html_text += _("<b>definition:</b> ") + the_definition["def"].strip().replace("\n", "<br />") + '<br /><br />'
+            html_text += _("<b>definition:</b> ") + the_definition[
+                "def"].strip().replace("\n", "<br />") + '<br /><br />'
         if "example" in the_definition:
-            html_text += _("<b>example:</b> ") + the_definition["example"].strip().replace("\n", "<br />")
+            html_text += _("<b>example:</b> ") + \
+                the_definition["example"].strip().replace("\n", "<br />")
 
         yield from bot.coro_send_message(event.conv, html_text)
     else:

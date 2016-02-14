@@ -2,11 +2,14 @@ import plugins
 from slogans import slogans
 from random import choice
 from control import *
+
+
 def _initialise():
     plugins.register_user_command(['slogan'])
 
+
 def slogan(bot, event, *args):
-    '''Creates a slogan for something. Format is /bot slogan <something>''' 
+    '''Creates a slogan for something. Format is /bot slogan <something>'''
     try:
         slogan = choice(slogans).format(' '.join(args))
         msg = _('{}').format(slogan)
