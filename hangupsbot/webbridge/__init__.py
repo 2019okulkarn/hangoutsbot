@@ -1,4 +1,5 @@
-import asyncio, logging
+import asyncio
+import logging
 
 import plugins
 import threadmanager
@@ -11,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 class WebFramework:
+
     def __init__(self, bot, configkey, RequestHandler=IncomingRequestHandler):
         self._bot = bot
 
@@ -19,19 +21,18 @@ class WebFramework:
         self.RequestHandler = RequestHandler
 
         if not self.load_configuration(bot, configkey):
-            logger.info("no configuration for {}, not running".format(self.configkey))
+            logger.info(
+                "no configuration for {}, not running".format(self.configkey))
             return
 
         self._start_sinks(bot)
 
         plugins.register_handler(self._handle_websync)
 
-
     def load_configuration(self, bot, configkey):
         self.configuration = bot.get_config_option(self.configkey)
 
         return self.configuration
-
 
     def _start_sinks(self, bot):
         loop = asyncio.get_event_loop()
@@ -46,12 +47,14 @@ class WebFramework:
                 try:
                     certfile = listener["certfile"]
                     if not certfile:
-                        logger.warning("config.{}[{}].certfile must be configured".format(self.configkey, itemNo))
+                        logger.warning("config.{}[{}].certfile must be configured".format(
+                            self.configkey, itemNo))
                         continue
                     name = listener["name"]
                     port = listener["port"]
                 except KeyError as e:
-                    logger.warning("config.{}[{}] missing keyword".format(self.configkey, itemNo))
+                    logger.warning("config.{}[{}] missing keyword".format(
+                        self.configkey, itemNo))
                     continue
 
                 aiohttp_start(
@@ -62,8 +65,8 @@ class WebFramework:
                     self.RequestHandler,
                     "webbridge." + self.configkey)
 
-        logger.info("webbridge.sinks: {} thread(s) started for {}".format(itemNo + 1, self.configkey))
-
+        logger.info("webbridge.sinks: {} thread(s) started for {}".format(
+            itemNo + 1, self.configkey))
 
     def _handle_websync(self, bot, event, command):
         """Handle hangouts messages, preparing them to be sent to the
@@ -80,5 +83,5 @@ class WebFramework:
                     logger.exception("EXCEPTION in _handle_websync")
 
     def _send_to_external_chat(self, bot, event, config):
-        logger.info("webbridge._send_to_external_chat(): {} {}".format(self.configkey, config))
-
+        logger.info("webbridge._send_to_external_chat(): {} {}".format(
+            self.configkey, config))

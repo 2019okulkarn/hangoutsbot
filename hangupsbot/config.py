@@ -1,4 +1,13 @@
-import collections, datetime, functools, json, glob, logging, os, shutil, sys, time
+import collections
+import datetime
+import functools
+import json
+import glob
+import logging
+import os
+import shutil
+import sys
+import time
 
 from threading import Timer
 
@@ -8,6 +17,7 @@ logger = logging.getLogger(__name__)
 
 class Config(collections.MutableMapping):
     """Configuration JSON storage class"""
+
     def __init__(self, filename, default=None, failsafe_backups=0, save_delay=0):
         self.filename = filename
         self.default = None
@@ -25,14 +35,16 @@ class Config(collections.MutableMapping):
         except IOError:
             return False
         except ValueError:
-            logger.warning("{} is corrupted, aborting backup".format(self.filename))
+            logger.warning(
+                "{} is corrupted, aborting backup".format(self.filename))
             return False
 
         existing = sorted(glob.glob(self.filename + ".*.bak"))
         while len(existing) > (self.failsafe_backups - 1):
             os.remove(existing.pop(0))
 
-        backup_file = self.filename + "." + datetime.datetime.now().strftime("%Y%m%d%H%M%S") + ".bak"
+        backup_file = self.filename + "." + \
+            datetime.datetime.now().strftime("%Y%m%d%H%M%S") + ".bak"
         shutil.copy2(self.filename, backup_file)
 
         return True
@@ -45,7 +57,8 @@ class Config(collections.MutableMapping):
                 json.load(open(recovery_filename))
                 shutil.copy2(recovery_filename, self.filename)
                 self.load(recovery=True)
-                logger.info("recovery successful: {}".format(recovery_filename))
+                logger.info("recovery successful: {}".format(
+                    recovery_filename))
                 return True
             except IOError:
                 pass
@@ -83,7 +96,8 @@ class Config(collections.MutableMapping):
             if delay:
                 if self._timer_save and self._timer_save.is_alive():
                     self._timer_save.cancel()
-                self._timer_save = Timer(self.save_delay, self.save, [], {"delay": False})
+                self._timer_save = Timer(
+                    self.save_delay, self.save, [], {"delay": False})
                 self._timer_save.start()
                 return False
 

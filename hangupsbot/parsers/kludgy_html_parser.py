@@ -12,7 +12,8 @@ import hangups
 
 def simple_parse_to_segments(html, debug=False, **kwargs):
     html = fix_urls(html)
-    html = '<html>' + html + '</html>' # html.parser seems to ignore the final entityref without html closure
+    # html.parser seems to ignore the final entityref without html closure
+    html = '<html>' + html + '</html>'
     parser = simpleHTMLParser(debug)
     return parser.feed(html)
 
@@ -27,12 +28,14 @@ def segment_to_html(segment):
         message.append(text)
     elif segment.type_ == hangups.schemas.SegmentType.LINK:
         message.append(
-            '<a href="{}">{}</a>'.format(segment.link_target if segment.link_target else text, text)
+            '<a href="{}">{}</a>'.format(
+                segment.link_target if segment.link_target else text, text)
         )
     elif segment.type_ == hangups.schemas.SegmentType.LINE_BREAK:
         message.append('<br />\n')
     else:
-        logging.warning('Ignoring unknown chat message segment type: {}'.format(segment.type_))
+        logging.warning(
+            'Ignoring unknown chat message segment type: {}'.format(segment.type_))
 
     if not segment.type_ == hangups.schemas.SegmentType.LINE_BREAK:
         for is_f, f in ((segment.is_bold, 'b'), (segment.is_italic, 'i'),
@@ -45,19 +48,20 @@ def segment_to_html(segment):
 
 
 class simpleHTMLParser(HTMLParser):
+
     def __init__(self, debug=False, **kwargs):
         super().__init__(kwargs)
 
         self._debug = debug
 
-        self._flags = {"bold" : False,
-                       "italic" : False,
-                       "underline" : False,
-                       "link_target" : None}
+        self._flags = {"bold": False,
+                       "italic": False,
+                       "underline": False,
+                       "link_target": None}
 
         self._link_text = None
 
-        self._allow_extra_html_tag = False;
+        self._allow_extra_html_tag = False
 
     def feed(self, html):
         self._segments = list()
@@ -106,13 +110,13 @@ class simpleHTMLParser(HTMLParser):
             self._flags["underline"] = False
         elif tag == 'a':
             self._segments.append(
-              hangups.ChatMessageSegment(
-                self._link_text,
-                hangups.SegmentType.LINK,
-                link_target=self._flags["link_target"],
-                is_bold=self._flags["bold"],
-                is_italic=self._flags["italic"],
-                is_underline=self._flags["underline"]))
+                hangups.ChatMessageSegment(
+                    self._link_text,
+                    hangups.SegmentType.LINK,
+                    link_target=self._flags["link_target"],
+                    is_bold=self._flags["bold"],
+                    is_italic=self._flags["italic"],
+                    is_underline=self._flags["underline"]))
             self._flags["link_target"] = None
         else:
             # xxx: this removes any attributes inside the tag
@@ -120,7 +124,8 @@ class simpleHTMLParser(HTMLParser):
 
     def handle_entityref(self, name):
         if self._flags["link_target"] is not None:
-            if(self._debug): print("simpleHTMLParser(): [LINK] entityref {}".format(name))
+            if(self._debug):
+                print("simpleHTMLParser(): [LINK] entityref {}".format(name))
             self._link_text += "&" + name
         else:
             _unescaped = html.unescape("&" + name)
@@ -128,7 +133,8 @@ class simpleHTMLParser(HTMLParser):
 
     def handle_data(self, data):
         if self._flags["link_target"] is not None:
-            if(self._debug): print("simpleHTMLParser(): [LINK] data \"{}\"".format(data))
+            if(self._debug):
+                print("simpleHTMLParser(): [LINK] data \"{}\"".format(data))
             self._link_text += data
         else:
             self.segments_extend(data, "data")
@@ -141,16 +147,18 @@ class simpleHTMLParser(HTMLParser):
 
     def segments_extend(self, text, type, forceNew=False):
         if len(self._segments) == 0 or forceNew is True:
-            if(self._debug): print("simpleHTMLParser(): [NEW] {} {}".format(type, text))
+            if(self._debug):
+                print("simpleHTMLParser(): [NEW] {} {}".format(type, text))
             self._segments.append(
-              hangups.ChatMessageSegment(
-                text,
-                is_bold=self._flags["bold"],
-                is_italic=self._flags["italic"],
-                is_underline=self._flags["underline"],
-                link_target=self._flags["link_target"]))
+                hangups.ChatMessageSegment(
+                    text,
+                    is_bold=self._flags["bold"],
+                    is_italic=self._flags["italic"],
+                    is_underline=self._flags["underline"],
+                    link_target=self._flags["link_target"]))
         else:
-            if(self._debug): print("simpleHTMLParser(): [APPEND] {} {}".format(type, text))
+            if(self._debug):
+                print("simpleHTMLParser(): [APPEND] {} {}".format(type, text))
             previous_segment = self._segments[-1]
             if (previous_segment.is_bold != self._flags["bold"] or
                     previous_segment.is_italic != self._flags["italic"] or
@@ -161,16 +169,17 @@ class simpleHTMLParser(HTMLParser):
             else:
                 previous_segment.text += text
 
+
 def fix_urls(text):
-    tokens = text.split() # "a  b" => (a,b)
+    tokens = text.split()  # "a  b" => (a,b)
     urlified = []
     for token in tokens:
         pretoken = ""
         posttoken = ""
         # consume a token looking for a url-like pattern...
-        while len(token)>10: # stop below shortest possible domain http://g.cn length
+        while len(token) > 10:  # stop below shortest possible domain http://g.cn length
             if token.startswith(("http://", "https://")):
-                break;
+                break
             if token[0:1] in ('"', '=', "'", "<"):
                 # stop if any consumed character matches possible tag fragment
                 break
@@ -190,11 +199,12 @@ def fix_urls(text):
     text = " ".join(urlified)
     return text
 
+
 def test_parser():
     test_strings = [
         ["hello world",
-            'hello world', # expected return by fix_urls()
-            [1]], # expected number of segments returned by simple_parse_to_segments()
+            'hello world',  # expected return by fix_urls()
+            [1]],  # expected number of segments returned by simple_parse_to_segments()
         ["http://www.google.com/",
             '<a href="http://www.google.com/">http://www.google.com/</a>',
             [1]],
@@ -237,10 +247,10 @@ def test_parser():
         ["abc <some@email.com>",
             'abc <some@email.com>',
             [1]],
-        ['</in "a"="xyz" fake tag>', # XXX: fails due to HTMLParser limitations
+        ['</in "a"="xyz" fake tag>',  # XXX: fails due to HTMLParser limitations
             '</in "a"="xyz" fake tag>',
             [1]],
-        ['<html><html><b></html></b><b>ABC</b>', # XXX: </html> is consumed
+        ['<html><html><b></html></b><b>ABC</b>',  # XXX: </html> is consumed
             '<html><html><b></html></b><b>ABC</b>',
             [2]],
         ["go here: http://www.google.com/",
@@ -296,13 +306,17 @@ def test_parser():
 
             if expected_segment_count != actual_segment_count:
                 print("ORIGINAL: {}".format(original))
-                print("EXPECTED/ACTUAL COUNT: {}/{}".format(expected_segment_count, actual_segment_count))
+                print(
+                    "EXPECTED/ACTUAL COUNT: {}/{}".format(expected_segment_count, actual_segment_count))
                 for segment in segments:
                     is_bold = 0
                     is_link = 0
-                    if segment.is_bold: is_bold = 1
-                    if segment.link_target: is_link = 1
-                    print(" B L TXT: {} {} {}".format(is_bold, is_link, segment.text))
+                    if segment.is_bold:
+                        is_bold = 1
+                    if segment.link_target:
+                        is_link = 1
+                    print(" B L TXT: {} {} {}".format(
+                        is_bold, is_link, segment.text))
                 print()
                 DEVIATION = True
     if DEVIATION is False:

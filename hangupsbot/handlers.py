@@ -23,19 +23,18 @@ class EventHandler:
         self._prefix_reprocessor = "uuid://"
         self._reprocessors = {}
 
-        self.pluggables = { "allmessages": [],
-                            "call": [],
-                            "membership": [],
-                            "message": [],
-                            "rename": [],
-                            "sending":[],
-                            "typing": [],
-                            "watermark": [] }
+        self.pluggables = {"allmessages": [],
+                           "call": [],
+                           "membership": [],
+                           "message": [],
+                           "rename": [],
+                           "sending": [],
+                           "typing": [],
+                           "watermark": []}
 
-        bot.register_shared( 'reprocessor.attach_reprocessor',
-                             self.attach_reprocessor,
-                             forgiving=True )
-
+        bot.register_shared('reprocessor.attach_reprocessor',
+                            self.attach_reprocessor,
+                            forgiving=True)
 
     def register_handler(self, function, type="message", priority=50):
         """registers extra event handlers"""
@@ -45,12 +44,14 @@ class EventHandler:
                 function = asyncio.coroutine(function)
         elif type in ["sending"]:
             if asyncio.iscoroutine(function):
-                raise RuntimeError("{} handler cannot be a coroutine".format(type))
+                raise RuntimeError(
+                    "{} handler cannot be a coroutine".format(type))
         else:
             raise ValueError("unknown event type for handler: {}".format(type))
 
         current_plugin = plugins.tracking.current()
-        self.pluggables[type].append((function, priority, current_plugin["metadata"]))
+        self.pluggables[type].append(
+            (function, priority, current_plugin["metadata"]))
         self.pluggables[type].sort(key=lambda tup: tup[1])
 
         plugins.tracking.register_handler(function, type, priority)
@@ -68,9 +69,9 @@ class EventHandler:
         _id = self.register_reprocessor(callable)
         context_fragment = '<a href="' + self._prefix_reprocessor + _id + '"> </a>'
         if return_as_dict:
-            return { "id": _id,
-                     "callable": callable,
-                     "fragment": context_fragment }
+            return {"id": _id,
+                    "callable": callable,
+                    "fragment": context_fragment}
         else:
             return context_fragment
 
@@ -80,26 +81,26 @@ class EventHandler:
         """registers a shared object into bot.shared
         historically, this function was more lenient than the actual bot function it calls
         """
-        logger.debug(   "[LEGACY] plugins.register_shared()"
-                        " instead of handlers.register_object()")
+        logger.debug("[LEGACY] plugins.register_shared()"
+                     " instead of handlers.register_object()")
 
         self.bot.register_shared(id, objectref, forgiving=forgiving)
 
     def register_user_command(self, command_names):
-        logger.debug(   "[LEGACY] plugins.register_user_command()"
-                        " instead of handlers.register_user_command()")
+        logger.debug("[LEGACY] plugins.register_user_command()"
+                     " instead of handlers.register_user_command()")
 
         plugins.register_user_command(command_names)
 
     def register_admin_command(self, command_names):
-        logger.debug(   "[LEGACY] plugins.register_admin_command()"
-                        " instead of handlers.register_admin_command()")
+        logger.debug("[LEGACY] plugins.register_admin_command()"
+                     " instead of handlers.register_admin_command()")
 
         plugins.register_admin_command(command_names)
 
     def get_admin_commands(self, conversation_id):
-        logger.debug(   "[LEGACY] command.get_admin_commands()"
-                        " instead of handlers.get_admin_commands()")
+        logger.debug("[LEGACY] command.get_admin_commands()"
+                     " instead of handlers.get_admin_commands()")
 
         return command.get_admin_commands(self.bot, conversation_id)
 
@@ -109,7 +110,8 @@ class EventHandler:
     def run_reprocessor(self, id, event, *args, **kwargs):
         if id in self._reprocessors:
             is_coroutine = asyncio.iscoroutinefunction(self._reprocessors[id])
-            logger.info("reprocessor uuid found: {} coroutine={}".format(id, is_coroutine))
+            logger.info(
+                "reprocessor uuid found: {} coroutine={}".format(id, is_coroutine))
             if is_coroutine:
                 yield from self._reprocessors[id](self.bot, event, id, *args, **kwargs)
             else:
@@ -130,7 +132,8 @@ class EventHandler:
                 for segment in event.conv_event.segments:
                     if segment.link_target:
                         if segment.link_target.startswith(self._prefix_reprocessor):
-                            _id = segment.link_target[len(self._prefix_reprocessor):]
+                            _id = segment.link_target[
+                                len(self._prefix_reprocessor):]
                             yield from self.run_reprocessor(_id, event)
 
             """auto opt-in - opted-out users who chat with the bot will be opted-in again"""
@@ -138,7 +141,8 @@ class EventHandler:
                 if self.bot.memory.exists(["user_data", event.user.id_.chat_id, "optout"]):
                     if self.bot.memory.get_by_path(["user_data", event.user.id_.chat_id, "optout"]):
                         yield from command.run(self.bot, event, *["optout"])
-                        logger.info("auto opt-in for {}".format(event.user.id_.chat_id))
+                        logger.info(
+                            "auto opt-in for {}".format(event.user.id_.chat_id))
                         return
 
             yield from self.run_pluggable_omnibus("allmessages", self.bot, event, command)
@@ -152,11 +156,14 @@ class EventHandler:
 
         # is commands_enabled?
 
-        config_commands_enabled = self.bot.get_config_suboption(event.conv_id, 'commands_enabled')
-        tagged_ignore = "ignore" in self.bot.tags.useractive(event.user_id.chat_id, event.conv_id)
+        config_commands_enabled = self.bot.get_config_suboption(
+            event.conv_id, 'commands_enabled')
+        tagged_ignore = "ignore" in self.bot.tags.useractive(
+            event.user_id.chat_id, event.conv_id)
 
         if not config_commands_enabled or tagged_ignore:
-            admins_list = self.bot.get_config_suboption(event.conv_id, 'admins') or []
+            admins_list = self.bot.get_config_suboption(
+                event.conv_id, 'admins') or []
             # admins always have commands enabled
             if event.user_id.chat_id not in admins_list:
                 return
@@ -170,7 +177,8 @@ class EventHandler:
             return
 
         # Parse message
-        event.text = event.text.replace(u'\xa0', u' ') # convert non-breaking space in Latin1 (ISO 8859-1)
+        # convert non-breaking space in Latin1 (ISO 8859-1)
+        event.text = event.text.replace(u'\xa0', u' ')
         try:
             line_args = shlex.split(event.text, posix=False)
         except Exception as e:
@@ -181,14 +189,17 @@ class EventHandler:
 
         # Test if command length is sufficient
         if len(line_args) < 2:
-            config_silent = bot.get_config_suboption(event.conv.id_, 'silentmode')
-            tagged_silent = "silent" in bot.tags.useractive(event.user_id.chat_id, event.conv.id_)
+            config_silent = bot.get_config_suboption(
+                event.conv.id_, 'silentmode')
+            tagged_silent = "silent" in bot.tags.useractive(
+                event.user_id.chat_id, event.conv.id_)
             if not (config_silent or tagged_silent):
                 yield from self.bot.coro_send_message(event.conv, _('{}: Missing parameter(s)').format(
                     event.user.full_name))
             return
-        
-        commands = command.get_available_commands(self.bot, event.user.id_.chat_id, event.conv_id)
+
+        commands = command.get_available_commands(
+            self.bot, event.user.id_.chat_id, event.conv_id)
 
         supplied_command = line_args[1].lower()
         if supplied_command in commands["user"]:
@@ -240,9 +251,9 @@ class EventHandler:
             try:
                 for function, priority, plugin_metadata in self.pluggables[name]:
                     message = ["{}: {}.{}".format(
-                                name,
-                                plugin_metadata["module.path"],
-                                function.__name__)]
+                        name,
+                        plugin_metadata["module.path"],
+                        function.__name__)]
 
                     try:
                         """accepted handler signatures:
@@ -251,7 +262,8 @@ class EventHandler:
                         function(bot, event, context)
                         function(bot, event)
                         """
-                        _expected = list(inspect.signature(function).parameters)
+                        _expected = list(
+                            inspect.signature(function).parameters)
                         _passed = args[0:len(_expected)]
                         if asyncio.iscoroutinefunction(function):
                             message.append("coroutine")
@@ -268,7 +280,8 @@ class EventHandler:
                         pass
                     except (self.bot.Exceptions.SuppressEventHandling,
                             self.bot.Exceptions.SuppressAllHandlers):
-                        # skip all pluggables, decide whether to handle event at next level
+                        # skip all pluggables, decide whether to handle event
+                        # at next level
                         raise
                     except:
                         message = " : ".join(message)
@@ -282,6 +295,7 @@ class EventHandler:
             except:
                 raise
 
+
 class HandlerBridge:
     """shim for xmikosbot handler decorator"""
 
@@ -293,7 +307,7 @@ class HandlerBridge:
         """Decorator for registering event handler"""
 
         # make compatible with this bot fork
-        scaled_priority = priority * 10 # scale for compatibility - xmikos range 1 - 10
+        scaled_priority = priority * 10  # scale for compatibility - xmikos range 1 - 10
         if event is hangups.ChatMessageEvent:
             event_type = "message"
         elif event is hangups.MembershipChangeEvent:
@@ -301,7 +315,7 @@ class HandlerBridge:
         elif event is hangups.RenameEvent:
             event_type = "rename"
         elif type(event) is str:
-            event_type = str # accept all kinds of strings, just like register_handler
+            event_type = str  # accept all kinds of strings, just like register_handler
         else:
             raise ValueError("unrecognised event {}".format(event))
 
@@ -312,7 +326,8 @@ class HandlerBridge:
 
             # Automatically wrap handler function in coroutine
             compatible_func = asyncio.coroutine(thunk)
-            self.bot._handlers.register_handler(compatible_func, event_type, scaled_priority)
+            self.bot._handlers.register_handler(
+                compatible_func, event_type, scaled_priority)
             return compatible_func
 
         # If there is one (and only one) positional argument and this argument is callable,

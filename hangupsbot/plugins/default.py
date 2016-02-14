@@ -1,4 +1,6 @@
-import re, json, logging
+import re
+import json
+import logging
 
 import hangups
 
@@ -11,12 +13,14 @@ from commands import command
 logger = logging.getLogger(__name__)
 
 
-_internal = {} # non-persistent internal state independent of config.json/memory.json
+_internal = {}  # non-persistent internal state independent of config.json/memory.json
 
-_internal["broadcast"] = { "message": "", "conversations": [] } # /bot broadcast
+_internal["broadcast"] = {"message": "", "conversations": []}  # /bot broadcast
+
 
 def _initialise(bot):
-    plugins.register_admin_command(["broadcast", "users", "user", "hangouts", "rename", "leave", "reload", "quit", "config", "whereami"])
+    plugins.register_admin_command(
+        ["broadcast", "users", "user", "hangouts", "rename", "leave", "reload", "quit", "config", "whereami"])
     plugins.register_user_command(["echo", "whoami"])
 
 
@@ -32,7 +36,8 @@ def echo(bot, event, *args):
                 convid = raw_arguments[2]
             else:
                 convid = event.conv_id
-                raw_arguments = [ _("<b>only admins can echo other conversations</b>") ]
+                raw_arguments = [
+                    _("<b>only admins can echo other conversations</b>")]
         else:
             # assumed /bot echo <text>
             convid = event.conv_id
@@ -57,8 +62,8 @@ def broadcast(bot, event, *args):
         if subcmd == "info":
             """display broadcast data such as message and target rooms"""
 
-            conv_info = [ "<b><pre>{}</pre></b> ... <pre>{}</pre>".format(bot.conversations.get_name(convid), convid) 
-                          for convid in _internal["broadcast"]["conversations"] ]
+            conv_info = ["<b><pre>{}</pre></b> ... <pre>{}</pre>".format(bot.conversations.get_name(convid), convid)
+                         for convid in _internal["broadcast"]["conversations"]]
 
             if not _internal["broadcast"]["message"]:
                 yield from bot.coro_send_message(event.conv, _("broadcast: no message set"))
@@ -69,11 +74,11 @@ def broadcast(bot, event, *args):
                 return
 
             yield from bot.coro_send_message(event.conv, _(
-                                            "<b>message:</b><br />"
-                                            "{}<br />"
-                                            "<b>to:</b><br />"
-                                            "{}".format(_internal["broadcast"]["message"],
-                                                "<br />".join(conv_info))))
+                "<b>message:</b><br />"
+                "{}<br />"
+                "<b>to:</b><br />"
+                "{}".format(_internal["broadcast"]["message"],
+                            "<br />".join(conv_info))))
 
         elif subcmd == "message":
             """set broadcast message"""
@@ -107,7 +112,8 @@ def broadcast(bot, event, *args):
                     if search.lower() in convdata["title"].lower() or search in convid:
                         _internal["broadcast"]["conversations"].append(convid)
 
-            _internal["broadcast"]["conversations"] = list(set(_internal["broadcast"]["conversations"]))
+            _internal["broadcast"]["conversations"] = list(
+                set(_internal["broadcast"]["conversations"]))
             yield from bot.coro_send_message(event.conv, _("broadcast: {} conversation(s)".format(len(_internal["broadcast"]["conversations"]))))
 
         elif subcmd == "remove":
@@ -122,14 +128,15 @@ def broadcast(bot, event, *args):
                 for convid in _internal["broadcast"]["conversations"]:
                     if search.lower() in bot.conversations.get_name(convid).lower() or search in convid:
                         _internal["broadcast"]["conversations"].remove(convid)
-                        removed.append("<b><pre>{}</pre></b> (<pre>{}</pre>)".format(bot.conversations.get_name(convid), convid))
+                        removed.append(
+                            "<b><pre>{}</pre></b> (<pre>{}</pre>)".format(bot.conversations.get_name(convid), convid))
 
                 if removed:
                     yield from bot.coro_send_message(event.conv, _("broadcast: removed {}".format(", ".join(removed))))
 
         elif subcmd == "NOW":
             """send the broadcast - no turning back!"""
-            context = { "explicit_relay": True } # prevent echos across syncrooms
+            context = {"explicit_relay": True}  # prevent echos across syncrooms
             for convid in _internal["broadcast"]["conversations"]:
                 yield from bot.coro_send_message(convid, _internal["broadcast"]["message"], context=context)
             yield from bot.coro_send_message(event.conv, _("broadcast: message sent to {} chats".format(len(_internal["broadcast"]["conversations"]))))
@@ -171,11 +178,12 @@ def user(bot, event, *args):
         unspaced_lower = re.sub(r'\s+', '', fullname_lower)
         unspaced_upper = re.sub(r'\s+', '', u.full_name.upper())
 
-        if( search_lower in fullname_lower
-            or search_lower in unspaced_lower
-            # XXX: turkish alphabet special case: converstion works better when uppercase
-            or search_upper in remove_accents(fullname_upper)
-            or search_upper in remove_accents(unspaced_upper) ):
+        if(search_lower in fullname_lower
+                or search_lower in unspaced_lower
+                # XXX: turkish alphabet special case: converstion works better
+                # when uppercase
+                or search_upper in remove_accents(fullname_upper)
+                or search_upper in remove_accents(unspaced_upper)):
 
             link = 'https://plus.google.com/u/0/{}/about'.format(u.id_.chat_id)
             segments.append(hangups.ChatMessageSegment(u.full_name, hangups.SegmentType.LINK,
@@ -185,8 +193,10 @@ def user(bot, event, *args):
                 segments.append(hangups.ChatMessageSegment(u.emails[0], hangups.SegmentType.LINK,
                                                            link_target='mailto:{}'.format(u.emails[0])))
                 segments.append(hangups.ChatMessageSegment(')'))
-            segments.append(hangups.ChatMessageSegment(' ... {}'.format(u.id_.chat_id)))
-            segments.append(hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK))
+            segments.append(hangups.ChatMessageSegment(
+                ' ... {}'.format(u.id_.chat_id)))
+            segments.append(hangups.ChatMessageSegment(
+                '\n', hangups.SegmentType.LINE_BREAK))
 
     yield from bot.coro_send_message(event.conv, segments)
 
@@ -198,11 +208,13 @@ def hangouts(bot, event, *args):
 
     lines = []
     for convid, convdata in bot.conversations.get(filter="text:" + text_search).items():
-        lines.append("<b>{}</b>: <em>`{}`</em>".format(convdata["title"], convid))
+        lines.append(
+            "<b>{}</b>: <em>`{}`</em>".format(convdata["title"], convid))
 
     lines.append(_('<b>Total: {}</b>').format(len(lines)))
     if text_search:
-        lines.insert(0, _('<b>List of hangouts with keyword:</b> "<pre>{}</pre>"').format(text_search))
+        lines.insert(0, _(
+            '<b>List of hangouts with keyword:</b> "<pre>{}</pre>"').format(text_search))
 
     yield from bot.coro_send_message(event.conv, "<br />".join(lines))
 
@@ -260,7 +272,8 @@ def config(bot, event, cmd=None, *args):
     state = "key"
     for token in tokens:
         if token.startswith(("{", "[", '"', "'")):
-            # apparent start of json array/object, consume into a single list item
+            # apparent start of json array/object, consume into a single list
+            # item
             state = "json"
         if state == "key":
             parameters.append(token)
@@ -273,7 +286,8 @@ def config(bot, event, cmd=None, *args):
 
     if cmd == 'get' or cmd is None:
         config_args = list(parameters)
-        value = bot.config.get_by_path(config_args) if config_args else dict(bot.config)
+        value = bot.config.get_by_path(
+            config_args) if config_args else dict(bot.config)
 
     elif cmd == 'test':
         num_parameters = len(parameters)
@@ -290,7 +304,8 @@ def config(bot, event, cmd=None, *args):
         text_parameters.insert(0, "<b>config test</b>")
 
         if num_parameters == 1:
-            text_parameters.append(_("<em>note: testing single parameter as json</em>"))
+            text_parameters.append(
+                _("<em>note: testing single parameter as json</em>"))
         elif num_parameters < 1:
             yield from command.unknown_command(bot, event)
             return
@@ -347,7 +362,8 @@ def config(bot, event, cmd=None, *args):
     segments = [hangups.ChatMessageSegment('{}:'.format(config_path),
                                            is_bold=True),
                 hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK)]
-    segments.extend(text_to_segments(json.dumps(value, indent=2, sort_keys=True)))
+    segments.extend(text_to_segments(
+        json.dumps(value, indent=2, sort_keys=True)))
     yield from bot.coro_send_message(event.conv, segments)
 
 
@@ -356,8 +372,8 @@ def whoami(bot, event, *args):
 
     if bot.memory.exists(['user_data', event.user_id.chat_id, "nickname"]):
         try:
-            fullname = '{0} ({1})'.format(event.user.full_name.split(' ', 1)[0]
-                , bot.get_memory_suboption(event.user_id.chat_id, 'nickname'))
+            fullname = '{0} ({1})'.format(event.user.full_name.split(' ', 1)[
+                0], bot.get_memory_suboption(event.user_id.chat_id, 'nickname'))
         except TypeError:
             fullname = event.user.full_name
     else:
@@ -370,7 +386,7 @@ def whereami(bot, event, *args):
     """get current conversation id"""
 
     yield from bot.coro_send_message(
-      event.conv,
-      _("You are at <b><pre>{}</pre></b>, conv_id = <i><pre>{}</pre></i>").format(
-        bot.conversations.get_name(event.conv),
-        event.conv.id_))
+        event.conv,
+        _("You are at <b><pre>{}</pre></b>, conv_id = <i><pre>{}</pre></i>").format(
+            bot.conversations.get_name(event.conv),
+            event.conv.id_))

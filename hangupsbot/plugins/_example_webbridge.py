@@ -34,7 +34,6 @@ def _initialise(bot):
         "synced_conversations": ["<CONV ID 1>", "<CONV ID 2>"]
       }
     ],
-    
+
     """
     BridgeInstance(bot, "samplebridge", IncomingMessages)
-

@@ -1,11 +1,14 @@
-import plugins, string
+import plugins
+import string
 
 from random import choice as choose
 
 from insultslist import *
 
+
 def _initialise():
     plugins.register_user_command(["insult"])
+
 
 def insult(bot, event, *args):
     '''Insult something/somebody using a predefined list of insults. Will not insult itself. Format is /bot insult <whattoinsult>'''
@@ -13,7 +16,7 @@ def insult(bot, event, *args):
         insulttouse = choose(insultslist.insults)
         checkforbot = ''.join(args)
         for c in string.punctuation:
-            checkforbot = checkforbot.replace(c,'')
+            checkforbot = checkforbot.replace(c, '')
         for i in range(len(checkforbot)):
             if not checkforbot[i].isalnum == True:
                 checkforbot[i].replace(checkforbot[i], '')

@@ -2,7 +2,12 @@
 based on the word/image list for the image linker bot on reddit
 sauce: http://www.reddit.com/r/image_linker_bot/comments/2znbrg/image_suggestion_thread_20/
 """
-import aiohttp, io, logging, os, random, re
+import aiohttp
+import io
+import logging
+import os
+import random
+import re
 
 import plugins
 
@@ -40,14 +45,15 @@ def _scan_for_triggers(bot, event, command):
             if count >= limit:
                 break
 
-    image_links = list(set(image_links)) # make unique
+    image_links = list(set(image_links))  # make unique
 
     if len(image_links) > 0:
         for image_link in image_links:
             if "gfycat.com/" in image_link:
                 r = yield from aiohttp.request('get', image_link)
                 raw = yield from r.read()
-                image_link = re.search("<a href=\"(.*?)\">\\1</a>", str(raw, 'utf-8')).group(1)
+                image_link = re.search(
+                    "<a href=\"(.*?)\">\\1</a>", str(raw, 'utf-8')).group(1)
             filename = os.path.basename(image_link)
             r = yield from aiohttp.request('get', image_link)
             raw = yield from r.read()
@@ -67,7 +73,8 @@ def _load_all_the_things():
         if len(parts) == 2:
             triggers, images = parts
             triggers = [x.strip() for x in triggers.split(',')]
-            images = [re.search('\((.*?)\)$', x).group(1) for x in images.split(' ')]
+            images = [re.search('\((.*?)\)$', x).group(1)
+                      for x in images.split(' ')]
             for trigger in triggers:
                 if trigger in _lookup:
                     _lookup[trigger].extend(images)

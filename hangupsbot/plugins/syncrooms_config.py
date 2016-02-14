@@ -52,7 +52,7 @@ def attachsyncout(bot, event, *args):
         if any(x in conversation_ids for x in sync_room_list):
             missing_ids = list(set(conversation_ids) - set(sync_room_list))
             sync_room_list.extend(missing_ids)
-            affected_conversations = list(sync_room_list) # clone
+            affected_conversations = list(sync_room_list)  # clone
             found_existing = True
             break
 
@@ -100,7 +100,7 @@ def detachsyncout(bot, event, target_conversation_id=None, *args):
         if target_conversation_id in sync_room_list:
             sync_room_list.remove(target_conversation_id)
             _detached = True
-            break;
+            break
 
     # cleanup: remove empty or 1-item syncouts by rewriting variable
     _syncouts = []

@@ -1,4 +1,8 @@
-import asyncio, hashlib, html, logging, urllib
+import asyncio
+import hashlib
+import html
+import logging
+import urllib
 
 import urllib.request as urllib2
 from http.cookiejar import CookieJar
@@ -16,6 +20,8 @@ __cleverbots = dict()
 
 
 """ Cleverbot API adapted from https://github.com/folz/cleverbot.py """
+
+
 class Cleverbot:
     """
     Wrapper over the Cleverbot API.
@@ -89,7 +95,6 @@ class Cleverbot:
         except urllib2.HTTPError:
             logger.exception(e)
 
-
     def ask(self, question):
         """Asks Cleverbot a question.
 
@@ -136,7 +141,6 @@ class Cleverbot:
 
         return parsed['answer']
 
-
     def _send(self):
         """POST the user's question and all required information to the
         Cleverbot API
@@ -159,40 +163,40 @@ class Cleverbot:
         payload during normal operation of the bot
         """
         if self.asked <= 1:
-            payload = ( "stimulus={0[stimulus]}"
-                        "&cb_settings_scripting=no"
-                        "&islearning=1"
-                        "&icognoid={0[icognoid]}" ).format(self.data)
+            payload = ("stimulus={0[stimulus]}"
+                       "&cb_settings_scripting=no"
+                       "&islearning=1"
+                       "&icognoid={0[icognoid]}").format(self.data)
 
             query_string = ""
 
         else:
-            payload = ( "stimulus={0[stimulus]}"
-                        "&vText2={0[vText2]}"
-                        "&vText3={0[vText3]}"
-                        "&vText4={0[vText4]}"
-                        "&vText5={0[vText5]}"
-                        "&vText6={0[vText6]}"
-                        "&vText7={0[vText7]}"
-                        "&sessionid={0[sessionid]}"
-                        "&cb_settings_language=es"
-                        "&cb_settings_scripting=no"
-                        "&islearning={0[islearning]}"
-                        "&icognoid={0[icognoid]}" ).format(self.data)
+            payload = ("stimulus={0[stimulus]}"
+                       "&vText2={0[vText2]}"
+                       "&vText3={0[vText3]}"
+                       "&vText4={0[vText4]}"
+                       "&vText5={0[vText5]}"
+                       "&vText6={0[vText6]}"
+                       "&vText7={0[vText7]}"
+                       "&sessionid={0[sessionid]}"
+                       "&cb_settings_language=es"
+                       "&cb_settings_scripting=no"
+                       "&islearning={0[islearning]}"
+                       "&icognoid={0[icognoid]}").format(self.data)
 
             query_string = {
-                'out' : self.lastanswer, 
-                'in' : self.data['stimulus'], 
-                'bot' : 'c', 
-                'cbsid' : self.data['sessionid'], 
-                'xai' : self.data["sessionid"][0:3], 
-                'ns' : self.asked, 
-                'al' : '', 
-                'dl' : '', 
-                'flag': '', 
-                'user' : '', 
-                'mode' : 1, 
-                't' : randint(10000, 99999)
+                'out': self.lastanswer,
+                'in': self.data['stimulus'],
+                'bot': 'c',
+                'cbsid': self.data['sessionid'],
+                'xai': self.data["sessionid"][0:3],
+                'ns': self.asked,
+                'al': '',
+                'dl': '',
+                'flag': '',
+                'user': '',
+                'mode': 1,
+                't': randint(10000, 99999)
             }
 
         # Generate the token
@@ -247,7 +251,8 @@ def _handle_incoming_message(bot, event, command):
     if not bot.get_config_suboption(event.conv_id, 'cleverbot_percentage_replies'):
         return
 
-    percentage = bot.get_config_suboption(event.conv_id, 'cleverbot_percentage_replies')
+    percentage = bot.get_config_suboption(
+        event.conv_id, 'cleverbot_percentage_replies')
 
     if randrange(0, 101, 1) < float(percentage):
         text = yield from cleverbot_ask(event.conv_id, event.text)
@@ -302,7 +307,8 @@ def cleverbot_ask(conv_id, message, filter_ads=True):
                     text = False
                 else:
                     # filter out specific ad-related keywords
-                    ad_text = ["cleverscript", "cleverme", "clevertweet", "cleverenglish"]
+                    ad_text = ["cleverscript", "cleverme",
+                               "clevertweet", "cleverenglish"]
                     for ad in ad_text:
                         if ad.lower() in text.lower():
                             logger.debug("ad-blocked")

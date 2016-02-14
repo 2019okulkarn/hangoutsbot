@@ -2,7 +2,12 @@
 Identify images, upload them to google plus, post in hangouts
 """
 
-import aiohttp, asyncio, io, logging, os, re
+import aiohttp
+import asyncio
+import io
+import logging
+import os
+import re
 
 import plugins
 from control import *
@@ -35,7 +40,8 @@ def _watch_image_link(bot, event, command):
 
         if probable_image_link and "googleusercontent" in event_text_lower:
             """reject links posted by google to prevent endless attachment loop"""
-            logger.debug("rejected link {} with googleusercontent".format(event.text))
+            logger.debug(
+                "rejected link {} with googleusercontent".format(event.text))
             return
 
         if probable_image_link:
@@ -45,10 +51,11 @@ def _watch_image_link(bot, event, command):
                 """special imgur link handling"""
                 if not link_image.endswith((".jpg", ".gif", "gifv", "webm", "png")):
                     link_image = link_image + ".gif"
-                link_image = "https://i.imgur.com/" + os.path.basename(link_image)
+                link_image = "https://i.imgur.com/" + \
+                    os.path.basename(link_image)
 
-            link_image = link_image.replace(".webm",".gif")
-            link_image = link_image.replace(".gifv",".gif")
+            link_image = link_image.replace(".webm", ".gif")
+            link_image = link_image.replace(".gifv", ".gif")
 
             logger.info("getting {}".format(link_image))
 
@@ -60,7 +67,7 @@ def _watch_image_link(bot, event, command):
             image_id = yield from bot._client.upload_image(image_data, filename=filename)
 
             yield from bot.coro_send_message(event.conv.id_, None, image_id=image_id)
-        words  = str(event.text).split()
+        words = str(event.text).split()
         for i in range(len(words)):
             if 'http' in words[i]:
                 parsedurl = str(words[i])

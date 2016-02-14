@@ -1,8 +1,12 @@
-import asyncio, inspect, logging, sys
+import asyncio
+import inspect
+import logging
+import sys
 
 # hangups-specific imports
 
-import json, random
+import json
+import random
 
 from hangups import exceptions
 from hangups.client import Client as class_hangups_client
@@ -13,7 +17,8 @@ logger = logging.getLogger(__name__)
 
 
 def _initialise(bot):
-    replace_method(class_hangups_client, "removeuser", otr_monkeypatch_removeuser)
+    replace_method(class_hangups_client, "removeuser",
+                   otr_monkeypatch_removeuser)
     replace_method(class_hangups_client, "adduser", otr_monkeypatched_adduser)
 
     # store a reference to the bot object
@@ -27,21 +32,23 @@ def replace_method(the_class, class_method_name, new_method):
     old_signature = set(inspect.signature(class_method).parameters)
     new_signature = set(inspect.signature(new_method).parameters)
 
-    if old_signature < new_signature: # only patch if SUBSET of parameters
+    if old_signature < new_signature:  # only patch if SUBSET of parameters
         setattr(the_class, class_method_name, new_method)
-        logger.info("{} replaced with {}".format(class_method_name, new_method.__name__))
+        logger.info("{} replaced with {}".format(
+            class_method_name, new_method.__name__))
 
 
 @asyncio.coroutine
 def otr_monkeypatch_removeuser(self, conversation_id, otr_status=None):
     if otr_status is None:
-        otr_status = OffTheRecordStatus.ON_THE_RECORD # default
+        otr_status = OffTheRecordStatus.ON_THE_RECORD  # default
         try:
             if not bot.conversations.catalog[conversation_id]["history"]:
                 otr_status = OffTheRecordStatus.OFF_THE_RECORD
         except KeyError:
             logger.warning("missing history flag: {}".format(conversation_id))
-    logger.debug("hangups.client.Client.removeuser, convid={} OTR={}".format(conversation_id, otr_status))
+    logger.debug("hangups.client.Client.removeuser, convid={} OTR={}".format(
+        conversation_id, otr_status))
 
     # https://github.com/tdryer/hangups/blob/5ca47c7497c1456e99cef0f8d3dc5fc8c3ffe9df/hangups/client.py#L510
 
@@ -67,13 +74,14 @@ def otr_monkeypatch_removeuser(self, conversation_id, otr_status=None):
 @asyncio.coroutine
 def otr_monkeypatched_adduser(self, conversation_id, chat_id_list, otr_status=None):
     if otr_status is None:
-        otr_status = OffTheRecordStatus.ON_THE_RECORD # default
+        otr_status = OffTheRecordStatus.ON_THE_RECORD  # default
         try:
             if not bot.conversations.catalog[conversation_id]["history"]:
                 otr_status = OffTheRecordStatus.OFF_THE_RECORD
         except KeyError:
             logger.warning("missing history flag: {}".format(conversation_id))
-    logger.debug("hangups.client.Client.adduser, convid={} OTR={}".format(conversation_id, otr_status))
+    logger.debug("hangups.client.Client.adduser, convid={} OTR={}".format(
+        conversation_id, otr_status))
 
     # https://github.com/tdryer/hangups/blob/5ca47c7497c1456e99cef0f8d3dc5fc8c3ffe9df/hangups/client.py#L858
 

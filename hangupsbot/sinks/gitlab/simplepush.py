@@ -1,4 +1,6 @@
-import asyncio, json, logging
+import asyncio
+import json
+import logging
 
 from sinks.base_bot_request_handler import AsyncRequestHandler
 
@@ -7,9 +9,9 @@ logger = logging.getLogger(__name__)
 try:
     import dateutil.parser
 except ImportError:
-    logger.error("missing module python_dateutil: pip3 install python_dateutil")
+    logger.error(
+        "missing module python_dateutil: pip3 install python_dateutil")
     raise
-
 
 
 class webhookReceiver(AsyncRequestHandler):
@@ -20,7 +22,8 @@ class webhookReceiver(AsyncRequestHandler):
         path = path.split("/")
         conv_or_user_id = path[1]
         if conv_or_user_id is None:
-            logger.error("conversation or user id must be provided as part of path")
+            logger.error(
+                "conversation or user id must be provided as part of path")
             return
 
         try:
@@ -36,8 +39,8 @@ class webhookReceiver(AsyncRequestHandler):
         if object_kind == 'push':
             logger.debug('GITLAB push: {}'.format(json.dumps(payload)))
             html = '<b>{}</b> has pushed {} commit(s) to <a href="{}">{}</a><br/>'.format(
-                    payload["user_name"], payload["total_commits_count"],
-                    payload["repository"]["url"], payload["repository"]["name"])
+                payload["user_name"], payload["total_commits_count"],
+                payload["repository"]["url"], payload["repository"]["name"])
 
             for commit in payload["commits"]:
                 html += '* <i>{}</i> -- {} at <a href="{}">{:%c}</a><br/>'.format(

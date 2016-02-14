@@ -1,8 +1,11 @@
 from urllib.request import urlopen
 import plugins
 from control import *
+
+
 def _initialize():
     plugins.register_user_command(['joke'])
+
 
 def joke(bot, event, *args):
     '''Tells a joke from http://tambal.azurewebsites.net/joke/random Format is /bot joke'''

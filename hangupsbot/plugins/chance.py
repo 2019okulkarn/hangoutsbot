@@ -30,7 +30,7 @@ def diceroll(bot, event, dice="1d6", *args):
     """
     usage = "usage: diceroll <b>n</b>d<b>s</b>"
     try:
-        n,s = dice.split('d')
+        n, s = dice.split('d')
     except ValueError:
         yield from bot.coro_send_message(event.conv, usage)
         return
@@ -49,8 +49,8 @@ def diceroll(bot, event, dice="1d6", *args):
         return
     msg = _("<i>{} rolled ").format(event.user.full_name)
     total = 0
-    for i in range(0,n):
-        roll = randint(1,s)
+    for i in range(0, n):
+        roll = randint(1, s)
         total = total + roll
         if i != 0:
             msg = msg + ", "
@@ -62,7 +62,7 @@ def diceroll(bot, event, dice="1d6", *args):
 
 def coinflip(bot, event, *args):
     """flip a coin"""
-    if randint(1,2) == 1:
+    if randint(1, 2) == 1:
         yield from bot.coro_send_message(event.conv, _("<i>{}, coin turned up <b>heads</b></i>").format(event.user.full_name))
     else:
         yield from bot.coro_send_message(event.conv, _("<i>{}, coin turned up <b>tails</b></i>").format(event.user.full_name))

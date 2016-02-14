@@ -2,15 +2,17 @@ import plugins
 from control import *
 from collections import Counter
 
+
 def _initialize():
     plugins.register_admin_command(["poll"])
-    plugins.register_user_command(["vote","polls", "results"])
+    plugins.register_user_command(["vote", "polls", "results"])
+
 
 def poll(bot, event, *args):
     '''Creates a poll. Format is /bot poll <name>'''
     try:
         if not bot.memory.exists(['polls']):
-                bot.memory.set_by_path(['polls'], {})
+            bot.memory.set_by_path(['polls'], {})
         if args:
             name = ' '.join(args)
             bot.memory.set_by_path(['polls', name], {})
@@ -26,6 +28,7 @@ def poll(bot, event, *args):
         yield from bot.coro_send_message(event.conv, simple)
         yield from bot.coro_send_message(CONTROL, msg)
 
+
 def polls(bot, event, *args):
     '''Lists available polls. Format is /bot polls.'''
     path = bot.memory.get_by_path(['polls'])
@@ -35,11 +38,12 @@ def polls(bot, event, *args):
     msg = '<br>'.join(polls)
     yield from bot.coro_send_message(event.conv, msg)
 
+
 def vote(bot, event, *args):
     '''Votes in a poll. Format is /bot vote <vote> - <poll>'''
     try:
         spl = ' '.join(args).split(' - ')
-        if len(spl) == 2:  
+        if len(spl) == 2:
             vote = spl[0]
             poll = spl[1]
             path = bot.memory.get_by_path(['polls', poll])
@@ -55,6 +59,7 @@ def vote(bot, event, *args):
         msg = _("{} -- {}").format(str(e), event.text)
         yield from bot.coro_send_message(event.conv, simple)
         yield from bot.coro_send_message(CONTROL, msg)
+
 
 def results(bot, event, *args):
     '''Get's results of poll. Format is /bot results <poll>'''
@@ -81,9 +86,11 @@ def results(bot, event, *args):
             winners.append(str(item[0]))
         freq = str(common[0][1])
         if len(winners) == 1:
-            msg.append('<br>THE WINNER IS <b>{}</b> with <b>{}</b> votes'.format(winners[0], freq))
+            msg.append(
+                '<br>THE WINNER IS <b>{}</b> with <b>{}</b> votes'.format(winners[0], freq))
         else:
-            msg.append('<br>THE WINNERS ARE <b>{}</b> with <b>{}</b> votes'.format(', '.join(winners), freq))
+            msg.append(
+                '<br>THE WINNERS ARE <b>{}</b> with <b>{}</b> votes'.format(', '.join(winners), freq))
         final = ''.join(msg)
         yield from bot.coro_send_message(event.conv, final)
     except BaseException as e:

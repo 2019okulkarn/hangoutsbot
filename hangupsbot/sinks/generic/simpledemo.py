@@ -12,13 +12,15 @@ from urllib.parse import urlparse, parse_qs
 
 from utils import simple_parse_to_segments
 
+
 class webhookReceiver(BaseHTTPRequestHandler):
-    _bot = None # set externally by the hangupsbot sink loader
+    _bot = None  # set externally by the hangupsbot sink loader
     sinkname = "sink"
 
     @asyncio.coroutine
     def process_payload(self, path, query_string, payload):
-        logging.warning("[DEPRECATED] simpledemo.webhookReceiver, use sinks.generic.SimpleMessagePoster")
+        logging.warning(
+            "[DEPRECATED] simpledemo.webhookReceiver, use sinks.generic.SimpleMessagePoster")
 
         sinkname = self.sinkname
 
@@ -34,11 +36,12 @@ class webhookReceiver(BaseHTTPRequestHandler):
             image_filename = False
             image_type = 'unknown'
             if "base64encoded" in payload["image"]:
-                raw = base64.b64decode(payload["image"]["base64encoded"], None, True)
+                raw = base64.b64decode(
+                    payload["image"]["base64encoded"], None, True)
                 image_data = io.BytesIO(raw)
                 image_type = imghdr.what('ignore', raw)
                 if not image_type:
-                  image_type = 'error'
+                    image_type = 'error'
             if "filename" in payload["image"]:
                 image_filename = payload["image"]["filename"]
             else:
@@ -57,15 +60,16 @@ class webhookReceiver(BaseHTTPRequestHandler):
 
         yield from self._bot.coro_send_message(conversation_id, segments, context=None, image_id=image_id)
 
-
     def do_POST(self):
-        logging.warning("[DEPRECATED] simpledemo.webhookReceiver, use sinks.generic.SimpleMessagePoster")
+        logging.warning(
+            "[DEPRECATED] simpledemo.webhookReceiver, use sinks.generic.SimpleMessagePoster")
 
         sinkname = self.sinkname
 
         print('{}: receiving POST...'.format(sinkname))
 
-        data_string = self.rfile.read(int(self.headers['Content-Length'])).decode('UTF-8')
+        data_string = self.rfile.read(
+            int(self.headers['Content-Length'])).decode('UTF-8')
         self.send_response(200)
         message = bytes('OK', 'UTF-8')
         self.send_header("Content-type", "text")
@@ -80,7 +84,8 @@ class webhookReceiver(BaseHTTPRequestHandler):
         query_string = parse_qs(_parsed.query)
 
         print("{}: incoming path: {}".format(sinkname, path))
-        print("{}: incoming data: approx {} bytes".format(sinkname, len(data_string)))
+        print("{}: incoming data: approx {} bytes".format(
+            sinkname, len(data_string)))
 
         # parse incoming data
         payload = json.loads(data_string)

@@ -1,1 +1,1 @@
-comebackslist=["YOUR MOM!"]
+comebackslist = ["YOUR MOM!"]

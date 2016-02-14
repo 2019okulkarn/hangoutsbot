@@ -1,4 +1,8 @@
-import aiohttp, asyncio, json, logging, requests
+import aiohttp
+import asyncio
+import json
+import logging
+import requests
 
 import plugins
 
@@ -26,14 +30,12 @@ class BridgeInstance(WebFramework):
 
                 for telegram_id in mapped["telegram"]:
                     asyncio.async(
-                        self.telegram_api_request("sendMessage", { "chat_id" : telegram_id, 
-                                                                   "text" : user_full_name + " : " + conversation_text })
+                        self.telegram_api_request("sendMessage", {"chat_id": telegram_id,
+                                                                  "text": user_full_name + " : " + conversation_text})
                     ).add_done_callback(lambda future: future.result())
-
 
     def _start_sinks(self, bot):
         plugins.start_asyncio_task(self.telegram_longpoll)
-
 
     @asyncio.coroutine
     def telegram_api_request(self, method, data):
@@ -51,7 +53,6 @@ class BridgeInstance(WebFramework):
 
         return raw
 
-
     @asyncio.coroutine
     def telegram_longpoll(self, bot):
         connector = aiohttp.TCPConnector(verify_ssl=True)
@@ -68,11 +69,11 @@ class BridgeInstance(WebFramework):
 
         while True:
             try:
-                data = { "timeout": 60 }
+                data = {"timeout": 60}
                 if max_offset:
                     data["offset"] = int(max_offset) + 1
                 res = yield from asyncio.wait_for(aiohttp.request('post', url, data=data, headers=headers, connector=connector), CONNECT_TIMEOUT)
-                chunk = yield from res.content.read(1024*1024)
+                chunk = yield from res.content.read(1024 * 1024)
             except asyncio.TimeoutError:
                 raise
             except asyncio.CancelledError:
@@ -88,18 +89,21 @@ class BridgeInstance(WebFramework):
                         message = Update["message"]
 
                         if "text" in message:
-                            text_message = message["from"]["username"] + " : " + message["text"]
+                            text_message = message["from"][
+                                "username"] + " : " + message["text"]
                         elif "photo" in message:
-                            text_message = message["from"]["username"] + " sent a photo on telegram"
+                            text_message = message["from"][
+                                "username"] + " sent a photo on telegram"
                         else:
-                            text_message = "unrecognised telegram update: {}".format(message)
+                            text_message = "unrecognised telegram update: {}".format(
+                                message)
 
                         for mapped in self.configuration[0]["conversation_map"]:
                             telegram = mapped["telegram"]
                             if str(message["chat"]["id"]) in telegram:
                                 for conv_id in mapped["hangouts"]:
-                                    yield from bot.coro_send_message( conv_id, 
-                                                                      text_message )
+                                    yield from bot.coro_send_message(conv_id,
+                                                                     text_message)
 
                     logger.debug(response)
             else:

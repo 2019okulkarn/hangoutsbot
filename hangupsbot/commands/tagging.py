@@ -1,4 +1,5 @@
-import logging, pprint
+import logging
+import pprint
 
 from commands import command
 
@@ -6,7 +7,8 @@ from commands import command
 logger = logging.getLogger(__name__)
 
 
-def _initialise(bot): pass # prevents commands from being automatically added
+def _initialise(bot): pass  # prevents commands from being automatically added
+
 
 def _tagshortcuts(event, type, id):
     """given type=conv, type=convuser, id=here expands to event.conv_id"""
@@ -29,7 +31,8 @@ def tagset(bot, event, *args):
         [type, id, tag] = args
         type, id = _tagshortcuts(event, type, id)
         if bot.tags.add(type, id, tag):
-            message = _("tagged <b><pre>{}</pre></b> with <b><pre>{}</pre></b>".format(id, tag))
+            message = _(
+                "tagged <b><pre>{}</pre></b> with <b><pre>{}</pre></b>".format(id, tag))
         else:
             message = _("<b><pre>{}</pre></b> unchanged".format(id))
     else:
@@ -44,7 +47,8 @@ def tagdel(bot, event, *args):
         [type, id, tag] = args
         type, id = _tagshortcuts(event, type, id)
         if bot.tags.remove(type, id, tag):
-            message = _("removed <b><pre>{}</pre></b> from <b><pre>{}</pre></b>".format(tag, id))
+            message = _(
+                "removed <b><pre>{}</pre></b> from <b><pre>{}</pre></b>".format(tag, id))
         else:
             message = _("<b><pre>{}</pre></b> unchanged".format(id))
     else:
@@ -59,7 +63,8 @@ def tagspurge(bot, event, *args):
         [type, id] = args
         type, id = _tagshortcuts(event, type, id)
         entries_removed = bot.tags.purge(type, id)
-        message = _("entries removed: <b><pre>{}</pre></b>".format(entries_removed))
+        message = _(
+            "entries removed: <b><pre>{}</pre></b>".format(entries_removed))
     else:
         message = _("<b>supply type, id</b>")
     yield from bot.coro_send_message(event.conv_id, message)
@@ -72,7 +77,8 @@ def tagscommand(bot, event, *args):
         [command_name] = args
 
         if command_name not in command.commands:
-            message = _("<b><pre>COMMAND: {}</pre></b> does not exist".format(command_name))
+            message = _(
+                "<b><pre>COMMAND: {}</pre></b> does not exist".format(command_name))
 
         else:
             lines = []
@@ -85,20 +91,22 @@ def tagscommand(bot, event, *args):
                 ALL_TAGS = ALL_TAGS | plugin_defined
 
             config_root = set()
-            config_commands_tagged = bot.get_config_option('commands_tagged') or {}
+            config_commands_tagged = bot.get_config_option(
+                'commands_tagged') or {}
             if command_name in config_commands_tagged and config_commands_tagged[command_name]:
-                config_root = set([ frozenset(value if isinstance(value, list) else [value])
-                    for value in config_commands_tagged[command_name] ])
+                config_root = set([frozenset(value if isinstance(value, list) else [value])
+                                   for value in config_commands_tagged[command_name]])
                 ALL_TAGS = ALL_TAGS | config_root
 
             config_conv = {}
             if bot.config.exists(["conversations"]):
                 for convid in bot.config["conversations"]:
                     if bot.config.exists(["conversations", convid, "commands_tagged"]):
-                        conv_tagged = bot.config.get_by_path(["conversations", convid, "commands_tagged"])
+                        conv_tagged = bot.config.get_by_path(
+                            ["conversations", convid, "commands_tagged"])
                         if command_name in conv_tagged and conv_tagged[command_name]:
-                            config_conv[convid] = set([ frozenset(value if isinstance(value, list) else [value])
-                                for value in conv_tagged[command_name] ])
+                            config_conv[convid] = set([frozenset(value if isinstance(value, list) else [value])
+                                                       for value in conv_tagged[command_name]])
                             ALL_TAGS = ALL_TAGS | config_conv[convid]
 
             dict_tags = {}
@@ -114,17 +122,20 @@ def tagscommand(bot, event, *args):
                     dict_tags[text_match].append("config: root")
                 for convid, tagsets in config_conv.items():
                     if match in tagsets:
-                        dict_tags[text_match].append("config: {}".format(convid))
+                        dict_tags[text_match].append(
+                            "config: {}".format(convid))
 
             for text_tags in sorted(dict_tags.keys()):
                 lines.append("[ {} ]".format(text_tags))
                 for source in dict_tags[text_tags]:
                     lines.append("... {}".format(source))
 
-            if len(lines)==0:
-                message = _("<b><pre>COMMAND: {}</pre></b> has no tags".format(command_name))
+            if len(lines) == 0:
+                message = _(
+                    "<b><pre>COMMAND: {}</pre></b> has no tags".format(command_name))
             else:
-                lines.insert(0, _("<b><pre>COMMAND: {}</pre></b>, match <b>ANY</b>:".format(command_name)))
+                lines.insert(
+                    0, _("<b><pre>COMMAND: {}</pre></b>, match <b>ANY</b>:".format(command_name)))
                 message = "<br />".join(lines)
 
     else:
@@ -174,13 +185,14 @@ def tagsuser(bot, event, *args):
 
     active_user_tags = bot.tags.useractive(chat_id, conv_id)
     if active_user_tags:
-        message_taglist = ", ".join([ "<pre>{}</pre>".format(tag) for tag in active_user_tags ])
+        message_taglist = ", ".join(
+            ["<pre>{}</pre>".format(tag) for tag in active_user_tags])
     else:
         message_taglist = "<em>no tags returned</em>"
 
     yield from bot.coro_send_message(event.conv_id,
                                      "<b><pre>{}</pre></b>@<b><pre>{}</pre></b>: {}".format(
-                                        chat_id, conv_id, message_taglist))
+                                         chat_id, conv_id, message_taglist))
 
 
 @command.register(admin=True)
@@ -205,7 +217,8 @@ def tagsuserlist(bot, event, *args):
     for chat_id, active_user_tags in users_to_tags.items():
         if not active_user_tags:
             active_user_tags = [_("<em>no tags returned</em>")]
-        lines.append("<b><pre>{}</pre></b>: <pre>{}</pre>".format(chat_id, ", ".join(active_user_tags)))
+        lines.append(
+            "<b><pre>{}</pre></b>: <pre>{}</pre>".format(chat_id, ", ".join(active_user_tags)))
 
     if len(lines) == 0:
         lines = [_("<b>no users found</b>")]

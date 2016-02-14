@@ -53,7 +53,8 @@ class WatermarkEvent(StatusEvent):
 
         self.user_id = state_update_event.participant_id
         self.timestamp = state_update_event.latest_read_timestamp
-        self.user = self.bot.get_hangups_user(state_update_event.participant_id)
+        self.user = self.bot.get_hangups_user(
+            state_update_event.participant_id)
         if self.user.is_self:
             self.from_bot = True
         self.text = "watermark"
@@ -72,14 +73,18 @@ class ConversationEvent(GenericEvent):
         self.user_id = conv_event.user_id
         self.user = self.conv.get_user(self.user_id)
         self.timestamp = conv_event.timestamp
-        self.text = conv_event.text.strip() if isinstance(conv_event, hangups.ChatMessageEvent) else ''
+        self.text = conv_event.text.strip() if isinstance(
+            conv_event, hangups.ChatMessageEvent) else ''
 
         self.log()
 
-
     def log(self):
         if logger.isEnabledFor(self.emit_log):
-            logger.log(self.emit_log, 'eid/dt: {}/{}'.format(self.event_id, self.timestamp.astimezone(tz=None).strftime('%Y-%m-%d %H:%M:%S')))
-            logger.log(self.emit_log, 'cid/cn: {}/{}'.format(self.conv_id, self.bot.conversations.get_name(self.conv)))
-            logger.log(self.emit_log, 'c/g/un: {}/{}/{}'.format(self.user_id.chat_id, self.user_id.gaia_id, self.user.full_name))
-            logger.log(self.emit_log, 'len/tx: {}/{}'.format(len(self.text), self.text))
+            logger.log(self.emit_log, 'eid/dt: {}/{}'.format(self.event_id,
+                                                             self.timestamp.astimezone(tz=None).strftime('%Y-%m-%d %H:%M:%S')))
+            logger.log(self.emit_log, 'cid/cn: {}/{}'.format(self.conv_id,
+                                                             self.bot.conversations.get_name(self.conv)))
+            logger.log(self.emit_log, 'c/g/un: {}/{}/{}'.format(self.user_id.chat_id,
+                                                                self.user_id.gaia_id, self.user.full_name))
+            logger.log(self.emit_log,
+                       'len/tx: {}/{}'.format(len(self.text), self.text))

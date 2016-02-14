@@ -1,4 +1,9 @@
-import aiohttp, asyncio, logging, os, random, urllib.request
+import aiohttp
+import asyncio
+import logging
+import os
+import random
+import urllib.request
 
 from bs4 import BeautifulSoup
 
@@ -10,7 +15,7 @@ import plugins
 logger = logging.getLogger(__name__)
 
 
-_externals = { "running": False }
+_externals = {"running": False}
 
 
 def _initialise(bot):
@@ -55,7 +60,8 @@ def meme(bot, event, *args):
             image_data = urllib.request.urlopen(jpg_link)
             filename = os.path.basename(jpg_link)
 
-            legacy_segments = [hangups.ChatMessageSegment(instance_link, hangups.SegmentType.LINK, link_target=instance_link)]
+            legacy_segments = [hangups.ChatMessageSegment(
+                instance_link, hangups.SegmentType.LINK, link_target=instance_link)]
 
             logger.debug("uploading {} from {}".format(filename, jpg_link))
             photo_id = yield from bot._client.upload_image(image_data, filename=filename)

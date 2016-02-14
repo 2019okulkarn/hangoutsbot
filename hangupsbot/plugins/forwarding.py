@@ -1,4 +1,8 @@
-import aiohttp, asyncio, logging, os, io
+import aiohttp
+import asyncio
+import logging
+import os
+import io
 
 import hangups
 
@@ -24,15 +28,16 @@ def _handle_forwarding(bot, event, command):
         logger.debug("{}".format(forward_to_list))
 
         for _conv_id in forward_to_list:
-            html_identity = "<b><a href='https://plus.google.com/u/0/{}/about'>{}</a></b><b>:</b> ".format(event.user_id.chat_id, event.user.full_name)
+            html_identity = "<b><a href='https://plus.google.com/u/0/{}/about'>{}</a></b><b>:</b> ".format(
+                event.user_id.chat_id, event.user.full_name)
 
             html_message = ""
             for segment in event.conv_event.segments:
                 html_message += segment.text
 
             if not event.conv_event.attachments:
-                yield from bot.coro_send_message( _conv_id, 
-                                                  html_identity + html_message )
+                yield from bot.coro_send_message(_conv_id,
+                                                 html_identity + html_message)
 
             for link in event.conv_event.attachments:
 
@@ -46,10 +51,10 @@ def _handle_forwarding(bot, event, command):
                     image_id = yield from bot._client.upload_image(image_data, filename=filename)
                     if not html_message:
                         html_message = "(sent an image)"
-                    yield from bot.coro_send_message( _conv_id,
-                                                      html_identity + html_message,
-                                                      image_id=image_id )
+                    yield from bot.coro_send_message(_conv_id,
+                                                     html_identity + html_message,
+                                                     image_id=image_id)
 
                 except AttributeError:
-                    yield from bot.coro_send_message( _conv_id,
-                                                      html_identity + html_message + " " + link )
+                    yield from bot.coro_send_message(_conv_id,
+                                                     html_identity + html_message + " " + link)

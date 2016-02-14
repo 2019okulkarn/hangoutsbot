@@ -1,4 +1,6 @@
-import asyncio, logging, re
+import asyncio
+import logging
+import re
 
 from random import choice
 import time
@@ -7,9 +9,11 @@ from control import *
 
 logger = logging.getLogger(__name__)
 
+
 def _initialize():
     plugins.register_admin_command(["addquote"])
     plugins.register_user_command(["quote"])
+
 
 def addquote(bot, event, *args):
     '''Adds a quote to the bot's memory. Format is /bot addquote <quote> - <person>'''
@@ -32,6 +36,7 @@ def addquote(bot, event, *args):
     except BaseException as e:
         msg = _('{} -- {}').format(str(e), event.text)
         yield from bot.coro_send_message(CONTROL, msg)
+
 
 def quote(bot, event, *args):
     '''Retrieves quote from bot's memory. Format is /bot quote <person>'''
@@ -73,5 +78,3 @@ def quote(bot, event, *args):
     except:
         msg = _("No quote found")
     yield from bot.coro_send_message(event.conv, msg)
-
-

@@ -1,4 +1,10 @@
-import asyncio, io, logging, os, re, time, tempfile
+import asyncio
+import io
+import logging
+import os
+import re
+import time
+import tempfile
 
 import selenium
 
@@ -12,7 +18,7 @@ import plugins
 logger = logging.getLogger(__name__)
 
 
-_externals = { "running": False }
+_externals = {"running": False}
 
 
 dcap = dict(DesiredCapabilities.PHANTOMJS)
@@ -58,11 +64,13 @@ def seturl(bot, event, *args):
     url = bot.conversation_memory_get(event.conv_id, 'url')
     if url is None:
         bot.conversation_memory_set(event.conv_id, 'url', ''.join(args))
-        html = "<i><b>{}</b> updated screenshot URL".format(event.user.full_name)
+        html = "<i><b>{}</b> updated screenshot URL".format(
+            event.user.full_name)
         yield from bot.coro_send_message(event.conv, html)
 
     else:
-        html = "<i><b>{}</b> URL already exists for this conversation!<br /><br />".format(event.user.full_name)
+        html = "<i><b>{}</b> URL already exists for this conversation!<br /><br />".format(
+            event.user.full_name)
         html += "<i>Clear it first with /bot clearurl before setting a new one."
         yield from bot.coro_send_message(event.conv, html)
 
@@ -72,12 +80,14 @@ def clearurl(bot, event, *args):
     """
     url = bot.conversation_memory_get(event.conv_id, 'url')
     if url is None:
-        html = "<i><b>{}</b> nothing to clear for this conversation".format(event.user.full_name)
+        html = "<i><b>{}</b> nothing to clear for this conversation".format(
+            event.user.full_name)
         yield from bot.coro_send_message(event.conv, html)
 
     else:
         bot.conversation_memory_set(event.conv_id, 'url', None)
-        html = "<i><b>{}</b> URL cleared for this conversation!<br />".format(event.user.full_name)
+        html = "<i><b>{}</b> URL cleared for this conversation!<br />".format(
+            event.user.full_name)
         yield from bot.coro_send_message(event.conv, html)
 
 
@@ -94,20 +104,23 @@ def screenshot(bot, event, *args):
         url = bot.conversation_memory_get(event.conv_id, 'url')
 
     if url is None:
-        html = "<i><b>{}</b> No URL has been set for screenshots and none was provided manually.".format(event.user.full_name)
+        html = "<i><b>{}</b> No URL has been set for screenshots and none was provided manually.".format(
+            event.user.full_name)
         yield from bot.coro_send_message(event.conv, html)
 
     else:
         _externals["running"] = True
-        
+
         if not re.match(r'^[a-zA-Z]+://', url):
             url = 'http://' + url
-        filename = event.conv_id + "." + str(time.time()) +".png"
-        filepath = tempfile.NamedTemporaryFile(prefix=event.conv_id, suffix=".png", delete=False).name
+        filename = event.conv_id + "." + str(time.time()) + ".png"
+        filepath = tempfile.NamedTemporaryFile(
+            prefix=event.conv_id, suffix=".png", delete=False).name
         logger.debug("temporary screenshot file: {}".format(filepath))
 
         try:
-            browser = webdriver.PhantomJS(desired_capabilities=dcap,service_log_path=os.path.devnull)
+            browser = webdriver.PhantomJS(
+                desired_capabilities=dcap, service_log_path=os.path.devnull)
         except selenium.common.exceptions.WebDriverException as e:
             yield from bot.coro_send_message(event.conv, "<i>phantomjs could not be started - is it installed?</i>".format(e))
             return
@@ -123,7 +136,7 @@ def screenshot(bot, event, *args):
             return
         finally:
             _externals["running"] = False
-            
+
         try:
             image_id = yield from bot._client.upload_image(image_data, filename=filename)
             yield from bot._client.sendchatmessage(event.conv.id_, None, image_id=image_id)

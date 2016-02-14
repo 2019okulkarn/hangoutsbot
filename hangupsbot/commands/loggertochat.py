@@ -1,4 +1,7 @@
-import asyncio, logging, logging.handlers, sys
+import asyncio
+import logging
+import logging.handlers
+import sys
 
 import plugins
 
@@ -11,12 +14,13 @@ def _initialise(bot):
     rootLogger = logging.getLogger()
     for handler in rootLogger.handlers:
         if handler.__class__.__name__ == "ChatMessageLogger":
-            logger.info("ChatMessageLogger already attached") 
+            logger.info("ChatMessageLogger already attached")
             return
 
     chatHandler = ChatMessageLogger(bot)
 
-    chatHandler.setFormatter(logging.Formatter("<b>%(levelname)s %(name)s </b>: %(message)s"))
+    chatHandler.setFormatter(logging.Formatter(
+        "<b>%(levelname)s %(name)s </b>: %(message)s"))
     chatHandler.setLevel(logging.WARNING)
     chatHandler.addFilter(PluginFilter(bot))
 
@@ -27,11 +31,11 @@ def logconfig(bot, event, loggername, level):
     if loggername in sys.modules:
         config_logging = bot.get_config_option("logging") or {}
 
-        mapping = { "critical": 50,
-                    "error": 40,
-                    "warning": 30,
-                    "info": 20,
-                    "debug": 10 }
+        mapping = {"critical": 50,
+                   "error": 40,
+                   "warning": 30,
+                   "info": 20,
+                   "debug": 10}
 
         effective_level = 0
         if level.isdigit():
@@ -44,18 +48,20 @@ def logconfig(bot, event, loggername, level):
         if effective_level == 0:
             if loggername in config_logging:
                 del config_logging[loggername]
-            message = "logging: {} disabled".format(loggername, effective_level)
+            message = "logging: {} disabled".format(
+                loggername, effective_level)
 
         else:
             if loggername in config_logging:
                 current = config_logging[loggername]
             else:
-                current = { "level": 0 }
+                current = {"level": 0}
 
             current["level"] = effective_level
 
             config_logging[loggername] = current
-            message = "logging: {} set to {} / {}".format(loggername, effective_level, level)
+            message = "logging: {} set to {} / {}".format(
+                loggername, effective_level, level)
 
         bot.config.set_by_path(["logging"], config_logging)
         bot.config.save()
@@ -82,6 +88,7 @@ def lograise(bot, event, *args):
 
 
 class PluginFilter(logging.Filter):
+
     def __init__(self, bot):
         self.bot = bot
         logging.Filter.__init__(self)
@@ -101,6 +108,7 @@ class PluginFilter(logging.Filter):
 
 
 class ChatMessageLogger(logging.Handler):
+
     def __init__(self, bot):
         self.bot = bot
         logging.Handler.__init__(self)

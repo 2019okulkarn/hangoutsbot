@@ -1,4 +1,6 @@
-import asyncio, logging, urllib
+import asyncio
+import logging
+import urllib
 
 import goslate
 

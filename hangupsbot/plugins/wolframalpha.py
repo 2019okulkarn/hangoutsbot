@@ -31,7 +31,7 @@ def ask(bot, event, *args):
 
     if not len(args):
         yield from bot.coro_send_message(event.conv,
-                _("You need to ask WolframAlpha a question"))
+                                         _("You need to ask WolframAlpha a question"))
         return
 
     keyword = ' '.join(args)
@@ -50,7 +50,9 @@ def ask(bot, event, *args):
         else:
             for node in pod.node.iter():
                 if node.tag == "img":
-                    html += '<a href="' + node.attrib["src"] + '">' + node.attrib["src"] + "</a><br />"
+                    html += '<a href="' + \
+                        node.attrib["src"] + '">' + \
+                            node.attrib["src"] + "</a><br />"
                     has_content = True
 
     if not has_content:
