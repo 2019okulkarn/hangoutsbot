@@ -1,0 +1,10 @@
+#Create a user for the bot on github.com and grant read/write access to repo
+USERNAME = 'Enter username for github.com here'
+PASSWORD = 'Enter password for github.com here'
+
+#Repository info
+REPO_OWNER = 'Enter repo owner here'
+REPO_NAME = 'Enter repo name here'
+
+#Local Directory
+git_dir = 'relative/path/to/directory/with/.git/folder'
