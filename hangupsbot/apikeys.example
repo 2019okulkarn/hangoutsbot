@@ -1,0 +1,5 @@
+#NOTE: Rename this file to apikeys.py
+mashape = 'Get key from mashape.com and substitute here'
+cx = 'Create a Custom Search Engine that searches the entire internet and add the cx here'
+image = 'Create a Custom Search Engine that has image search enabled and searches the entire internet'
+gapi = 'Get an api key from google and enter it here'
