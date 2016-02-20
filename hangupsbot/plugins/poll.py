@@ -9,15 +9,25 @@ def _initialize():
 
 
 def poll(bot, event, *args):
-    '''Creates a poll. Format is /bot poll <name>'''
+    '''Creates a poll. Format is /bot poll [--delete] <name>'''
     try:
         if not bot.memory.exists(['polls']):
             bot.memory.set_by_path(['polls'], {})
-        if args:
+        if not args[0] == '--delete':
             name = ' '.join(args)
             bot.memory.set_by_path(['polls', name], {})
             bot.memory.save()
             msg = _("Poll '{}' created").format(name)
+        elif args[0] == '--delete':
+            poll_name = ' '.join(args[1:])
+            path = bot.memory.get_by_path(['polls'])
+            if poll_name in path:
+                del path[poll_name] 
+                bot.memory.set_by_path(['polls'], path)
+                bot.memory.save()
+                msg = _('Poll {} deleted.').format(poll_name)
+            else:
+                msg = _('There is no poll by the name "{}"').format(poll_name)
         else:
             msg = _("What is this poll called?")
         yield from bot.coro_send_message(event.conv, msg)
@@ -35,7 +45,10 @@ def polls(bot, event, *args):
     polls = []
     for poll in path:
         polls.append('•' + poll)
-    msg = '<br>'.join(polls)
+    if len(polls) == 0:
+        msg = _('No polls exist right now.')
+    else:
+        msg = '<br>'.join(polls)
     yield from bot.coro_send_message(event.conv, msg)
 
 
