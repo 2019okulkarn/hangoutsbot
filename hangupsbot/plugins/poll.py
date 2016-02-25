@@ -15,9 +15,12 @@ def poll(bot, event, *args):
             bot.memory.set_by_path(['polls'], {})
         if not args[0] == '--delete':
             name = ' '.join(args)
-            bot.memory.set_by_path(['polls', name], {})
-            bot.memory.save()
-            msg = _("Poll '{}' created").format(name)
+            if not bot.memory.exists(['polls', name]):
+                bot.memory.set_by_path(['polls', name], {})
+                bot.memory.save()
+                msg = _("Poll '{}' created").format(name)
+            else:
+                msg = _("Poll '{}' already exists").format(name)
         elif args[0] == '--delete':
             poll_name = ' '.join(args[1:])
             path = bot.memory.get_by_path(['polls'])
