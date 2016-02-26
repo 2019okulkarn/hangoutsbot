@@ -2,7 +2,7 @@ import plugins
 import sqlite3
 
 def _initialise():
-	plugins.register_user_command(['quote', 'addquote'])
+	plugins.register_admin_command(['quote', 'addquote'])
 	conn = sqlite3.connect('bot.db')
 	c = conn.cursor()
 	c.execute("CREATE TABLE IF NOT EXISTS  quotes (author TEXT, quote TEXT,  id INTEGER PRIMARY KEY AUTOINCREMENT)")
@@ -14,9 +14,9 @@ def add(conn, quote, author):
 	c.execute("INSERT INTO quotes(quote, author) VALUES (?, ?)", [author, quote])
 	conn.commit()
 
-def retrieve(conn, id):
+def retrieve(conn, id_):
 	c = conn.cursor()
-	c.execute('SELECT * FROM quotes WHERE id = ?', [id])
+	c.execute('SELECT * FROM quotes WHERE id = ?', [id_])
 	quote = c.fetchone()
 	msg = str(quote)
 	return msg
