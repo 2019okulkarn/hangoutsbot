@@ -78,12 +78,6 @@ def help(bot, event, cmd=None, *args):
             .format(event.user.full_name))
     else:
         yield from bot.coro_send_message(CONTROL, "<br />".join(help_lines))
-    yield from bot.coro_send_to_user_and_conversation(
-        event.user.id_.chat_id,
-        event.conv_id,
-        "<br />".join(help_lines),  # via private message
-        _("<i>{}, I've sent you some help ;)</i>")  # public message
-        .format(event.user.full_name))
 
 
 @command.register(admin=True)
