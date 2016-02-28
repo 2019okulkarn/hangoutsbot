@@ -222,7 +222,7 @@ class SlackMessage(object):
 
         # text now contains the real message, but html entities have to be dequoted still
         text = html.unescape(text)
-        
+
         username4ho = username
         realname4ho = username
         if not is_bot:
@@ -401,14 +401,38 @@ class SlackRTM(object):
 
     def get_slackDM(self, userid):
         if not userid in self.dminfos:
+<<<<<<< HEAD
             self.dminfos[userid] = json.loads(self.slack.api_call(
                 'im.open', user=userid).decode("utf-8"))['channel']
+=======
+<<<<<<< HEAD
+            self.dminfos[userid] = json.loads(self.slack.api_call(
+                'im.open', user=userid).decode("utf-8"))['channel']
+=======
+            try:
+                self.dminfos[userid] = json.loads(self.slack.api_call('im.open', user = userid).decode("utf-8"))['channel']
+            except AttributeError:
+                self.dminfos[userid] = json.loads(self.slack.api_call('im.open', user = userid))['channel']
+>>>>>>> 4416ec7499a72f294326130559e28a0e59d6dccf
+>>>>>>> 933ad2193339b634df2ec1e476aa36886321c6ac
         return self.dminfos[userid]['id']
 
     def update_userinfos(self, users=None):
         if users is None:
+<<<<<<< HEAD
             response = json.loads(self.slack.api_call(
                 'users.list').decode("utf-8"))
+=======
+<<<<<<< HEAD
+            response = json.loads(self.slack.api_call(
+                'users.list').decode("utf-8"))
+=======
+            try:
+                response = json.loads(self.slack.api_call('users.list').decode("utf-8"))
+            except AttributeError:
+                response = json.loads(self.slack.api_call('users.list'))
+>>>>>>> 4416ec7499a72f294326130559e28a0e59d6dccf
+>>>>>>> 933ad2193339b634df2ec1e476aa36886321c6ac
             users = response['members']
         userinfos = {}
         for u in users:
@@ -448,8 +472,20 @@ class SlackRTM(object):
 
     def update_teaminfos(self, team=None):
         if team is None:
+<<<<<<< HEAD
             response = json.loads(self.slack.api_call(
                 'team.info').decode("utf-8"))
+=======
+<<<<<<< HEAD
+            response = json.loads(self.slack.api_call(
+                'team.info').decode("utf-8"))
+=======
+            try:
+                response = json.loads(self.slack.api_call('team.info').decode("utf-8"))
+            except AttributeError:
+                response = json.loads(self.slack.api_call('team.info'))
+>>>>>>> 4416ec7499a72f294326130559e28a0e59d6dccf
+>>>>>>> 933ad2193339b634df2ec1e476aa36886321c6ac
             team = response['team']
         self.team = team
 
@@ -485,8 +521,20 @@ class SlackRTM(object):
 
     def update_channelinfos(self, channels=None):
         if channels is None:
+<<<<<<< HEAD
             response = json.loads(self.slack.api_call(
                 'channels.list').decode("utf-8"))
+=======
+<<<<<<< HEAD
+            response = json.loads(self.slack.api_call(
+                'channels.list').decode("utf-8"))
+=======
+            try:
+                response = json.loads(self.slack.api_call('channels.list').decode("utf-8"))
+            except AttributeError:
+                response = json.loads(self.slack.api_call('channels.list'))
+>>>>>>> 4416ec7499a72f294326130559e28a0e59d6dccf
+>>>>>>> 933ad2193339b634df2ec1e476aa36886321c6ac
             channels = response['channels']
         channelinfos = {}
         for c in channels:
@@ -505,8 +553,20 @@ class SlackRTM(object):
 
     def update_groupinfos(self, groups=None):
         if groups is None:
+<<<<<<< HEAD
             response = json.loads(self.slack.api_call(
                 'groups.list').decode("utf-8"))
+=======
+<<<<<<< HEAD
+            response = json.loads(self.slack.api_call(
+                'groups.list').decode("utf-8"))
+=======
+            try:
+                response = json.loads(self.slack.api_call('groups.list').decode("utf-8"))
+            except AttributeError:
+                response = json.loads(self.slack.api_call('groups.list'))
+>>>>>>> 4416ec7499a72f294326130559e28a0e59d6dccf
+>>>>>>> 933ad2193339b634df2ec1e476aa36886321c6ac
             groups = response['groups']
         groupinfos = {}
         for c in groups:

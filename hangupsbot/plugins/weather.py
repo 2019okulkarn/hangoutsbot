@@ -56,7 +56,11 @@ def forecast(bot, event, *args):
     night = weather_com_result['forecasts'][1]['night']['text']
     if night == '':
         night = 'N/A'
+<<<<<<< HEAD
     date = weather_com_result['forecasts'][1]['date']
+=======
+    date = weather_com_result['forecasts'][0]['date']
+>>>>>>> 933ad2193339b634df2ec1e476aa36886321c6ac
     url = links.shorten(
         'http://www.weather.com/weather/today/l/' + location_id)
     msg = _("<b>Forecast for {} on {}:</b><br>Conditions: Day - {}; Night - {}<br>High: {}<br>Low: {}<br>For more information visit {}").format(
