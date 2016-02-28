@@ -126,10 +126,7 @@ def g(bot, event, *args):
         tb = traceback.format_exc()
         msg = _('{} -- {}').format(tb, event.text)
         yield from bot.coro_send_message(CONTROL, msg)
-<<<<<<< HEAD
-=======
         yield from bot.coro_send_message(event.conv, _('An Error Occured'))
->>>>>>> 933ad2193339b634df2ec1e476aa36886321c6ac
 
 
 def lmgtfy(bot, event, *args):
