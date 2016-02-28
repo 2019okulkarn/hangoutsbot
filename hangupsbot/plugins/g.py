@@ -30,16 +30,9 @@ def search(term):
         }
 
 
-<<<<<<< HEAD
-def imagesearch(term, num=1):
-    r = get('https://www.googleapis.com/customsearch/v1',
-            params={'key': gapi, 'cx': image, 'q': term, 'defaultToImageSearch': 'True'})
-    print(r.url)
-=======
 def imagesearch(term):
     r = get('https://www.googleapis.com/customsearch/v1',
             params={'key': gapi, 'cx': image, 'q': term, 'defaultToImageSearch': 'True'})
->>>>>>> 933ad2193339b634df2ec1e476aa36886321c6ac
     data = json.loads(r.text)
     if 'items' not in data:
         return 'No Images Found'

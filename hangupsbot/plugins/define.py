@@ -3,13 +3,8 @@ import json
 import plugins
 from apikeys import wordnik
 
-<<<<<<< HEAD
-def initialise():
-    plugins.register_user_command["define"]
-=======
 def _initialise():
     plugins.register_user_command(["define"])
->>>>>>> 933ad2193339b634df2ec1e476aa36886321c6ac
 
 def defineword(word):
     try:
