@@ -57,6 +57,7 @@ import plugins
 import emoji
 from websocket import WebSocketConnectionClosedException
 from slackclient import SlackClient
+import html # for html.unescape
 
 logger = logging.getLogger(__name__)
 
@@ -218,6 +219,9 @@ class SlackMessage(object):
                 if match:
                     text = match.group(1)
                     file_attachment = match.group(2)
+
+        # text now contains the real message, but html entities have to be dequoted still
+        text = html.unescape(text)
 
         username4ho = username
         realname4ho = username
@@ -397,14 +401,28 @@ class SlackRTM(object):
 
     def get_slackDM(self, userid):
         if not userid in self.dminfos:
+<<<<<<< HEAD
             self.dminfos[userid] = json.loads(self.slack.api_call(
                 'im.open', user=userid).decode("utf-8"))['channel']
+=======
+            try:
+                self.dminfos[userid] = json.loads(self.slack.api_call('im.open', user = userid).decode("utf-8"))['channel']
+            except AttributeError:
+                self.dminfos[userid] = json.loads(self.slack.api_call('im.open', user = userid))['channel']
+>>>>>>> 4416ec7499a72f294326130559e28a0e59d6dccf
         return self.dminfos[userid]['id']
 
     def update_userinfos(self, users=None):
         if users is None:
+<<<<<<< HEAD
             response = json.loads(self.slack.api_call(
                 'users.list').decode("utf-8"))
+=======
+            try:
+                response = json.loads(self.slack.api_call('users.list').decode("utf-8"))
+            except AttributeError:
+                response = json.loads(self.slack.api_call('users.list'))
+>>>>>>> 4416ec7499a72f294326130559e28a0e59d6dccf
             users = response['members']
         userinfos = {}
         for u in users:
@@ -444,8 +462,15 @@ class SlackRTM(object):
 
     def update_teaminfos(self, team=None):
         if team is None:
+<<<<<<< HEAD
             response = json.loads(self.slack.api_call(
                 'team.info').decode("utf-8"))
+=======
+            try:
+                response = json.loads(self.slack.api_call('team.info').decode("utf-8"))
+            except AttributeError:
+                response = json.loads(self.slack.api_call('team.info'))
+>>>>>>> 4416ec7499a72f294326130559e28a0e59d6dccf
             team = response['team']
         self.team = team
 
@@ -481,8 +506,15 @@ class SlackRTM(object):
 
     def update_channelinfos(self, channels=None):
         if channels is None:
+<<<<<<< HEAD
             response = json.loads(self.slack.api_call(
                 'channels.list').decode("utf-8"))
+=======
+            try:
+                response = json.loads(self.slack.api_call('channels.list').decode("utf-8"))
+            except AttributeError:
+                response = json.loads(self.slack.api_call('channels.list'))
+>>>>>>> 4416ec7499a72f294326130559e28a0e59d6dccf
             channels = response['channels']
         channelinfos = {}
         for c in channels:
@@ -501,8 +533,15 @@ class SlackRTM(object):
 
     def update_groupinfos(self, groups=None):
         if groups is None:
+<<<<<<< HEAD
             response = json.loads(self.slack.api_call(
                 'groups.list').decode("utf-8"))
+=======
+            try:
+                response = json.loads(self.slack.api_call('groups.list').decode("utf-8"))
+            except AttributeError:
+                response = json.loads(self.slack.api_call('groups.list'))
+>>>>>>> 4416ec7499a72f294326130559e28a0e59d6dccf
             groups = response['groups']
         groupinfos = {}
         for c in groups:
