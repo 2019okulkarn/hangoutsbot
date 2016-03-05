@@ -4,6 +4,7 @@ import inspect
 import logging
 import os
 import sys
+from control import *
 
 from inspect import getmembers, isfunction
 
