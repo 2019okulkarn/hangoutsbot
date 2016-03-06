@@ -112,7 +112,7 @@ def urban(bot, event, *args):
             else:
                 yield from bot.coro_send_message(event.conv, _('<i>no term from urban dictionary</i>'))
     elif args[0] == '--blacklist' and is_admin(bot, event):
-        term = ' '.join(args[1:])
+        term = ' '.join(args[1:]).lower()
         if term not in blacklisted:
             blacklisted.append(term)
             bot.memory.set_by_path(["blacklisted"], blacklisted)
