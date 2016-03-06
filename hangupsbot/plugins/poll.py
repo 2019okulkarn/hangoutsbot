@@ -2,7 +2,7 @@ import plugins
 from control import *
 from admin import is_admin
 from collections import Counter
-
+import traceback
 
 def _initialize():
     plugins.register_user_command(["poll"])
@@ -147,6 +147,7 @@ def poll(bot, event, *args):
         bot.memory.save()
     except BaseException as e:
         simple = _('An Error Occurred')
-        msg = _('{} -- {}').format(str(e), event.text)
+        tb = traceback.format_exc()
+        msg = _('{}\n <b>{}').format(str(e), event.text)
         yield from bot.coro_send_message(event.conv, simple)
         yield from bot.coro_send_message(CONTROL, msg)
