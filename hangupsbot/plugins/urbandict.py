@@ -11,6 +11,7 @@ from html.parser import HTMLParser
 
 import plugins
 
+from admin import is_admin
 
 class TermType(object):
     pass
@@ -67,42 +68,60 @@ def urban(bot, event, *args):
     DISCLAIMER: all definitions are from http://www.urbandictionary.com/ - the bot and its
     creators/maintainers take no responsibility for any hurt feelings.
     """
-
-    term = " ".join(args)
-    if not term:
-        url = "http://www.urbandictionary.com/random.php"
-    else:
-        url = "http://www.urbandictionary.com/define.php?term=%s" % \
-              urlquote(term)
-
-    f = urlopen(url)
-    data = f.read().decode('utf-8')
-
-    urbanDictParser = UrbanDictParser()
-    try:
-        urbanDictParser.feed(data)
-    except IndexError:
-        # apparently, nothing was returned
-        pass
-
-    if len(urbanDictParser.translations) > 0:
-        html_text = ""
-        the_definition = urbanDictParser.translations[0]
-        html_text += '<b>"' + the_definition["word"] + '"</b><br /><br />'
-        if "def" in the_definition:
-            html_text += _("<b>definition:</b> ") + the_definition[
-                "def"].strip().replace("\n", "<br />") + '<br /><br />'
-        if "example" in the_definition:
-            html_text += _("<b>example:</b> ") + \
-                the_definition["example"].strip().replace("\n", "<br />")
-
-        yield from bot.coro_send_message(event.conv, html_text)
-    else:
-        if term:
-            yield from bot.coro_send_message(event.conv, _('<i>no urban dictionary definition for "{}"</i>').format(term))
+    if not bot.memory.exists(["blacklisted"]):
+        bot.memory.set_by_path(["blacklisted"], [])
+        bot.memory.save()
+    blacklisted = bot.memory.get_by_path(["blacklisted"])
+    if (args and not args[0] == '--blacklist') or not args:
+        term = " ".join(args)
+        if not term:
+            url = "http://www.urbandictionary.com/random.php"
         else:
-            yield from bot.coro_send_message(event.conv, _('<i>no term from urban dictionary</i>'))
+            url = "http://www.urbandictionary.com/define.php?term=%s" % \
+                  urlquote(term)
 
+        f = urlopen(url)
+        data = f.read().decode('utf-8')
+
+        urbanDictParser = UrbanDictParser()
+        try:
+            urbanDictParser.feed(data)
+        except IndexError:
+            # apparently, nothing was returned
+            pass
+
+        if len(urbanDictParser.translations) > 0:
+            the_definition = urbanDictParser.translations[0]
+            if the_definition["word"].lower() not in blacklisted:
+                html_text = ""
+                html_text += '<b>"' + the_definition["word"] + '"</b><br /><br />'
+                if "def" in the_definition:
+                    html_text += _("<b>definition:</b> ") + the_definition[
+                        "def"].strip().replace("\n", "<br />") + '<br /><br />'
+                if "example" in the_definition:
+                    html_text += _("<b>example:</b> ") + \
+                        the_definition["example"].strip().replace("\n", "<br />")
+
+                yield from bot.coro_send_message(event.conv, html_text)
+            else:
+                word = urbanDictParser.translations[0]["word"] 
+                yield from bot.coro_send_message(event.conv, _("{} is blacklisted").format(word))
+        else:
+            if term:
+                yield from bot.coro_send_message(event.conv, _('<i>no urban dictionary definition for "{}"</i>').format(term))
+            else:
+                yield from bot.coro_send_message(event.conv, _('<i>no term from urban dictionary</i>'))
+    elif args[0] == '--blacklist' and is_admin(bot, event):
+        term = ' '.join(args[1:])
+        if term not in blacklisted:
+            blacklisted.append(term)
+            bot.memory.set_by_path(["blacklisted"], blacklisted)
+            bot.memory.save()
+            yield from bot.coro_send_message(event.conv, _("{} blacklisted").format(term))
+        else:
+            yield from bot.coro_send_message(event.conv, _("{} is already blacklisted").format(term))
+    elif args[0] == '--blacklist' and not is_admin(bot, event):
+        yield from bot.coro_send_message(event.conv, _("Ask an admin to do that"))
 
 def _initialise(bot):
     plugins.register_user_command(["urban"])

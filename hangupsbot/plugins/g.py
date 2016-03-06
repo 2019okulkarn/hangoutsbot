@@ -30,10 +30,9 @@ def search(term):
         }
 
 
-def imagesearch(term, num=1):
+def imagesearch(term):
     r = get('https://www.googleapis.com/customsearch/v1',
             params={'key': gapi, 'cx': image, 'q': term, 'defaultToImageSearch': 'True'})
-    print(r.url)
     data = json.loads(r.text)
     if 'items' not in data:
         return 'No Images Found'
@@ -127,6 +126,7 @@ def g(bot, event, *args):
         tb = traceback.format_exc()
         msg = _('{} -- {}').format(tb, event.text)
         yield from bot.coro_send_message(CONTROL, msg)
+        yield from bot.coro_send_message(event.conv, _('An Error Occured'))
 
 
 def lmgtfy(bot, event, *args):

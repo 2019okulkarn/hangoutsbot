@@ -16,9 +16,9 @@ def add(conn, quote, author):
 	c.execute("INSERT INTO quotes(quote, author) VALUES (?, ?)", [author, quote])
 	conn.commit()
 
-def retrieve(conn, id):
+def retrieve(conn, id_):
 	c = conn.cursor()
-	c.execute('SELECT * FROM quotes WHERE id = ?', [id])
+	c.execute('SELECT * FROM quotes WHERE id = ?', [id_])
 	quote = c.fetchone()
 	msg = str(quote)
 	return msg
