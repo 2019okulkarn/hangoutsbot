@@ -21,16 +21,7 @@ def _initialize(bot):
         plugins.register_user_command(['weather', 'forecast'])
         plugins.register_admin_command(['setweatherlocation'])
     else:
-<<<<<<< HEAD
-        logger.info(
-            'not enabled, need forecast.io API key in config["forecast_api_key"]')
-=======
         logger.error('WEATHER: config["forecast_api_key"] required')
-<<<<<<< HEAD
->>>>>>> 7a4d33df91c5e9679e7eb6f45e308f4f015b6049
-=======
->>>>>>> 4416ec7499a72f294326130559e28a0e59d6dccf
->>>>>>> 933ad2193339b634df2ec1e476aa36886321c6ac
 
 def setweatherlocation(bot, event, *args):
     """Sets the Lat Long default coordinates for this hangout when polling for weather data
@@ -149,14 +140,12 @@ def _lookup_weather(coords):
         if current['units']['pressure'] == 'kPa':
             current['pressure'] = Decimal(current['pressure']/10)
 
-<<<<<<< HEAD
     unit = _internal.get('unit', 'F')
     temperature = j['temperature'] if unit == 'F' else to_celsius(j[
                                                                   'temperature'])
 
     return _('<em>In {}, it is currently {}, {:.0f}{} and {:.0f}% humidity.</em>').format(
         coords['address'], j['summary'].lower(), round(temperature, 0), unit, j['humidity'] * 100)
-=======
         if 'hourly' in j:
             current['hourly'] = j['hourly']['summary']
         if 'daily' in j:
@@ -165,12 +154,6 @@ def _lookup_weather(coords):
     except ValueError as e:
         logger.error("Forecast Error: {}".format(e))
         current = dict()
-<<<<<<< HEAD
->>>>>>> 7a4d33df91c5e9679e7eb6f45e308f4f015b6049
-=======
->>>>>>> 4416ec7499a72f294326130559e28a0e59d6dccf
->>>>>>> 933ad2193339b634df2ec1e476aa36886321c6ac
-
     return current
 
 def _get_weather(bot,event,params):
