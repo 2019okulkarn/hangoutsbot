@@ -16,7 +16,7 @@ def poll(bot, event, *args):
                 if not bot.memory.exists(['polls']):
                     bot.memory.set_by_path(['polls'], {})
                 if len(args) > 1:
-                    name = ' '.join(args[1:])
+                    name = ' '.join(args[1:]).lower()
                     if not bot.memory.exists(['polls', name]):
                         bot.memory.set_by_path(['polls', name], {})
                         bot.memory.save()
@@ -44,7 +44,7 @@ def poll(bot, event, *args):
                     spl = ' '.join(args[1:]).split(' - ')
                     if len(spl) == 2:
                         vote = str(spl[0]).lower()
-                        poll = spl[1]
+                        poll = spl[1].lower()
                         path = bot.memory.get_by_path(['polls', poll])
                         path[event.user.first_name] = vote
                         bot.memory.set_by_path(['polls', poll], path)
