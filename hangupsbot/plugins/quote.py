@@ -13,19 +13,27 @@ def _initialise():
 
 def add(conn, quote, author):
 	c = conn.cursor()
-	c.execute("INSERT INTO quotes(quote, author) VALUES (?, ?)", [author, quote])
+	c.execute("INSERT INTO quotes(author, quote) VALUES (?, ?)", [author, quote])
 	conn.commit()
 
 def retrieve(conn, id_, author, full=True):
 	c = conn.cursor()
 	if not author:
 		c.execute('SELECT * FROM quotes WHERE id = ?', [id_])
-		quote = c.fetchone()
-		msg = str(quote)
+		q = c.fetchone()
+		msg = format_quote(q)
 	elif author:
-		c.execute('SELECT * FROM quotes WHERE author = ?', [id_])
-		quote = c.fetchall() if full else c.fetchone()
-		msg = str(quote)
+		if not full:
+			c.execute('SELECT * FROM quotes WHERE author = ? ORDER BY RANDOM() LIMIT 1', [id_])
+			q = c.fetchone() 
+			msg = format_quote(q)
+		else:
+			c.execute('SELECT * FROM quotes WHERE author = ?', [id_])
+			q = c.fetchall()
+			quotes = []
+			for i in q:
+				quotes.append(format_quote(i))
+				msg =  '\n'.join(quotes)
 	return msg
 
 def delete(conn, id):
@@ -34,11 +42,14 @@ def delete(conn, id):
 def edit(conn, id, quote):
 	pass
 
+def format_quote(q):
+	 quote = "Quote {}: {} - {}".format(q[2], q[1], q[0])
+	 return quote
+
 def quote(bot, event, *args):
 	if not args:
 		msg = _("Please give me some args!")
 		yield from bot.coro_send_message(event.conv, msg)
-		return
 	try:
 		conn = sqlite3.connect('bot.db')
 		if args[0] not in ['-a', '-d', '-l', '-e'] and args[0].startswith('-'):
@@ -58,11 +69,11 @@ def quote(bot, event, *args):
 			else:
 				msg = _("You're not an admin!")
 		elif args[0].startswith('-l'):
-			quotes = retrieve(conn, args[1], full=True, author=True)
+			msg = _(str(retrieve(conn, args[1], True)))
 		else:
 			text = " ".join(args)
 			author = True if not text.isnumeric() else False
-			msg = _(retrieve(conn, text, author))
+			msg = _(retrieve(conn, text, author, full=False))
 		yield from bot.coro_send_message(event.conv, msg)
 		conn.close()
 	except BaseException as e:
