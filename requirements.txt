@@ -2,6 +2,7 @@
 git+https://github.com/hangoutsbot/hangups.git
 appdirs
 asyncio
+aiohttp >= 0.21.2
 jsonrpclib-pelix
 
 # PLUGIN DEPENDENCIES #
@@ -21,3 +22,4 @@ gitpython
 pykcd
 soundcloud
 python_dateutil # gitlab sink
+telepot >= 6.5 # telegram sync
