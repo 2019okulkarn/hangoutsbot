@@ -7,7 +7,7 @@ def _initialise():
 	plugins.register_user_command('quote')
 	conn = sqlite3.connect('bot.db')
 	c = conn.cursor()
-	c.execute("CREATE TABLE IF NOT EXISTS  quotes (author TEXT, quote TEXT,  id INTEGER PRIMARY KEY AUTOINCREMENT)")
+	c.execute("CREATE TABLE IF NOT EXISTS quotes (author TEXT, quote TEXT, id INTEGER PRIMARY KEY AUTOINCREMENT)")
 	conn.commit()
 	conn.close()
 
@@ -36,11 +36,15 @@ def retrieve(conn, id_, author, full=True):
 				msg =  '\n'.join(quotes)
 	return msg
 
-def delete(conn, id):
-	pass
+def delete(conn, id_):
+	c = conn.cursor()
+	c.execute("DELETE from quotes where id=?", [id_])
+	conn.commit()
 
-def edit(conn, id, quote):
-	pass
+def edit(conn, id_, quote):
+	c = conn.cursor()
+	c.execute("UPDATE quotes SET quote=? WHERE id=?", [quote, id_])
+	conn.commit()
 
 def format_quote(q):
 	 quote = "Quote {}: {} - {}".format(q[2], q[1], q[0])
@@ -76,6 +80,9 @@ def quote(bot, event, *args):
 			msg = _(retrieve(conn, text, author, full=False))
 		yield from bot.coro_send_message(event.conv, msg)
 		conn.close()
+	except TypeError:
+		msg = _('No such quote')
+		yield from bot.coro_send_message(event.conv, msg)
 	except BaseException as e:
 		msg = _('{} -- {}').format(str(e), event.text)
 		yield from bot.coro_send_message(CONTROL, msg)
