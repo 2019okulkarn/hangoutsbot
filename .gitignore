@@ -1,11 +1,2 @@
-__pycache__/
-*.py[cod]
-*.DS_Store
-hangups
-purplex
-aiohttp
-
-*.*~
-/hangupsbot/__pycache__
-/build
-/scripts
+venv/
+*pycache*
