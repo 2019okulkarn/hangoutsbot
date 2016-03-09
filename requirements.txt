@@ -17,10 +17,7 @@ google-api-python-client # for spotify
 spotipy
 slackclient >=0.16 # slackrtm (includes websockets)
 textblob
-<<<<<<< HEAD
 gitpython
 pykcd
 soundcloud
-=======
 python_dateutil # gitlab sink
->>>>>>> 4416ec7499a72f294326130559e28a0e59d6dccf
