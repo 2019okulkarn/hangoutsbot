@@ -51,6 +51,7 @@ def format_quote(q):
 	 return quote
 
 def quote(bot, event, *args):
+	'''Stores quotes. Usage: /bot quote <-a|-e|-d|-l> [args]'''
 	if not args:
 		msg = _("Please give me some args!")
 		yield from bot.coro_send_message(event.conv, msg)
