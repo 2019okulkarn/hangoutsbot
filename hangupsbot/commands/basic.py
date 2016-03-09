@@ -6,6 +6,7 @@ import plugins
 
 from version import __version__
 from commands import command
+from control import CONTROL
 
 
 logger = logging.getLogger(__name__)
@@ -68,12 +69,15 @@ def help(bot, event, cmd=None, *args):
         help_lines.append(
             "<b>{}</b>: {}".format(command_fn.__name__, command_fn.__doc__))
 
-    yield from bot.coro_send_to_user_and_conversation(
-        event.user.id_.chat_id,
-        event.conv_id,
-        "<br />".join(help_lines),  # via private message
-        _("<i>{}, I've sent you some help ;)</i>")  # public message
-        .format(event.user.full_name))
+    if not event.conv_id == CONTROL:
+        yield from bot.coro_send_to_user_and_conversation(
+            event.user.id_.chat_id,
+            event.conv_id,
+            "<br />".join(help_lines),  # via private message
+            _("<i>{}, I've sent you some help ;)</i>")  # public message
+            .format(event.user.full_name))
+    else:
+        yield from bot.coro_send_message(CONTROL, "<br />".join(help_lines))
 
 
 @command.register(admin=True)

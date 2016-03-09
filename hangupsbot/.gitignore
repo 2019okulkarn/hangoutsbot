@@ -4,3 +4,4 @@ apikeys.py
 ghinfo.py
 control.py
 logs/
+*pycache*
