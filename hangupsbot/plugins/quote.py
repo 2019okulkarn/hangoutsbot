@@ -1,80 +1,89 @@
-import asyncio
-import logging
-import re
-
-from random import choice
-import time
 import plugins
+import sqlite3
 from control import *
+from admin import is_admin
 
-logger = logging.getLogger(__name__)
+def _initialise():
+	plugins.register_user_command('quote')
+	conn = sqlite3.connect('bot.db')
+	c = conn.cursor()
+	c.execute("CREATE TABLE IF NOT EXISTS quotes (author TEXT, quote TEXT, id INTEGER PRIMARY KEY AUTOINCREMENT)")
+	conn.commit()
+	conn.close()
 
+def add(conn, quote, author):
+	c = conn.cursor()
+	c.execute("INSERT INTO quotes(author, quote) VALUES (?, ?)", [author, quote])
+	conn.commit()
 
-def _initialize():
-    plugins.register_admin_command(["addquote"])
-    plugins.register_user_command(["quote"])
+def retrieve(conn, id_, author, full=True):
+	c = conn.cursor()
+	if not author:
+		c.execute('SELECT * FROM quotes WHERE id = ?', [id_])
+		q = c.fetchone()
+		msg = format_quote(q)
+	elif author:
+		if not full:
+			c.execute('SELECT * FROM quotes WHERE author = ? ORDER BY RANDOM() LIMIT 1', [id_])
+			q = c.fetchone() 
+			msg = format_quote(q)
+		else:
+			c.execute('SELECT * FROM quotes WHERE author = ?', [id_])
+			q = c.fetchall()
+			quotes = []
+			for i in q:
+				quotes.append(format_quote(i))
+				msg =  '\n'.join(quotes)
+	return msg
 
+def delete(conn, id_):
+	c = conn.cursor()
+	c.execute("DELETE from quotes where id=?", [id_])
+	conn.commit()
 
-def addquote(bot, event, *args):
-    '''Adds a quote to the bot's memory. Format is /bot addquote <quote> - <person>'''
-    try:
-        if args:
-            quote = ' '.join(args).split(' - ')
-            user = quote[1].lower()
-            if not bot.memory.exists([user]):
-                bot.memory.set_by_path([user], {})
-            quotemem = bot.memory.get_by_path([user])
-            quotetoadd = quote[0]
-            quotemem[str(time.time())] = quotetoadd
-            bot.memory.set_by_path([user], quotemem)
-            bot.memory.save()
-            msg = _("New quote for {}").format(user)
-        else:
-            msg = _("Please give me a quote to add")
-        yield from bot.coro_send_message(event.conv, msg)
-        bot.memory.save()
-    except BaseException as e:
-        msg = _('{} -- {}').format(str(e), event.text)
-        yield from bot.coro_send_message(CONTROL, msg)
+def edit(conn, id_, quote):
+	c = conn.cursor()
+	c.execute("UPDATE quotes SET quote=? WHERE id=?", [quote, id_])
+	conn.commit()
 
+def format_quote(q):
+	 quote = "Quote {}: {} - {}".format(q[2], q[1], q[0])
+	 return quote
 
 def quote(bot, event, *args):
-    '''Retrieves quote from bot's memory. Format is /bot quote <person>'''
-    try:
-        if args:
-            if args[-1].isdigit():
-                user = ' '.join(args[:-1]).lower()
-                num = args[-1]
-            else:
-                user = ' '.join(args).lower()
-                num = None
-            listofquotes = bot.memory.get_by_path([user])
-            if ',' in str(listofquotes):
-                quotelist = str(listofquotes).split(',')
-                chosenquote = choice(quotelist) if not num else quotelist[num]
-                chosenquotelist = chosenquote.split(':')
-                quotetoshow = chosenquotelist[1]
-                quotecheck = list(quotetoshow)
-                for i in range(len(quotecheck)):
-                    if quotecheck[i] == '}':
-                        quotecheck[i] = ''
-                    else:
-                        quotecheck[i] = quotecheck[i]
-                quote = ''.join(quotecheck)
-                msg = _("{} - {}").format(quote, user)
-            else:
-                quotelist = str(listofquotes).split(':')
-                quotetoshow = quotelist[1]
-                quotecheck = list(quotetoshow)
-                for i in range(len(quotecheck)):
-                    if quotecheck[i] == '}':
-                        quotecheck[i] = ''
-                    else:
-                        quotecheck[i] = quotecheck[i]
-                quote = ''.join(quotecheck)
-                msg = _("{} - {}").format(quote, user)
-        else:
-            msg = _("Incorrect number of arguments")
-    except:
-        msg = _("No quote found")
-    yield from bot.coro_send_message(event.conv, msg)
+	if not args:
+		msg = _("Please give me some args!")
+		yield from bot.coro_send_message(event.conv, msg)
+	try:
+		conn = sqlite3.connect('bot.db')
+		if args[0] not in ['-a', '-d', '-l', '-e'] and args[0].startswith('-'):
+			msg = _("Invalid Flag")
+		elif args[0] in ['-a', '-d', '-e']:
+			if is_admin(bot, event): # admin only quote functions
+				if args[0] == "-a":
+					text = " ".join(args[1:]).split(' - ')
+					add(conn, text[0], text[1])
+					msg = _("Successfully added quote")
+				elif args[0] == "-d":
+					delete(conn, args[1])
+					msg = _("Successfully deleted quote")
+				elif args[0] == "-e":
+					edit(conn, args[1], " ".join(args[2:]))
+					msg = _("Successfully edited quote")
+			else:
+				msg = _("You're not an admin!")
+		elif args[0].startswith('-l'):
+			msg = _(str(retrieve(conn, args[1], True)))
+		else:
+			text = " ".join(args)
+			author = True if not text.isnumeric() else False
+			msg = _(retrieve(conn, text, author, full=False))
+		yield from bot.coro_send_message(event.conv, msg)
+		conn.close()
+	except TypeError:
+		msg = _('No such quote')
+		yield from bot.coro_send_message(event.conv, msg)
+	except BaseException as e:
+		msg = _('{} -- {}').format(str(e), event.text)
+		yield from bot.coro_send_message(CONTROL, msg)
+		raise e
