@@ -1,4 +1,6 @@
-import re, json, logging
+import re
+import json
+import logging
 
 import hangups
 
@@ -8,8 +10,10 @@ from commands import command
 
 logger = logging.getLogger(__name__)
 
+
 def _initialise(bot):
     plugins.register_admin_command(["getplugins", "addplugin", "removeplugin"])
+
 
 def getplugins(bot, event, *args):
     """List all plugins loaded by the bot, and all available plugins"""
@@ -28,6 +32,7 @@ def getplugins(bot, event, *args):
             html += "<i>{}</i><br />".format(plugin)
 
     yield from bot.coro_send_to_user_and_conversation(event.user_id.chat_id, event.conv_id, html, "<i>I've sent you a private message</i>")
+
 
 def addplugin(bot, event, plugin, *args):
     """Adds a plugin to the bot, REQUIRES REBOOT
@@ -50,6 +55,7 @@ def addplugin(bot, event, plugin, *args):
     else:
         yield from bot.coro_send_message(event.conv_id, "Plugin already loaded")
 
+
 def removeplugin(bot, event, plugin, *args):
     """Removes a plugin from the bot, REQUIRES REBOOT
     /bot removeplugin <pluginname>"""
@@ -65,4 +71,3 @@ def removeplugin(bot, event, plugin, *args):
         yield from bot.coro_send_message(event.conv_id, "Plugin <i>{}</i> removed".format(plugin))
     else:
         yield from bot.coro_send_message(event.conv_id, "Plugin config not set")
-

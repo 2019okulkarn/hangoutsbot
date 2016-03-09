@@ -4,6 +4,7 @@ from admin import is_admin
 from collections import Counter
 import traceback
 
+
 def _initialize():
     plugins.register_user_command(["poll"])
 
@@ -49,20 +50,24 @@ def poll(bot, event, *args):
                         path[event.user.first_name] = vote
                         bot.memory.set_by_path(['polls', poll], path)
                         bot.memory.save()
-                        msg = _('Your vote for {} has been recorded as {}').format(poll, vote)
+                        msg = _('Your vote for {} has been recorded as {}').format(
+                            poll, vote)
                     else:
-                        msg = _("The correct format is /bot poll --vote <poll> - <vote> OR /bot poll --vote <pollnum> <vote>")
+                        msg = _(
+                            "The correct format is /bot poll --vote <poll> - <vote> OR /bot poll --vote <pollnum> <vote>")
                 else:
                     path = bot.memory.get_by_path(['polls'])
                     pollnum = int(args[1]) - 1
                     if len(list(path.keys())) > 0 and len(list(path.keys())) >= pollnum:
                         polltovote = list(path.keys())[pollnum]
                         vote = ' '.join(args[2:])
-                        pollpath = bot.memory.get_by_path(['polls', polltovote])
+                        pollpath = bot.memory.get_by_path(
+                            ['polls', polltovote])
                         pollpath[event.user.first_name] = vote
                         bot.memory.set_by_path(['polls', polltovote], pollpath)
                         bot.memory.save()
-                        msg = _('Your vote for {} has been recorded as {}').format(list(path.keys())[pollnum], vote)
+                        msg = _('Your vote for {} has been recorded as {}').format(
+                            list(path.keys())[pollnum], vote)
                     else:
                         msg = _("There are not that many polls")
             elif args[0] == '--list':
@@ -74,7 +79,7 @@ def poll(bot, event, *args):
                     msg = _('No polls exist right now.')
                 else:
                     msg = '<br>'.join(polls)
-            #FIXME: Same code is written twice
+            # FIXME: Same code is written twice
             elif args[0] == '--results':
                 if args[1].isdigit():
                     path = bot.memory.get_by_path(['polls'])
@@ -91,7 +96,8 @@ def poll(bot, event, *args):
                             vote = path[person]
                             votes.append(vote)
                         for i in range(len(names)):
-                            result = '{} voted {}<br>'.format(names[i], votes[i])
+                            result = '{} voted {}<br>'.format(
+                                names[i], votes[i])
                             mesg.append(result)
                         count = Counter(votes)
                         freqlist = list(count.values())
@@ -140,9 +146,11 @@ def poll(bot, event, *args):
                             '<br>THE WINNERS ARE <b>{}</b> with <b>{}</b> votes'.format(', '.join(winners), freq))
                     msg = ''.join(mesg)
             else:
-                msg = _("Creates a poll. Format is /bot poll [--add, --delete, --list, --vote, --results] [pollnum, pollname] [vote]")
+                msg = _(
+                    "Creates a poll. Format is /bot poll [--add, --delete, --list, --vote, --results] [pollnum, pollname] [vote]")
         else:
-            msg = _("Creates a poll. Format is /bot poll [--add, --delete, --list, --vote, --results] [pollnum, pollname] [vote]")
+            msg = _(
+                "Creates a poll. Format is /bot poll [--add, --delete, --list, --vote, --results] [pollnum, pollname] [vote]")
         yield from bot.coro_send_message(event.conv, msg)
         bot.memory.save()
     except BaseException as e:
