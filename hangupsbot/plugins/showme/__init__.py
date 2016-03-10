@@ -30,50 +30,50 @@ CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
-__author__ = "Daniel Casner <www.artificelab.com>"
-
-import time
-import aiohttp, asyncio, io, logging
-import plugins
-
-logger = logging.getLogger(__name__)
-
-def _initalize(bot):
-    if bot.get_config_option("showme") is not None:
-        plugins.register_user_command(["showme"])
-    else:
-        logger.error('SHOWME: config["showme"] dict required')
-
-def sendSource(bot, event, name, imgLink):
-    logger.info("Getting {}".format(imgLink))
-    r = yield from aiohttp.request("get", imgLink)
-    raw = yield from r.read()
-    contentType = r.headers['Content-Type']
-    logger.info("\tContent-type: {}".format(contentType))
-    ext = contentType.split('/')[1]
-    image_data = io.BytesIO(raw)
-    filename = "{}_{}.{}".format(name, int(time.time()), ext)
-    try:
-        image_id = yield from bot._client.upload_image(image_data, filename=filename)
-    except:
-        yield from bot.coro_send_message(event.conv, _("I'm sorry, I couldn't upload a {} image".format(ext)))
-    else:
-        yield from bot.coro_send_message(event.conv.id_, None, image_id=image_id)
-
-def showme(bot, event, *args):
-    """Retrieve images from showme sources by saying: "/bot showme SOURCE" or list sources by saying "/bot showme sources" or all sources by saying "/bot showme all" """
-    sources = bot.get_config_option("showme")
-    if not len(args):
-        yield from bot.coro_send_message(event.conv, _("Show you what?"))
-    elif args[0].lower() == 'sources':
-        html = """My sources are:<br />"""
-        for name in sources.keys():
-            html += " * {}<br />".format(name)
-        yield from bot.coro_send_message(event.conv, _(html))
-    elif args[0].lower() == 'all':
-        for name, source in sources.items():
-            yield from sendSource(bot, event, name, source)
-    elif not args[0] in sources:
-        yield from bot.coro_send_message(event.conv, _("I don't know a \"{}\", try sources".format(args[0])))
-    else:
-        yield from sendSource(bot, event, args[0], sources[args[0]])
+#__author__ = "Daniel Casner <www.artificelab.com>"
+#
+#import time
+#import aiohttp, asyncio, io, logging
+#import plugins
+#
+#logger = logging.getLogger(__name__)
+#
+#def _initalize(bot):
+#    if bot.get_config_option("showme") is not None:
+#        plugins.register_user_command(["showme"])
+#    else:
+#        logger.error('SHOWME: config["showme"] dict required')
+#
+#def sendSource(bot, event, name, imgLink):
+#    logger.info("Getting {}".format(imgLink))
+#    r = yield from aiohttp.request("get", imgLink)
+#    raw = yield from r.read()
+#    contentType = r.headers['Content-Type']
+#    logger.info("\tContent-type: {}".format(contentType))
+#    ext = contentType.split('/')[1]
+#    image_data = io.BytesIO(raw)
+#    filename = "{}_{}.{}".format(name, int(time.time()), ext)
+#    try:
+#        image_id = yield from bot._client.upload_image(image_data, filename=filename)
+#    except:
+#        yield from bot.coro_send_message(event.conv, _("I'm sorry, I couldn't upload a {} image".format(ext)))
+#    else:
+#        yield from bot.coro_send_message(event.conv.id_, None, image_id=image_id)
+#
+#def showme(bot, event, *args):
+#    """Retrieve images from showme sources by saying: "/bot showme SOURCE" or list sources by saying "/bot showme sources" or all sources by saying "/bot showme all" """
+#    sources = bot.get_config_option("showme")
+#    if not len(args):
+#        yield from bot.coro_send_message(event.conv, _("Show you what?"))
+#    elif args[0].lower() == 'sources':
+#        html = """My sources are:<br />"""
+#        for name in sources.keys():
+#            html += " * {}<br />".format(name)
+#        yield from bot.coro_send_message(event.conv, _(html))
+#    elif args[0].lower() == 'all':
+#        for name, source in sources.items():
+#            yield from sendSource(bot, event, name, source)
+#    elif not args[0] in sources:
+#        yield from bot.coro_send_message(event.conv, _("I don't know a \"{}\", try sources".format(args[0])))
+#    else:
+#        yield from sendSource(bot, event, args[0], sources[args[0]])
