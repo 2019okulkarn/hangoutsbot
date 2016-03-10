@@ -564,9 +564,10 @@ class HangupsBot(object):
 
         self._conv_list.on_event.add_observer(self._on_event)
         self._client.on_state_update.add_observer(self._on_status_changes)
-        
+
         logger.info("bot initialised")
-        yield from self.coro_send_message(CONTROL, _("Bot is back up")) 
+        yield from self.coro_send_message(CONTROL, _("Bot is back up"))
+
     def _on_status_changes(self, state_update):
         if state_update.typing_notification is not None:
             asyncio.async(
