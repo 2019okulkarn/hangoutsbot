@@ -103,5 +103,5 @@ def quote(bot, event, *args):
 		msg = 'No such quote'
 		yield from bot.coro_send_message(event.conv, msg)
 	except BaseException as e:
-		msg = '{} -- {}').format(str(e), event.text
+		msg = ('{} -- {}').format(str(e), event.text
 		yield from bot.coro_send_message(CONTROL, msg)
