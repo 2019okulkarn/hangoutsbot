@@ -12,7 +12,11 @@ def get_id(bot, name):
     all_users = {}
     path = bot.memory.get_by_path(["user_data"])
     for person in path:
-        all_users[person] = bot.get_hangups_user(person)
+        try:
+            hangupsuser = bot.get_hangups_user(person)
+        except:
+            hangupsuser = None
+        all_users[person] = hangupsuser
     for user in all_users:
         userdata = all_users[user]
         if name in userdata.full_name.lower():
@@ -21,12 +25,13 @@ def get_id(bot, name):
 
 def create_memory(bot, name):
     user_id = get_id(bot, name)
-    check = bot.user_memory_get(user_id, "memos")
-    if not check:
-        bot.user_memory_set(user_id, "memos", [])
-        return True
-    else:
-        return False
+    if user_id:
+        check = bot.user_memory_get(user_id, "memos")
+        if not check:
+            bot.user_memory_set(user_id, "memos", [])
+            return True
+        else:
+            return False
 
 
 def add_memo(bot, event, name, text):
