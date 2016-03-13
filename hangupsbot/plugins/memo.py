@@ -49,7 +49,7 @@ def add_memo(bot, event, name, text):
 
 def memo(bot, event, *args):
     '''Leaves a memo for someone. Format is /bot memo <name> <message>'''
-    added = add_memo(bot, event, args[0], ' '.join(args[1:]))
+    added = add_memo(bot, event, args[0].lower(), ' '.join(args[1:]))
     if added:
         yield from bot.coro_send_message(event.conv, _(added))
 
