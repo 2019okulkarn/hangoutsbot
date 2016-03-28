@@ -22,6 +22,9 @@ def get_id(bot, name):
         if name in userdata.full_name.lower():
             return user
 
+def get_name(bot, id_):
+    user = bot.get_hangups_user(id_)
+    return user.full_name
 
 def create_memory(bot, name):
     user_id = get_id(bot, name)
@@ -44,7 +47,8 @@ def add_memo(bot, event, name, text):
         mem.append('Memo from {}: "{}" at {}'.format(
             event.user.first_name, text, str(datetime.datetime.now())))
         bot.user_memory_set(id_, "memos", mem)
-        return "Memo added"
+        name = get_name(bot, id_)
+        return "Memo added for {}".format(name)
 
 
 def memo(bot, event, *args):
