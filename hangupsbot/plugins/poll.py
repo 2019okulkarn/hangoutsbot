@@ -99,6 +99,20 @@ def list(bot):
         msg = '<br>'.join(polls)
     return msg
 
+def submit_for_approval(bot, event):
+    if not bot.memory.exists(["requests"]):
+        bot.memory.set_by_path(["requests"], {})
+        bot.memory.save()
+    if not bot.memory.exists(["requests", "polls"]):
+        bot.memory.set_by_path(["requests", "polls"], {})
+        bot.memory.save()
+    path = bot.memory.get_by_path(["requests", "polls"])
+    requestnum = len(path) + 1
+    text = str(event.conv_id) + " " + event.text
+    bot.memory.set_by_path(["requests", "polls", str(requestnum)], text) 
+    bot.memory.save()
+    return ["Poll request {} submitted for approval".format(requestnum), "New poll requested by {} -- {}\nTo approve this poll, do ! approve poll {}".format(event.user.first_name, event.text, requestnum)]
+
 def poll(bot, event, *args):
     '''Creates a poll. Format is /bot poll [--add, --delete, --list, --vote] [pollnum, pollname] [vote]'''
     try:
@@ -108,7 +122,10 @@ def poll(bot, event, *args):
                     name = ' '.join(args[1:])
                     msg = add(bot, name)
             elif args[0] == '--add' and not is_admin(bot, event):
-                msg = _("{}: Can't do that.").format(event.user.full_name)
+                request = submit_for_approval(bot, event)
+                msg = request[0]
+                yield from bot.coro_send_message(CONTROL, _(request[1]))
+                #msg = _("{}: Can't do that.").format(event.user.full_name)
             elif args[0] == '--delete' and is_admin(bot, event):
                 name = ' '.join(args[1:])
                 msg = delete(bot, name)
