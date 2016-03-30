@@ -42,7 +42,7 @@ def vote(bot, event, vote_, name, pollnum):
         else:
             poll = name
     path = bot.memory.get_by_path(["polls", poll])
-    path[event.user.first_name] = vote_
+    path[event.user.first_name] = vote_.lower()
     bot.memory.set_by_path(['polls', poll], path)
     bot.memory.save()
     msg = _('Your vote for {} has been recorded as {}').format(poll, vote_)
@@ -186,7 +186,7 @@ def poll(bot, event, *args):
                     pollnum = int(args[2]) - 1
                     msg = set_help(bot, pollnum, ' '.join(args[3:]))
                 else:
-                    msg = _("What number poll do you want to add help for?")
+                    msg = _("What number poll do you want to add help for?") 
             elif args[1] == '--set' and not is_admin(bot, event):
                 request = submit_for_approval(bot, event)
                 msg = request[0]
