@@ -48,6 +48,38 @@ def vote(bot, event, vote_, name, pollnum):
     msg = _('Your vote for {} has been recorded as {}').format(poll, vote_)
     return msg
 
+def set_help(bot, pollnum, help_text):
+    mem = bot.memory
+    path = mem.get_by_path(["polls"])
+    names = []
+    for poll in path:
+        names.append(poll)
+    if len(names) >= pollnum:
+        poll = names[pollnum]
+    path = bot.memory.get_by_path(["polls", poll])
+    path["help"] = help_text
+    bot.memory.set_by_path(['polls', poll], path)
+    bot.memory.save()
+    return "Help for <b>{}</b> set to '{}'".format(poll, help_text)
+
+def get_help(bot, name, pollnum):
+    mem = bot.memory
+    path = mem.get_by_path(["polls"])
+    names = []
+    for poll in path:
+        names.append(poll)
+    if pollnum == -1:
+        poll = name
+    else:
+        if len(names) >= pollnum:
+            poll = names[pollnum]
+        else:
+            poll = name
+    if bot.memory.exists(["polls", poll, "help"]):
+        help_text = bot.memory.get_by_path(["polls", poll, "help"])
+    else:
+        help_text = "None"
+    return "Help for <b>{}:</b>\n{}".format(poll, str(help_text))
 
 def results(bot, poll):
     votes = []
@@ -148,6 +180,23 @@ def poll(bot, event, *args):
             else:
                 poll = ' '.join(args[1:])
                 msg = results(bot, poll)
+        elif args[0] == '--help':
+            if args[1] == '--set' and is_admin(bot, event):
+                if args[2].isdigit():
+                    pollnum = int(args[2]) - 1
+                    msg = set_help(bot, pollnum, ' '.join(args[3:]))
+                else:
+                    msg = _("What number poll do you want to add help for?") 
+            elif args[1] == '--set' and not is_admin(bot, event):
+                request = submit_for_approval(bot, event)
+                msg = request[0]
+                yield from bot.coro_send_message(CONTROL, _(request[1]))
+            else:
+                if args[1].isdigit():
+                    pollnum = int(args[1]) - 1
+                    msg = get_help(bot, "default", pollnum)
+                else:
+                    msg = get_help(bot, ' '.join(args[1:]), -1)
         else:
             if args[0].isdigit():
                 pollnum = int(args[0]) - 1
