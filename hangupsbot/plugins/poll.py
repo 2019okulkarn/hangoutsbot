@@ -149,9 +149,13 @@ def poll(bot, event, *args):
                 poll = ' '.join(args[1:])
                 msg = results(bot, poll)
         else:
-            vote_ = ' '.join(args).split(' - ')[0]
-            name = ' '.join(args).split(' - ')[1]
-            msg = vote(bot, event, vote_, name, -1)
+            if args[0].isdigit():
+                pollnum = int(args[0]) - 1
+                msg = vote(bot, event, ' '.join(args[2:]), "default", pollnum)
+            else:
+                vote_ = ' '.join(args).split(' - ')[0]
+                name = ' '.join(args).split(' - ')[1]
+                msg = vote(bot, event, vote_, name , -1)
     else:
         msg = _("Creates a poll. Format is /bot poll [--add, --delete, --list, --vote, --results] [pollnum, pollname] [vote]")
     yield from bot.coro_send_message(event.conv, msg)
