@@ -151,7 +151,7 @@ def poll(bot, event, *args):
         else:
             if args[0].isdigit():
                 pollnum = int(args[0]) - 1
-                msg = vote(bot, event, ' '.join(args[2:]), "default", pollnum)
+                msg = vote(bot, event, ' '.join(args[1:]), "default", pollnum)
             else:
                 vote_ = ' '.join(args).split(' - ')[0]
                 name = ' '.join(args).split(' - ')[1]
