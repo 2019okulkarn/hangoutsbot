@@ -29,34 +29,20 @@ def delete(bot, name):
         msg = _('There is no poll by the name "{}"').format(name)
     return msg
 
-def vote(bot, event, message, num=False):
-    if not num:
-        spl = ' '.join(message).split(' - ')
-        if len(spl) == 2:
-            vote = str(spl[0]).lower()
-            poll = spl[1]
-            path = bot.memory.get_by_path(['polls', poll])
-            path[event.user.first_name] = vote
-            bot.memory.set_by_path(['polls', poll], path)
-            bot.memory.save()
-            msg = _('Your vote for {} has been recorded as {}').format(poll, vote)
-        else:
-            msg = _("The correct format is /bot poll --vote <poll> - <vote> OR /bot poll --vote <pollnum> <vote>")
+def vote(bot, event, vote_, name, pollnum):
+    if pollnum == -1:
+        poll = name
     else:
         path = bot.memory.get_by_path(['polls'])
-        args = message.split()
-        pollnum = int(args[0]) - 1
         if len(list(path.keys())) > 0 and len(list(path.keys())) >= pollnum:
-            polltovote = list(path.keys())[pollnum]
-            vote = ' '.join(args[1:])
-            pollpath = bot.memory.get_by_path(['polls', polltovote])
-            pollpath[event.user.first_name] = vote
-            bot.memory.set_by_path(['polls', polltovote], pollpath)
-            bot.memory.save()
-            msg = _('Your vote for {} has been recorded as {}').format(list(path.keys())[pollnum], vote)
-        else:
-            msg = _("There are not that many polls")
+            poll = list(path.keys())[pollnum]
+    path = bot.memory.get_by_path(['polls', poll])
+    path[event.user.first_name] = vote_
+    bot.memory.set_by_path(['polls', poll], path)
+    bot.memory.save()
+    msg = _('Your vote for {} has been recorded as {}').format(poll, vote)
     return msg
+
 
 def results(bot, poll):
     votes = []
@@ -115,49 +101,46 @@ def submit_for_approval(bot, event):
 
 def poll(bot, event, *args):
     '''Creates a poll. Format is /bot poll [--add, --delete, --list, --vote] [pollnum, pollname] [vote]'''
-    try:
-        if args:
-            if args[0] == '--add' and is_admin(bot, event):
-                if len(args) > 1:
-                    name = ' '.join(args[1:])
-                    msg = add(bot, name)
-            elif args[0] == '--add' and not is_admin(bot, event):
-                request = submit_for_approval(bot, event)
-                msg = request[0]
-                yield from bot.coro_send_message(CONTROL, _(request[1]))
-                #msg = _("{}: Can't do that.").format(event.user.full_name)
-            elif args[0] == '--delete' and is_admin(bot, event):
+    if args:
+        if args[0] == '--add' and is_admin(bot, event):
+            if len(args) > 1:
                 name = ' '.join(args[1:])
-                msg = delete(bot, name)
-            elif args[0] == '--delete' and not is_admin(bot, event):
-                msg = _("{}: Can't do that.").format(event.user.full_name)
-            elif args[0] == '--vote':
-                if args[1].isdigit():
-                    msg = vote(bot, event,  ' '.join(args[1:]), num=True)
-                else:
-                    msg = vote(bot, event, ' '.join(args[1:]))
-            elif args[0] == '--list':
-                msg = list(bot)
-            elif args[0] == '--results':
-                if args[1].isdigit():
-                    path = bot.memory.get_by_path(['polls'])
-                    pollnum = int(args[1]) - 1
-                    if len(list(path.keys())) > 0 and len(list(path.keys())) >= pollnum:
-                        poll = list(path.keys())[pollnum]
-                        msg = results(bot, poll)
-                    else:
-                        msg = _("Not that many polls")
-                else:
-                    poll = ' '.join(args[1:])
-                    msg = results(bot, poll)
+                msg = add(bot, name)
+        elif args[0] == '--add' and not is_admin(bot, event):
+            request = submit_for_approval(bot, event)
+            msg = request[0]
+            yield from bot.coro_send_message(CONTROL, _(request[1]))
+            #msg = _("{}: Can't do that.").format(event.user.full_name)
+        elif args[0] == '--delete' and is_admin(bot, event):
+            name = ' '.join(args[1:])
+            msg = delete(bot, name)
+        elif args[0] == '--delete' and not is_admin(bot, event):
+            msg = _("{}: Can't do that.").format(event.user.full_name)
+        elif args[0] == '--vote':
+            if args[1].isdigit():
+                pollnum = int(args[1]) - 1
+                msg = vote(bot, event, ' '.join(args[2:]), "default", pollnum)
             else:
-                msg = _("Creates a poll. Format is /bot poll [--add, --delete, --list, --vote, --results] [pollnum, pollname] [vote]")
+                vote_ = ' '.join(args[1:]).split(' - ')[0]
+                name = ' '.join(args[1:]).split(' - ')[1]
+                msg = vote(bot, event, vote_, name , -1)
+        elif args[0] == '--list':
+            msg = list(bot)
+        elif args[0] == '--results':
+            if args[1].isdigit():
+                path = bot.memory.get_by_path(['polls'])
+                pollnum = int(args[1]) - 1
+                if len(list(path.keys())) > 0 and len(list(path.keys())) >= pollnum:
+                    poll = list(path.keys())[pollnum]
+                    msg = results(bot, poll)
+                else:
+                    msg = _("Not that many polls")
+            else:
+                poll = ' '.join(args[1:])
+                msg = results(bot, poll)
         else:
             msg = _("Creates a poll. Format is /bot poll [--add, --delete, --list, --vote, --results] [pollnum, pollname] [vote]")
-        yield from bot.coro_send_message(event.conv, msg)
-        bot.memory.save()
-    except BaseException as e:
-        simple = _('An Error Occurred')
-        msg = _('{} -- {}').format(str(e), event.text)
-        yield from bot.coro_send_message(event.conv, simple)
-        yield from bot.coro_send_message(CONTROL, msg)
+    else:
+        msg = _("Creates a poll. Format is /bot poll [--add, --delete, --list, --vote, --results] [pollnum, pollname] [vote]")
+    yield from bot.coro_send_message(event.conv, msg)
+    bot.memory.save()
