@@ -42,7 +42,7 @@ def vote(bot, event, vote_, name, pollnum):
         else:
             poll = name
     path = bot.memory.get_by_path(["polls", poll])
-    path[event.user.first_name] = vote_
+    path[event.user.first_name] = vote_.lower()
     bot.memory.set_by_path(['polls', poll], path)
     bot.memory.save()
     msg = _('Your vote for {} has been recorded as {}').format(poll, vote_)
