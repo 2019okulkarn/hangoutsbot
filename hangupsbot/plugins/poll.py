@@ -3,15 +3,14 @@ from control import *
 from admin import is_admin
 from collections import Counter
 
-
 def _initialize():
     plugins.register_user_command(["poll"])
 
 def add(bot, name):
-    if not bot.memory.exists(['polls']):
-        bot.memory.set_by_path(['polls'], {})
-    if not bot.memory.exists(['polls', name]):
-        bot.memory.set_by_path(['polls', name], {})
+    if not bot.memory.exists(["polls"]):
+        bot.memory.set_by_path(["polls"], {})
+    if not bot.memory.exists(["polls", name]):
+        bot.memory.set_by_path(["polls", name], {})
         bot.memory.save()
         msg = _("Poll '{}' created").format(name)
     else:
@@ -30,17 +29,23 @@ def delete(bot, name):
     return msg
 
 def vote(bot, event, vote_, name, pollnum):
+    mem = bot.memory
+    path = mem.get_by_path(["polls"])
+    names = []
+    for poll in path:
+        names.append(poll)
     if pollnum == -1:
         poll = name
     else:
-        path = bot.memory.get_by_path(['polls'])
-        if len(list(path.keys())) > 0 and len(list(path.keys())) >= pollnum:
-            poll = list(path.keys())[pollnum]
-    path = bot.memory.get_by_path(['polls', poll])
+        if len(names) >= pollnum:
+            poll = names[pollnum]
+        else:
+            poll = name
+    path = bot.memory.get_by_path(["polls", poll])
     path[event.user.first_name] = vote_
     bot.memory.set_by_path(['polls', poll], path)
     bot.memory.save()
-    msg = _('Your vote for {} has been recorded as {}').format(poll, vote)
+    msg = _('Your vote for {} has been recorded as {}').format(poll, vote_)
     return msg
 
 
@@ -58,7 +63,9 @@ def results(bot, poll):
         result = '{} voted {}<br>'.format(names[i], votes[i])
         mesg.append(result)
     count = Counter(votes)
-    freqlist = list(count.values())
+    freqlist = []
+    for item in count:
+        freqlist.append(item)
     maxcount = max(freqlist)
     total = freqlist.count(maxcount)
     common = count.most_common(total)
@@ -130,8 +137,11 @@ def poll(bot, event, *args):
             if args[1].isdigit():
                 path = bot.memory.get_by_path(['polls'])
                 pollnum = int(args[1]) - 1
-                if len(list(path.keys())) > 0 and len(list(path.keys())) >= pollnum:
-                    poll = list(path.keys())[pollnum]
+                keys = []
+                for poll in path:
+                    keys.append(poll)
+                if len(keys) > 0 and len(keys) >= pollnum:
+                    poll = keys[pollnum]
                     msg = results(bot, poll)
                 else:
                     msg = _("Not that many polls")
@@ -139,7 +149,9 @@ def poll(bot, event, *args):
                 poll = ' '.join(args[1:])
                 msg = results(bot, poll)
         else:
-            msg = _("Creates a poll. Format is /bot poll [--add, --delete, --list, --vote, --results] [pollnum, pollname] [vote]")
+            vote_ = ' '.join(args).split(' - ')[0]
+            name = ' '.join(args).split(' - ')[1]
+            msg = vote(bot, event, vote_, name, -1)
     else:
         msg = _("Creates a poll. Format is /bot poll [--add, --delete, --list, --vote, --results] [pollnum, pollname] [vote]")
     yield from bot.coro_send_message(event.conv, msg)
