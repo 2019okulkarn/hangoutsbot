@@ -37,7 +37,7 @@ def imagesearch(term):
     if 'items' not in data:
         return 'No Images Found'
     else:
-        link = data['items'][0]['pagemap']['cse_image'][0]['src']
+        link = data['items'][num - 1]['pagemap']['cse_image'][0]['src']
         return link
 
 
@@ -53,8 +53,15 @@ def google(bot, event, *args):
                         'Google says:<br>**{}**<br>{}').format(s['title'], s['link'])
                 yield from bot.coro_send_message(event.conv, msg)
             else:
-                term = ' '.join(args[1:])
-                s = imagesearch(term)
+                if args[-1].isdigit():
+                    num = int(args[-1])
+                    term = ' '.join(args[1:-1])
+                    yield from bot.coro_send_message(event.conv, _("num: %s, term: %s" % (num, term)))
+                else:
+                    num = 1
+                    term = ' '.join(args[1:])
+                    yield from bot.coro_send_message(event.conv, _("num: %s, term: %s" % (num, term)))
+                s = imagesearch(term, num)
                 if s == "No Images Found":
                     msg = _(s)
                     yield from bot.coro_send_message(event.conv, msg)
@@ -90,8 +97,15 @@ def g(bot, event, *args):
                         'Google says:<br>**{}**<br>{}').format(s['title'], s['link'])
                 yield from bot.coro_send_message(event.conv, msg)
             else:
-                term = ' '.join(args[1:])
-                s = imagesearch(term)
+                if args[-1].isdigit():
+                    num = int(args[-1])
+                    term = ' '.join(args[1:-1])
+                    yield from bot.coro_send_message(event.conv, _("num: %s, term: %s" % (num, term)))
+                else:
+                    num = 1
+                    term = ' '.join(args[1:])
+                    yield from bot.coro_send_message(event.conv, _("num: %s, term: %s" % (num, term)))
+                s = imagesearch(term, num)
                 if s == "No Images Found":
                     msg = _(s)
                     yield from bot.coro_send_message(event.conv, msg)
