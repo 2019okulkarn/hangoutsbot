@@ -1,10 +1,8 @@
 import plugins
 from commands import command
 
-
 def _initialize():
     plugins.register_admin_command(['approve'])
-
 
 def approve(bot, event, *args):
     request = args[0]
@@ -14,8 +12,7 @@ def approve(bot, event, *args):
             yield from bot.coro_send_message(event.conv, _("No requests"))
             return
         else:
-            path = bot.memory.get_by_path(
-                ["requests", "polls", str(request_number)])
+            path = bot.memory.get_by_path(["requests", "polls", str(request_number)])
             conversation_id = path.split()[0]
             command_to_run = path.split()[2:]
             yield from command.run(bot, event, *command_to_run)

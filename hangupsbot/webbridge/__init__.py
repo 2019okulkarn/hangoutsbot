@@ -47,9 +47,8 @@ class WebFramework:
                 try:
                     certfile = listener["certfile"]
                     if not certfile:
-                        logger.warning(
-                            "config.{}[{}].certfile must be configured".format(
-                                self.configkey, itemNo))
+                        logger.warning("config.{}[{}].certfile must be configured".format(
+                            self.configkey, itemNo))
                         continue
                     name = listener["name"]
                     port = listener["port"]

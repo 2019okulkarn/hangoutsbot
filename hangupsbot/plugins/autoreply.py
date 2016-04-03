@@ -27,8 +27,7 @@ def _handle_autoreply(bot, event, command):
     if not (config_autoreplies or tagged_autoreplies):
         return
 
-    if "autoreplies-disable" in bot.tags.useractive(
-            event.user_id.chat_id, event.conv.id_):
+    if "autoreplies-disable" in bot.tags.useractive(event.user_id.chat_id, event.conv.id_):
         logger.debug("explicitly disabled by tag for {} {}".format(
             event.user_id.chat_id, event.conv.id_))
         return
@@ -70,12 +69,13 @@ def _handle_autoreply(bot, event, command):
 
 @asyncio.coroutine
 def send_reply(bot, event, message):
-    values = {"event": event, "conv_title": bot.conversations.get_name(
-        event.conv, fallback_string=_("Unidentified Conversation"))}
+    values = {"event": event,
+              "conv_title": bot.conversations.get_name(event.conv,
+                                                       fallback_string=_("Unidentified Conversation"))}
 
     if "participant_ids" in dir(event.conv_event):
-        values["participants"] = [event.conv.get_user(
-            user_id) for user_id in event.conv_event.participant_ids]
+        values["participants"] = [event.conv.get_user(user_id)
+                                  for user_id in event.conv_event.participant_ids]
         values["participants_namelist"] = ", ".join(
             [u.full_name for u in values["participants"]])
 

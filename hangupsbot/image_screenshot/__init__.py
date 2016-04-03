@@ -58,7 +58,7 @@ def _screencap(browser, url, filename):
 
 
 def seturl(bot, event, *args):
-    """set url for current converation for the screenshot command.
+    """set url for current converation for the screenshot command. 
     use /bot clearurl to clear the previous url before setting a new one.
     """
     url = bot.conversation_memory_get(event.conv_id, 'url')
@@ -76,7 +76,7 @@ def seturl(bot, event, *args):
 
 
 def clearurl(bot, event, *args):
-    """clear url for current converation for the screenshot command.
+    """clear url for current converation for the screenshot command. 
     """
     url = bot.conversation_memory_get(event.conv_id, 'url')
     if url is None:
@@ -92,7 +92,7 @@ def clearurl(bot, event, *args):
 
 
 def screenshot(bot, event, *args):
-    """get a screenshot of a user provided URL or the default URL of the hangout.
+    """get a screenshot of a user provided URL or the default URL of the hangout. 
     """
     if _externals["running"]:
         yield from bot.coro_send_message(event.conv_id, "<i>processing another request, try again shortly</i>")
@@ -133,19 +133,17 @@ def screenshot(bot, event, *args):
             yield from bot.coro_send_message(event.conv_id, "<i>error getting screenshot</i>")
             logger.exception("screencap failed".format(url))
             _externals["running"] = False
-<< << << < HEAD:
-    hangupsbot / image_screenshot / __init__.py
+<<<<<<< HEAD:hangupsbot/image_screenshot/__init__.py
 
-== == == =
-    return
-
->>>>>> > 4416ec7499a72f294326130559e28a0e59d6dccf:
-    hangupsbot / plugins / image_screenshot / __init__.py
-    try:
-        image_id = yield from bot._client.upload_image(image_data, filename=filename)
-        yield from bot._client.sendchatmessage(event.conv.id_, None, image_id=image_id)
-    except Exception as e:
-        yield from bot.coro_send_message(event.conv_id, "<i>error uploading screenshot</i>")
-        logger.exception("upload failed".format(url))
-    finally:
-        _externals["running"] = False
+=======
+            return
+            
+>>>>>>> 4416ec7499a72f294326130559e28a0e59d6dccf:hangupsbot/plugins/image_screenshot/__init__.py
+        try:
+            image_id = yield from bot._client.upload_image(image_data, filename=filename)
+            yield from bot._client.sendchatmessage(event.conv.id_, None, image_id=image_id)
+        except Exception as e:
+            yield from bot.coro_send_message(event.conv_id, "<i>error uploading screenshot</i>")
+            logger.exception("upload failed".format(url))
+        finally:
+            _externals["running"] = False

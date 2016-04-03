@@ -72,11 +72,7 @@ def otr_monkeypatch_removeuser(self, conversation_id, otr_status=None):
 
 
 @asyncio.coroutine
-def otr_monkeypatched_adduser(
-        self,
-        conversation_id,
-        chat_id_list,
-        otr_status=None):
+def otr_monkeypatched_adduser(self, conversation_id, chat_id_list, otr_status=None):
     if otr_status is None:
         otr_status = OffTheRecordStatus.ON_THE_RECORD  # default
         try:

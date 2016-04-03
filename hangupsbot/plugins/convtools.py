@@ -24,8 +24,7 @@ def _batch_add_users(bot, target_conv, chat_ids, batch_max=20):
 
     not_there = []
     for chat_id in chat_ids:
-        if chat_id not in bot.conversations.catalog[
-                target_conv]["participants"]:
+        if chat_id not in bot.conversations.catalog[target_conv]["participants"]:
             not_there.append(chat_id)
         else:
             logger.debug("addusers: user {} already in {}".format(

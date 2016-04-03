@@ -35,8 +35,7 @@ def segment_to_html(segment):
         message.append('<br />\n')
     else:
         logging.warning(
-            'Ignoring unknown chat message segment type: {}'.format(
-                segment.type_))
+            'Ignoring unknown chat message segment type: {}'.format(segment.type_))
 
     if not segment.type_ == hangups.schemas.SegmentType.LINE_BREAK:
         for is_f, f in ((segment.is_bold, 'b'), (segment.is_italic, 'i'),
@@ -178,8 +177,7 @@ def fix_urls(text):
         pretoken = ""
         posttoken = ""
         # consume a token looking for a url-like pattern...
-        while len(
-                token) > 10:  # stop below shortest possible domain http://g.cn length
+        while len(token) > 10:  # stop below shortest possible domain http://g.cn length
             if token.startswith(("http://", "https://")):
                 break
             if token[0:1] in ('"', '=', "'", "<"):

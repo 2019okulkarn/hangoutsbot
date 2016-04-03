@@ -25,8 +25,7 @@ def on_hangout_call(bot, event, command):
             else:
                 humantime = "{} days".format(since // 86400)
 
-            if bot.conversations.catalog[
-                    event.conv_id]["type"] == "ONE_TO_ONE":
+            if bot.conversations.catalog[event.conv_id]["type"] == "ONE_TO_ONE":
                 """subsequent calls for a ONE_TO_ONE"""
                 yield from bot.coro_send_message(event.conv_id,
                                                  _("<b>It's been {} since the last call. Lonely? I can't reply you as I don't have speech synthesis (or speech recognition either!)</b>").format(humantime))
@@ -41,6 +40,5 @@ def on_hangout_call(bot, event, command):
             yield from bot.coro_send_message(event.conv_id,
                                              _("<b>No prizes for that call</b>"))
 
-        bot.conversation_memory_set(
-            event.conv_id, "lastcall", {
-                "caller": event.user.full_name, "timestamp": time.time()})
+        bot.conversation_memory_set(event.conv_id, "lastcall", {
+                                    "caller": event.user.full_name, "timestamp": time.time()})

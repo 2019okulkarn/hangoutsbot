@@ -15,20 +15,9 @@ logger = logging.getLogger(__name__)
 
 
 def _initialise(bot):
-    plugins.register_admin_command(["memorytaint",
-                                    "memoryuntaint",
-                                    "memorystatus",
-                                    "memoryset",
-                                    "memoryget",
-                                    "memorypop",
-                                    "memorysave",
-                                    "memorydelete",
-                                    "submemoryinit",
-                                    "submemoryclear",
-                                    "submemoryset",
-                                    "submemoryget",
-                                    "submemorypop",
-                                    "submemorydelete"])
+    plugins.register_admin_command(["memorytaint", "memoryuntaint", "memorystatus",
+                                    "memoryset", "memoryget", "memorypop", "memorysave", "memorydelete",
+                                    "submemoryinit", "submemoryclear", "submemoryset", "submemoryget", "submemorypop", "submemorydelete"])
 
 
 def memoryset(bot, event, *args):

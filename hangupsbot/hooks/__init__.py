@@ -17,9 +17,8 @@ def load(bot):
                 module = hook_config["module"].split(".")
 
                 if len(module) < 4:
-                    logger.error(
-                        "[DEPRECATED] config.hooks[{}].module should have at least 4 packages {}".format(
-                            itemNo, module))
+                    logger.error("[DEPRECATED] config.hooks[{}].module should have at least 4 packages {}".format(
+                        itemNo, module))
                     continue
 
                 module_name = ".".join(module[0:-1])

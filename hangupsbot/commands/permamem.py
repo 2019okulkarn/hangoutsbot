@@ -7,12 +7,8 @@ logger = logging.getLogger(__name__)
 
 
 def _initialise(bot):
-    plugins.register_admin_command(["dumpconv",
-                                    "dumpunknownusers",
-                                    "resetunknownusers",
-                                    "refreshusermemory",
-                                    "removeconvrecord",
-                                    "makeallusersindefinite"])
+    plugins.register_admin_command(["dumpconv", "dumpunknownusers", "resetunknownusers",
+                                    "refreshusermemory", "removeconvrecord", "makeallusersindefinite"])
 
 
 def dumpconv(bot, event, *args):
@@ -22,10 +18,8 @@ def dumpconv(bot, event, *args):
     all_conversations = bot.conversations.get().items()
     for convid, convdata in all_conversations:
         if text_search.lower() in convdata["title"].lower():
-            lines.append(
-                "`{}` <em>{}</em> {}<br />... `{}` history: {} <br />... <b>{}</b>".format(
-                    convid, convdata["source"], len(
-                        convdata["participants"]), convdata["type"], convdata["history"], convdata["title"]))
+            lines.append("`{}` <em>{}</em> {}<br />... `{}` history: {} <br />... <b>{}</b>".format(
+                convid, convdata["source"], len(convdata["participants"]), convdata["type"], convdata["history"], convdata["title"]))
     lines.append(
         "<b><em>Totals: {}/{}</em></b>".format(len(lines), len(all_conversations)))
     yield from bot.coro_send_message(event.conv, "<br />".join(lines))
@@ -40,8 +34,7 @@ def dumpunknownusers(bot, event, *args):
             if "_hangups" in bot.memory["user_data"][chat_id]:
                 _hangups = bot.memory["user_data"][chat_id]["_hangups"]
                 if _hangups["is_definitive"]:
-                    if _hangups["full_name"].upper() == "UNKNOWN" and _hangups[
-                            "full_name"] == _hangups["first_name"]:
+                    if _hangups["full_name"].upper() == "UNKNOWN" and _hangups["full_name"] == _hangups["first_name"]:
                         logger.info("dumpunknownusers {}".format(_hangups))
 
     logger.info("dumpunknownusers finished")
@@ -58,8 +51,7 @@ def resetunknownusers(bot, event, *args):
             if "_hangups" in bot.memory["user_data"][chat_id]:
                 _hangups = bot.memory["user_data"][chat_id]["_hangups"]
                 if _hangups["is_definitive"]:
-                    if _hangups["full_name"].upper() == "UNKNOWN" and _hangups[
-                            "full_name"] == _hangups["first_name"]:
+                    if _hangups["full_name"].upper() == "UNKNOWN" and _hangups["full_name"] == _hangups["first_name"]:
                         logger.info("resetunknownusers {}".format(_hangups))
                         bot.memory.set_by_path(
                             ["user_data", chat_id, "_hangups", "is_definitive"], False)

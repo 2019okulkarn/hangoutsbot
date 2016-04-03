@@ -13,9 +13,9 @@ class BridgeInstance(WebFramework):
 class IncomingMessages(IncomingRequestHandler):
     """request handler for incoming external chat events
     based on sinks.base_bot_request_handler
-    override
+    override 
         process_request()
-        send_data()
+        send_data() 
 
     more info: https://github.com/hangoutsbot/hangoutsbot/wiki/Sinks-(2.4-and-above)#reference-documentation
     """

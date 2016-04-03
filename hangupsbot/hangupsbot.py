@@ -46,12 +46,7 @@ logger = logging.getLogger()
 class HangupsBot(object):
     """Hangouts bot listening on all conversations"""
 
-    def __init__(
-            self,
-            cookies_path,
-            config_path,
-            max_retries=5,
-            memory_file=None):
+    def __init__(self, cookies_path, config_path, max_retries=5, memory_file=None):
         self.Exceptions = HangupsBotExceptions()
 
         self.shared = {}  # safe place to store references to objects
@@ -94,9 +89,7 @@ class HangupsBot(object):
                 memory_file, _failsafe_backups, _save_delay))
 
             self.memory = config.Config(
-                memory_file,
-                failsafe_backups=_failsafe_backups,
-                save_delay=_save_delay)
+                memory_file, failsafe_backups=_failsafe_backups, save_delay=_save_delay)
             if not os.path.isfile(memory_file):
                 try:
                     logger.info("creating memory file: {}".format(memory_file))
@@ -119,9 +112,8 @@ class HangupsBot(object):
     def set_locale(self, language_code, reuse=True):
         if not reuse or language_code not in self._locales:
             try:
-                self._locales[language_code] = gettext.translation(
-                    'hangupsbot', localedir=os.path.join(
-                        os.path.dirname(__file__), 'locale'), languages=[language_code])
+                self._locales[language_code] = gettext.translation('hangupsbot', localedir=os.path.join(
+                    os.path.dirname(__file__), 'locale'), languages=[language_code])
                 logger.debug("locale loaded: {}".format(language_code))
             except OSError:
                 logger.exception("no translation for {}".format(language_code))
@@ -203,9 +195,8 @@ class HangupsBot(object):
 
                     logger.info('Waiting {} seconds...'.format(5 + retry * 5))
                     time.sleep(5 + retry * 5)
-                    logger.info(
-                        'Trying to connect again (try {} of {})...'.format(
-                            retry + 1, self._max_retries))
+                    logger.info('Trying to connect again (try {} of {})...'.format(
+                        retry + 1, self._max_retries))
 
             logger.error('Maximum number of retries reached! Exiting...')
 
@@ -223,8 +214,7 @@ class HangupsBot(object):
         # historical signature: conversation, text, context=None
         if context is None:
             context = {}
-        if "parser" not in context and image_id is None and isinstance(
-                text, str):
+        if "parser" not in context and image_id is None and isinstance(text, str):
             # replicate old behaviour (no html/markdown parsing) if no new
             # features are used
             context["parser"] = False
@@ -236,12 +226,7 @@ class HangupsBot(object):
                                    image_id=image_id)
         ).add_done_callback(lambda future: future.result())
 
-    def send_message_parsed(
-            self,
-            conversation,
-            html,
-            context=None,
-            image_id=None):
+    def send_message_parsed(self, conversation, html, context=None, image_id=None):
         logger.debug('[DEPRECATED]: yield from bot.coro_send_message()'
                      ' instead of send_message_parsed()')
 
@@ -254,12 +239,7 @@ class HangupsBot(object):
                                    image_id=image_id)
         ).add_done_callback(lambda future: future.result())
 
-    def send_message_segments(
-            self,
-            conversation,
-            segments,
-            context=None,
-            image_id=None):
+    def send_message_segments(self, conversation, segments, context=None, image_id=None):
         logger.debug('[DEPRECATED]: yield from bot.coro_send_message()'
                      ' instead of send_message_segments()')
 
@@ -287,14 +267,12 @@ class HangupsBot(object):
                 if conv.id_ not in check_ids:
                     missing.append(conv.id_)
 
-            logger.info(
-                "list_conversations: "
-                "{} from permamem, "
-                "{} from hangups - "
-                "discrepancies: {}".format(
-                    len(convs),
-                    len(hangups_conv_list),
-                    ", ".join(missing) or "none"))
+            logger.info("list_conversations: "
+                        "{} from permamem, "
+                        "{} from hangups - "
+                        "discrepancies: {}".format(len(convs),
+                                                   len(hangups_conv_list),
+                                                   ", ".join(missing) or "none"))
 
         except Exception as e:
             logger.exception("LIST_CONVERSATIONS: failed")
@@ -303,10 +281,7 @@ class HangupsBot(object):
         return convs
 
     def get_hangups_conversation(self, conv_id):
-        if isinstance(
-            conv_id,
-            (FakeConversation,
-             hangups.conversation.Conversation)):
+        if isinstance(conv_id, (FakeConversation, hangups.conversation.Conversation)):
             conv_id = conv_id.id_
 
         return HangupsConversation(self, conv_id)
@@ -491,12 +466,10 @@ class HangupsBot(object):
                 try:
                     introduction = self.get_config_option('bot_introduction')
                     if not introduction:
-                        introduction = _(
-                            "<i>Hi there! I'll be using this channel to send private "
-                            "messages and alerts. "
-                            "For help, type <b>{0} help</b>. "
-                            "To keep me quiet, reply with <b>{0} optout</b>.</i>").format(
-                            self._handlers.bot_command[0])
+                        introduction = _("<i>Hi there! I'll be using this channel to send private "
+                                         "messages and alerts. "
+                                         "For help, type <b>{0} help</b>. "
+                                         "To keep me quiet, reply with <b>{0} optout</b>.</i>").format(self._handlers.bot_command[0])
                     response = yield from self._client.createconversation([chat_id])
                     new_conversation_id = response['conversation']['id']['id']
                     yield from self.coro_send_message(new_conversation_id, introduction)
@@ -574,11 +547,10 @@ class HangupsBot(object):
         self._user_list = yield from hangups.user.build_user_list(self._client,
                                                                   initial_data)
 
-        self._conv_list = hangups.ConversationList(
-            self._client,
-            initial_data.conversation_states,
-            self._user_list,
-            initial_data.sync_timestamp)
+        self._conv_list = hangups.ConversationList(self._client,
+                                                   initial_data.conversation_states,
+                                                   self._user_list,
+                                                   initial_data.sync_timestamp)
 
         self.conversations = yield from permamem.initialise_permanent_memory(self)
 
@@ -592,10 +564,9 @@ class HangupsBot(object):
 
         self._conv_list.on_event.add_observer(self._on_event)
         self._client.on_state_update.add_observer(self._on_status_changes)
-
+        
         logger.info("bot initialised")
-        yield from self.coro_send_message(CONTROL, _("Bot is back up"))
-
+        yield from self.coro_send_message(CONTROL, _("Bot is back up")) 
     def _on_status_changes(self, state_update):
         if state_update.typing_notification is not None:
             asyncio.async(
@@ -627,9 +598,8 @@ class HangupsBot(object):
                 k: v for k, v in self._cache_event_id.items() if v > time.time() - 3}
             self._cache_event_id[conv_event.id_] = time.time()
 
-            logger.info(
-                "duplicate events workaround: event id = {} timestamp = {}".format(
-                    conv_event.id_, conv_event.timestamp))
+            logger.info("duplicate events workaround: event id = {} timestamp = {}".format(
+                conv_event.id_, conv_event.timestamp))
 
         event = ConversationEvent(self, conv_event)
 
@@ -654,7 +624,7 @@ class HangupsBot(object):
                 self._handlers.handle_chat_rename(event)
             ).add_done_callback(lambda future: future.result())
 
-        elif isinstance(conv_event, hangups.conversation_event.ConversationEvent):
+        elif type(conv_event) is hangups.conversation_event.ConversationEvent:
             if conv_event._event.hangout_event:
                 asyncio.async(
                     self._handlers.handle_call(event)
@@ -662,8 +632,7 @@ class HangupsBot(object):
 
         else:
             logger.warning(
-                "_on_event(): unrecognised event type: {}".format(
-                    type(conv_event)))
+                "_on_event(): unrecognised event type: {}".format(type(conv_event)))
 
     def _execute_hook(self, funcname, parameters=None):
         for hook in self._hooks:
@@ -714,25 +683,18 @@ class HangupsBot(object):
         self.send_message_parsed(conversation, html, context)
         return True
 
-    def send_html_to_user_or_conversation(
-            self, user_id_or_conversation_id, html, context=None):
+    def send_html_to_user_or_conversation(self, user_id_or_conversation_id, html, context=None):
         logger.warning('[DEPRECATED] yield from bot.coro_send_message() '
                        ' or yield from bot.coro_send_to_user()'
                        ' instead of send_html_to_user_or_conversation()')
 
         # NOTE: Assumption that a conversation_id will never match a user_id
-        if not self.send_html_to_user(
-                user_id_or_conversation_id, html, context):
+        if not self.send_html_to_user(user_id_or_conversation_id, html, context):
             self.send_html_to_conversation(
                 user_id_or_conversation_id, html, context)
 
     @asyncio.coroutine
-    def coro_send_message(
-            self,
-            conversation,
-            message,
-            context=None,
-            image_id=None):
+    def coro_send_message(self, conversation, message, context=None, image_id=None):
         if not message and not image_id:
             # at least a message OR an image_id must be supplied
             return
@@ -748,10 +710,7 @@ class HangupsBot(object):
 
         # get the conversation id
 
-        if isinstance(
-            conversation,
-            (FakeConversation,
-             hangups.conversation.Conversation)):
+        if isinstance(conversation, (FakeConversation, hangups.conversation.Conversation)):
             conversation_id = conversation.id_
         elif isinstance(conversation, str):
             conversation_id = conversation
@@ -799,8 +758,8 @@ class HangupsBot(object):
                 # rare scenario where a conversation was not refreshed
                 # once the initial message goes through, convmem will be
                 # updated
-                logger.warning(
-                    "CORO_SEND_MESSAGE(): could not determine otr for {}".format(conversation_id))
+                logger.warning("CORO_SEND_MESSAGE(): could not determine otr for {}".format(
+                    conversation_id))
 
         if context["history"]:
             otr_status = OffTheRecordStatus.ON_THE_RECORD
@@ -865,13 +824,7 @@ class HangupsBot(object):
         return True
 
     @asyncio.coroutine
-    def coro_send_to_user_and_conversation(
-            self,
-            chat_id,
-            conv_id,
-            html_private,
-            html_public=False,
-            context=None):
+    def coro_send_to_user_and_conversation(self, chat_id, conv_id, html_private, html_public=False, context=None):
         """
         If the command was issued on a public channel, respond to the user
         privately and optionally send a short public response back as well.
@@ -914,7 +867,7 @@ class HangupsBot(object):
                 public_message = responses["standard"]
 
         else:
-            if isinstance(conv_1on1_initiator, bool) and responses["optout"]:
+            if type(conv_1on1_initiator) is bool and responses["optout"]:
                 public_message = responses["optout"]
 
             elif responses["no1to1"]:
@@ -1045,9 +998,8 @@ def main():
     default_memory_path = os.path.join(dirs.user_data_dir, 'memory.json')
 
     # Configure argument parser
-    parser = argparse.ArgumentParser(
-        prog='hangupsbot',
-        formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(prog='hangupsbot',
+                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-d', '--debug', action='store_true',
                         help=_('log detailed debugging messages'))
     parser.add_argument('--log', default=default_log_path,
@@ -1058,17 +1010,10 @@ def main():
                         help=_('memory storage path'))
     parser.add_argument('--config', default=default_config_path,
                         help=_('config storage path'))
-    parser.add_argument(
-        '--retries',
-        default=5,
-        type=int,
-        help=_('Maximum disconnect / reconnect retries before quitting'))
-    parser.add_argument(
-        '--version',
-        action='version',
-        version='%(prog)s {}'.format(
-            version.__version__),
-        help=_('show program\'s version number and exit'))
+    parser.add_argument('--retries', default=5, type=int,
+                        help=_('Maximum disconnect / reconnect retries before quitting'))
+    parser.add_argument('--version', action='version', version='%(prog)s {}'.format(version.__version__),
+                        help=_('show program\'s version number and exit'))
     args = parser.parse_args()
 
     # Create all necessary directories.
@@ -1083,13 +1028,8 @@ def main():
     # If there is no config file in user data directory, copy default one there
     if not os.path.isfile(args.config):
         try:
-            shutil.copy(
-                os.path.abspath(
-                    os.path.join(
-                        os.path.dirname(
-                            sys.argv[0]),
-                        'config.json')),
-                args.config)
+            shutil.copy(os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), 'config.json')),
+                        args.config)
         except (OSError, IOError) as e:
             sys.exit(_('Failed to copy default config file: {}').format(e))
 

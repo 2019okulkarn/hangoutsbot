@@ -31,7 +31,8 @@ def _get_global_lottery_name(bot, conversation_id, listname):
             for sync_room_list in syncouts:
                 # seek the current room, if any
                 if conversation_id in sync_room_list:
-                    _linked_rooms = sorted(sync_room_list)
+                    _linked_rooms = sync_room_list
+                    _linked_rooms.sort()  # keeps the order consistent
                     conversation_id = ":".join(_linked_rooms)
                     logger.debug("joint room keys {}".format(conversation_id))
 
@@ -178,8 +179,7 @@ def perform_drawing(bot, event, *args):
 
         if global_draw_name is not None:
             if len(draw_lists[global_draw_name]["box"]) > 0:
-                if event.user.id_.chat_id in draw_lists[
-                        global_draw_name]["users"]:
+                if event.user.id_.chat_id in draw_lists[global_draw_name]["users"]:
                     # user already drawn something from the box
                     yield from bot.coro_send_message(event.conv,
                                                      _("<b>{}</b>, you have already drawn <b>{}</b> from the <b>{}</b> box").format(
@@ -206,8 +206,7 @@ def perform_drawing(bot, event, *args):
                 text_finished = _(
                     "<b>{}</b>, the <b>{}</b> lottery is over. ").format(event.user.full_name, word)
 
-                if event.user.id_.chat_id in draw_lists[
-                        global_draw_name]["users"]:
+                if event.user.id_.chat_id in draw_lists[global_draw_name]["users"]:
                     text_finished = _("You drew a {} previously.").format(
                         draw_lists[global_draw_name]["users"][event.user.id_.chat_id])
 

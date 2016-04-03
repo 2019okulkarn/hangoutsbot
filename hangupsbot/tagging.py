@@ -38,10 +38,8 @@ class tags:
         # XXX: custom iteration to retrieve per-conversation-user-overrides
         if self.bot.memory.exists(["conv_data"]):
             for conv_id in self.bot.memory["conv_data"]:
-                if self.bot.memory.exists(
-                        ["conv_data", conv_id, "tags-users"]):
-                    for chat_id, tags in self.bot.memory[
-                            "conv_data"][conv_id]["tags-users"].items():
+                if self.bot.memory.exists(["conv_data", conv_id, "tags-users"]):
+                    for chat_id, tags in self.bot.memory["conv_data"][conv_id]["tags-users"].items():
                         for tag in tags:
                             self.add_to_index(
                                 "user", tag, conv_id + "|" + chat_id)
@@ -251,16 +249,12 @@ class tags:
                                        conv_id + "|" + self.wildcard["user"]])
 
                     # additional overrides based on type of conversation
-                    if self.bot.conversations.catalog[
-                            conv_id]["type"] == "GROUP":
+                    if self.bot.conversations.catalog[conv_id]["type"] == "GROUP":
                         check_keys.extend([self.wildcard["group"] + "|" + chat_id,
                                            self.wildcard["group"] + "|" + self.wildcard["user"]])
                     else:
-                        check_keys.extend([self.wildcard["one2one"] +
-                                           "|" +
-                                           chat_id, self.wildcard["one2one"] +
-                                           "|" +
-                                           self.wildcard["user"]])
+                        check_keys.extend([self.wildcard["one2one"] + "|" + chat_id,
+                                           self.wildcard["one2one"] + "|" + self.wildcard["user"]])
 
                 else:
                     logger.warning(

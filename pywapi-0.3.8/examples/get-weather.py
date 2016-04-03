@@ -73,13 +73,9 @@ def write_everything_from_yahoo_to_xml(country, cities, outfile='weather.xml'):
 def main():
     parser = OptionParser(
         usage='Collect information about the weather in Greece.')
-    parser.add_option(
-        "-f",
-        "--file",
-        dest="filename",
-        default="weather.xml",
-        help="write directory contents to FILE (default: weather.xml)",
-        metavar="FILE")
+    parser.add_option("-f", "--file", dest="filename", default="weather.xml",
+                      help="write directory contents to FILE (default: weather.xml)",
+                      metavar="FILE")
 
     (options, args) = parser.parse_args()
 

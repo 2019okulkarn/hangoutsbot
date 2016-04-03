@@ -19,16 +19,8 @@ _internal["broadcast"] = {"message": "", "conversations": []}  # /bot broadcast
 
 
 def _initialise(bot):
-    plugins.register_admin_command(["broadcast",
-                                    "users",
-                                    "user",
-                                    "hangouts",
-                                    "rename",
-                                    "leave",
-                                    "reload",
-                                    "quit",
-                                    "config",
-                                    "whereami"])
+    plugins.register_admin_command(
+        ["broadcast", "users", "user", "hangouts", "rename", "leave", "reload", "quit", "config", "whereami"])
     plugins.register_user_command(["echo", "whoami"])
 
 
@@ -70,10 +62,8 @@ def broadcast(bot, event, *args):
         if subcmd == "info":
             """display broadcast data such as message and target rooms"""
 
-            conv_info = [
-                "<b><pre>{}</pre></b> ... <pre>{}</pre>".format(
-                    bot.conversations.get_name(convid),
-                    convid) for convid in _internal["broadcast"]["conversations"]]
+            conv_info = ["<b><pre>{}</pre></b> ... <pre>{}</pre>".format(bot.conversations.get_name(convid), convid)
+                         for convid in _internal["broadcast"]["conversations"]]
 
             if not _internal["broadcast"]["message"]:
                 yield from bot.coro_send_message(event.conv, _("broadcast: no message set"))
@@ -94,8 +84,7 @@ def broadcast(bot, event, *args):
             """set broadcast message"""
             message = ' '.join(parameters)
             if message:
-                if message.lower().strip().startswith(
-                        tuple([_.lower() for _ in bot._handlers.bot_command])):
+                if message.lower().strip().startswith(tuple([_.lower() for _ in bot._handlers.bot_command])):
                     yield from bot.coro_send_message(event.conv, _("broadcast: message not allowed"))
                     return
                 _internal["broadcast"]["message"] = message
@@ -120,8 +109,7 @@ def broadcast(bot, event, *args):
                 """add by wild card search of title or id"""
                 search = " ".join(parameters)
                 for convid, convdata in bot.conversations.get().items():
-                    if search.lower() in convdata[
-                            "title"].lower() or search in convid:
+                    if search.lower() in convdata["title"].lower() or search in convid:
                         _internal["broadcast"]["conversations"].append(convid)
 
             _internal["broadcast"]["conversations"] = list(
@@ -138,20 +126,17 @@ def broadcast(bot, event, *args):
                 search = " ".join(parameters)
                 removed = []
                 for convid in _internal["broadcast"]["conversations"]:
-                    if search.lower() in bot.conversations.get_name(
-                            convid).lower() or search in convid:
+                    if search.lower() in bot.conversations.get_name(convid).lower() or search in convid:
                         _internal["broadcast"]["conversations"].remove(convid)
                         removed.append(
-                            "<b><pre>{}</pre></b> (<pre>{}</pre>)".format(
-                                bot.conversations.get_name(convid), convid))
+                            "<b><pre>{}</pre></b> (<pre>{}</pre>)".format(bot.conversations.get_name(convid), convid))
 
                 if removed:
                     yield from bot.coro_send_message(event.conv, _("broadcast: removed {}".format(", ".join(removed))))
 
         elif subcmd == "NOW":
             """send the broadcast - no turning back!"""
-            context = {
-                "explicit_relay": True}  # prevent echos across syncrooms
+            context = {"explicit_relay": True}  # prevent echos across syncrooms
             for convid in _internal["broadcast"]["conversations"]:
                 yield from bot.coro_send_message(convid, _internal["broadcast"]["message"], context=context)
             yield from bot.coro_send_message(event.conv, _("broadcast: message sent to {} chats".format(len(_internal["broadcast"]["conversations"]))))
@@ -179,20 +164,15 @@ def user(bot, event, *args):
     search_lower = search.strip().lower()
     search_upper = search.strip().upper()
 
-    segments = [
-        hangups.ChatMessageSegment(
-            _('results for user named "{}":').format(search),
-            is_bold=True),
-        hangups.ChatMessageSegment(
-            '\n',
-            hangups.SegmentType.LINE_BREAK)]
+    segments = [hangups.ChatMessageSegment(_('results for user named "{}":').format(search),
+                                           is_bold=True),
+                hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK)]
 
     all_known_users = {}
     for chat_id in bot.memory["user_data"]:
         all_known_users[chat_id] = bot.get_hangups_user(chat_id)
 
-    for u in sorted(all_known_users.values(),
-                    key=lambda x: x.full_name.split()[-1]):
+    for u in sorted(all_known_users.values(), key=lambda x: x.full_name.split()[-1]):
         fullname_lower = u.full_name.lower()
         fullname_upper = u.full_name.upper()
         unspaced_lower = re.sub(r'\s+', '', fullname_lower)
@@ -206,19 +186,12 @@ def user(bot, event, *args):
                 or search_upper in remove_accents(unspaced_upper)):
 
             link = 'https://plus.google.com/u/0/{}/about'.format(u.id_.chat_id)
-            segments.append(
-                hangups.ChatMessageSegment(
-                    u.full_name,
-                    hangups.SegmentType.LINK,
-                    link_target=link))
+            segments.append(hangups.ChatMessageSegment(u.full_name, hangups.SegmentType.LINK,
+                                                       link_target=link))
             if u.emails:
                 segments.append(hangups.ChatMessageSegment(' ('))
-                segments.append(
-                    hangups.ChatMessageSegment(
-                        u.emails[0],
-                        hangups.SegmentType.LINK,
-                        link_target='mailto:{}'.format(
-                            u.emails[0])))
+                segments.append(hangups.ChatMessageSegment(u.emails[0], hangups.SegmentType.LINK,
+                                                           link_target='mailto:{}'.format(u.emails[0])))
                 segments.append(hangups.ChatMessageSegment(')'))
             segments.append(hangups.ChatMessageSegment(
                 ' ... {}'.format(u.id_.chat_id)))
@@ -234,16 +207,14 @@ def hangouts(bot, event, *args):
     text_search = " ".join(args)
 
     lines = []
-    for convid, convdata in bot.conversations.get(
-            filter="text:" + text_search).items():
+    for convid, convdata in bot.conversations.get(filter="text:" + text_search).items():
         lines.append(
             "<b>{}</b>: <em>`{}`</em>".format(convdata["title"], convid))
 
     lines.append(_('<b>Total: {}</b>').format(len(lines)))
     if text_search:
-        lines.insert(
-            0,
-            _('<b>List of hangouts with keyword:</b> "<pre>{}</pre>"').format(text_search))
+        lines.insert(0, _(
+            '<b>List of hangouts with keyword:</b> "<pre>{}</pre>"').format(text_search))
 
     yield from bot.coro_send_message(event.conv, "<br />".join(lines))
 
@@ -388,13 +359,9 @@ def config(bot, event, cmd=None, *args):
         value = _('Parameter does not exist!')
 
     config_path = ' '.join(k for k in ['config'] + config_args)
-    segments = [
-        hangups.ChatMessageSegment(
-            '{}:'.format(config_path),
-            is_bold=True),
-        hangups.ChatMessageSegment(
-            '\n',
-            hangups.SegmentType.LINE_BREAK)]
+    segments = [hangups.ChatMessageSegment('{}:'.format(config_path),
+                                           is_bold=True),
+                hangups.ChatMessageSegment('\n', hangups.SegmentType.LINE_BREAK)]
     segments.extend(text_to_segments(
         json.dumps(value, indent=2, sort_keys=True)))
     yield from bot.coro_send_message(event.conv, segments)
@@ -405,10 +372,8 @@ def whoami(bot, event, *args):
 
     if bot.memory.exists(['user_data', event.user_id.chat_id, "nickname"]):
         try:
-            fullname = '{0} ({1})'.format(
-                event.user.full_name.split(
-                    ' ', 1)[0], bot.get_memory_suboption(
-                    event.user_id.chat_id, 'nickname'))
+            fullname = '{0} ({1})'.format(event.user.full_name.split(' ', 1)[
+                0], bot.get_memory_suboption(event.user_id.chat_id, 'nickname'))
         except TypeError:
             fullname = event.user.full_name
     else:

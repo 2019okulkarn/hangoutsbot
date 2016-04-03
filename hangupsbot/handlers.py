@@ -38,14 +38,7 @@ class EventHandler:
 
     def register_handler(self, function, type="message", priority=50):
         """registers extra event handlers"""
-        if type in [
-                "allmessages",
-                "call",
-                "membership",
-                "message",
-                "rename",
-                "typing",
-                "watermark"]:
+        if type in ["allmessages", "call", "membership", "message", "rename", "typing", "watermark"]:
             if not asyncio.iscoroutine(function):
                 # transparently convert into coroutine
                 function = asyncio.coroutine(function)
@@ -69,8 +62,8 @@ class EventHandler:
         return _id
 
     def attach_reprocessor(self, callable, return_as_dict=False):
-        """reprocessor: map callable to a special hidden context link that can be added anywhere
-        in a message. when the message is sent and subsequently received by the bot, it will be
+        """reprocessor: map callable to a special hidden context link that can be added anywhere 
+        in a message. when the message is sent and subsequently received by the bot, it will be 
         passed to the callable, which can modify the event object by reference
         """
         _id = self.register_reprocessor(callable)
@@ -118,8 +111,7 @@ class EventHandler:
         if id in self._reprocessors:
             is_coroutine = asyncio.iscoroutinefunction(self._reprocessors[id])
             logger.info(
-                "reprocessor uuid found: {} coroutine={}".format(
-                    id, is_coroutine))
+                "reprocessor uuid found: {} coroutine={}".format(id, is_coroutine))
             if is_coroutine:
                 yield from self._reprocessors[id](self.bot, event, id, *args, **kwargs)
             else:
@@ -139,19 +131,15 @@ class EventHandler:
             if len(event.conv_event.segments) > 0:
                 for segment in event.conv_event.segments:
                     if segment.link_target:
-                        if segment.link_target.startswith(
-                                self._prefix_reprocessor):
+                        if segment.link_target.startswith(self._prefix_reprocessor):
                             _id = segment.link_target[
                                 len(self._prefix_reprocessor):]
                             yield from self.run_reprocessor(_id, event)
 
             """auto opt-in - opted-out users who chat with the bot will be opted-in again"""
-            if self.bot.conversations.catalog[
-                    event.conv_id]["type"] == "ONE_TO_ONE":
-                if self.bot.memory.exists(
-                        ["user_data", event.user.id_.chat_id, "optout"]):
-                    if self.bot.memory.get_by_path(
-                            ["user_data", event.user.id_.chat_id, "optout"]):
+            if self.bot.conversations.catalog[event.conv_id]["type"] == "ONE_TO_ONE":
+                if self.bot.memory.exists(["user_data", event.user.id_.chat_id, "optout"]):
+                    if self.bot.memory.get_by_path(["user_data", event.user.id_.chat_id, "optout"]):
                         yield from command.run(self.bot, event, *["optout"])
                         logger.info(
                             "auto opt-in for {}".format(event.user.id_.chat_id))
@@ -261,8 +249,7 @@ class EventHandler:
     def run_pluggable_omnibus(self, name, *args, **kwargs):
         if name in self.pluggables:
             try:
-                for function, priority, plugin_metadata in self.pluggables[
-                        name]:
+                for function, priority, plugin_metadata in self.pluggables[name]:
                     message = ["{}: {}.{}".format(
                         name,
                         plugin_metadata["module.path"],
@@ -327,7 +314,7 @@ class HandlerBridge:
             event_type = "membership"
         elif event is hangups.RenameEvent:
             event_type = "rename"
-        elif isinstance(event, str):
+        elif type(event) is str:
             event_type = str  # accept all kinds of strings, just like register_handler
         else:
             raise ValueError("unrecognised event {}".format(event))

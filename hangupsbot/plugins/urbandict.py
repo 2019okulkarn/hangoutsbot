@@ -13,7 +13,6 @@ import plugins
 
 from admin import is_admin
 
-
 class TermType(object):
     pass
 
@@ -95,8 +94,7 @@ def urban(bot, event, *args):
             the_definition = urbanDictParser.translations[0]
             if the_definition["word"].lower() not in blacklisted:
                 html_text = ""
-                html_text += '<b>"' + \
-                    the_definition["word"] + '"</b><br /><br />'
+                html_text += '<b>"' + the_definition["word"] + '"</b><br /><br />'
                 if "def" in the_definition:
                     html_text += _("<b>definition:</b> ") + the_definition[
                         "def"].strip().replace("\n", "<br />") + '<br /><br />'
@@ -106,7 +104,7 @@ def urban(bot, event, *args):
 
                 yield from bot.coro_send_message(event.conv, html_text)
             else:
-                word = urbanDictParser.translations[0]["word"]
+                word = urbanDictParser.translations[0]["word"] 
                 yield from bot.coro_send_message(event.conv, _("{} is blacklisted").format(word))
         else:
             if term:
@@ -124,7 +122,6 @@ def urban(bot, event, *args):
             yield from bot.coro_send_message(event.conv, _("{} is already blacklisted").format(term))
     elif args[0] == '--blacklist' and not is_admin(bot, event):
         yield from bot.coro_send_message(event.conv, _("Ask an admin to do that"))
-
 
 def _initialise(bot):
     plugins.register_user_command(["urban"])

@@ -143,42 +143,17 @@ def get_weather_from_weather_com(location_id, units='metric'):
         dom.unlink()
         return error_data
 
-    key_map = {
-        'head': 'units',
-        'ut': 'temperature',
-        'ud': 'distance',
-        'us': 'speed',
-        'up': 'pressure',
-        'ur': 'rainfall',
-        'loc': 'location',
-        'dnam': 'name',
-        'lat': 'lat',
-        'lon': 'lon',
-        'cc': 'current_conditions',
-        'lsup': 'last_updated',
-        'obst': 'station',
-        'tmp': 'temperature',
-        'flik': 'feels_like',
-        't': 'text',
-        'icon': 'icon',
-        'bar': 'barometer',
-        'r': 'reading',
-        'd': 'direction',
-        'wind': 'wind',
-        's': 'speed',
-        'gust': 'gust',
-        'hmid': 'humidity',
-        'vis': 'visibility',
-        'uv': 'uv',
-        'i': 'index',
-        'dewp': 'dewpoint',
-        'moon': 'moon_phase',
-        'hi': 'high',
-        'low': 'low',
-        'sunr': 'sunrise',
-        'suns': 'sunset',
-        'bt': 'brief_text',
-        'ppcp': 'chance_precip'}
+    key_map = {'head': 'units', 'ut': 'temperature', 'ud': 'distance',
+               'us': 'speed', 'up': 'pressure', 'ur': 'rainfall',
+               'loc': 'location', 'dnam': 'name', 'lat': 'lat', 'lon': 'lon',
+               'cc': 'current_conditions', 'lsup': 'last_updated',
+               'obst': 'station', 'tmp': 'temperature',
+               'flik': 'feels_like', 't': 'text', 'icon': 'icon',
+               'bar': 'barometer', 'r': 'reading', 'd': 'direction',
+               'wind': 'wind', 's': 'speed', 'gust': 'gust', 'hmid': 'humidity',
+               'vis': 'visibility', 'uv': 'uv', 'i': 'index', 'dewp': 'dewpoint',
+               'moon': 'moon_phase', 'hi': 'high', 'low': 'low', 'sunr': 'sunrise',
+               'suns': 'sunset', 'bt': 'brief_text', 'ppcp': 'chance_precip'}
 
     data_structure = {'head': ('ut', 'ud', 'us', 'up', 'ur'),
                       'loc': ('dnam', 'lat', 'lon'),
@@ -193,8 +168,7 @@ def get_weather_from_weather_com(location_id, units='metric'):
     try:
         for (tag, list_of_tags2) in data_structure.items():
             for tag2 in list_of_tags2:
-                if weather_dom.getElementsByTagName(
-                        tag)[0].childNodes.length == 0:
+                if weather_dom.getElementsByTagName(tag)[0].childNodes.length == 0:
                     data_structure[tag] = []
     except IndexError:
         error_data = {
@@ -236,8 +210,7 @@ def get_weather_from_weather_com(location_id, units='metric'):
     forecasts = []
     if len(weather_dom.getElementsByTagName('dayf')) > 0:
         time_of_day_map = {'d': 'day', 'n': 'night'}
-        for forecast in weather_dom.getElementsByTagName(
-                'dayf')[0].getElementsByTagName('day'):
+        for forecast in weather_dom.getElementsByTagName('dayf')[0].getElementsByTagName('day'):
             tmp_forecast = {}
             tmp_forecast['day_of_week'] = forecast.getAttribute('t')
             tmp_forecast['date'] = forecast.getAttribute('dt')
@@ -296,7 +269,7 @@ def get_countries_from_google(hl=''):
       string, in this case Google will use English.
     Returns:
       countries: a list of elements(all countries that exists in XML feed).
-      Each element is a dictionary with 'name' and 'iso_code' keys.
+      Each element is a dictionary with 'name' and 'iso_code' keys. 
       For example: [{'iso_code': 'US', 'name': 'USA'},
                     {'iso_code': 'FR', 'name': 'France'}]
 
@@ -345,13 +318,13 @@ def get_cities_from_google(country_code, hl=''):
     Parameters:
       country_code: code of the necessary country. For example 'de' or 'fr'.
 
-      hl: the language parameter (language code). Default value is empty
+      hl: the language parameter (language code). Default value is empty 
       string, in this case Google will use English.
 
     Returns:
-      cities: a list of elements(all cities that exists in XML feed). Each
-      element is a dictionary with 'name', 'latitude_e6' and 'longitude_e6'
-      keys. For example: [{'longitude_e6': '1750000', 'name': 'Bourges',
+      cities: a list of elements(all cities that exists in XML feed). Each 
+      element is a dictionary with 'name', 'latitude_e6' and 'longitude_e6' 
+      keys. For example: [{'longitude_e6': '1750000', 'name': 'Bourges', 
                            'latitude_e6': '47979999'}]
 
     """
@@ -552,7 +525,7 @@ def get_weather_from_noaa(station_id):
       function of this library: http://code.google.com/p/python-weather/
 
     Returns:
-      weather_data: a dictionary of weather data that exists in XML feed.
+      weather_data: a dictionary of weather data that exists in XML feed. 
 
       ( useful icons: http://www.weather.gov/xml/current_obs/weather.php )
 
@@ -638,7 +611,7 @@ def xml_get_ns_yahoo_tag(dom, ns, tag, attrs):
       attrs: tuple of attributes
 
     Returns:
-      a dictionary of elements
+      a dictionary of elements 
 
     """
     element = dom.getElementsByTagNameNS(ns, tag)[0]
@@ -648,7 +621,7 @@ def xml_get_ns_yahoo_tag(dom, ns, tag, attrs):
 def xml_get_attrs(xml_element, attrs):
     """Returns the list of necessary attributes
 
-    Parameters:
+    Parameters: 
       element: xml element
       attrs: tuple of attributes
 
@@ -922,8 +895,7 @@ def get_loc_id_from_weather_com(search_string):
     loc_id_data = {}
     try:
         num_locs = 0
-        for loc in dom.getElementsByTagName(
-                'search')[0].getElementsByTagName('loc'):
+        for loc in dom.getElementsByTagName('search')[0].getElementsByTagName('loc'):
             loc_id = loc.getAttribute('id')  # loc id
             place_name = loc.firstChild.data  # place name
             loc_id_data[num_locs] = (loc_id, place_name)
@@ -1048,7 +1020,7 @@ def heat_index(temperature, humidity, units='metric'):
 
     Heat Index = c_1 + (c_2 * T) + (c_3 * R) + (c_4 * T * R) +
                   (c_5 * T^2) + (c_6 * R^2) + (c_7 * T^2 * R) +
-                  (c_8 * T * R^2) + (c_9 * T^2 * R^2)
+                  (c_8 * T * R^2) + (c_9 * T^2 * R^2) 
     where:
       T = ambient dry-bulb temperature (in degrees Fahrenheit)
       R = relative humidity (percentage value between 0 and 100)

@@ -76,10 +76,7 @@ class file_writer():
         user_id = event.user_id
 
         text = "--- {}\n{} :: {}\n{}\n".format(
-            conversation_name,
-            event_timestamp,
-            user_full_name,
-            conversation_text)
+            conversation_name, event_timestamp, user_full_name, conversation_text)
 
         self._append_to_file(conversation_id, text)
 

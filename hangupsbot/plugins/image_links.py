@@ -30,10 +30,7 @@ def _watch_image_link(bot, event, command):
         probable_image_link = False
         event_text_lower = event.text.lower()
         not_image_but_link = False
-        if re.match(
-                "^(https?://)?([a-z0-9.]*?\.)?imgur.com/",
-                event_text_lower,
-                re.IGNORECASE):
+        if re.match("^(https?://)?([a-z0-9.]*?\.)?imgur.com/", event_text_lower, re.IGNORECASE):
             """imgur links can be supplied with/without protocol and extension"""
             probable_image_link = True
 
@@ -52,8 +49,7 @@ def _watch_image_link(bot, event, command):
 
             if "imgur.com" in link_image:
                 """special imgur link handling"""
-                if not link_image.endswith(
-                        (".jpg", ".gif", "gifv", "webm", "png")):
+                if not link_image.endswith((".jpg", ".gif", "gifv", "webm", "png")):
                     link_image = link_image + ".gif"
                 link_image = "https://i.imgur.com/" + \
                     os.path.basename(link_image)

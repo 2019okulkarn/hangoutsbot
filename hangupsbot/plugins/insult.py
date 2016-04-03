@@ -18,11 +18,10 @@ def insult(bot, event, *args):
         for c in string.punctuation:
             checkforbot = checkforbot.replace(c, '')
         for i in range(len(checkforbot)):
-            if not checkforbot[i].isalnum:
+            if not checkforbot[i].isalnum == True:
                 checkforbot[i].replace(checkforbot[i], '')
         tobeinsulted = ' '.join(args)
-        if '@' in tobeinsulted or '0' in tobeinsulted.lower() or '()' in tobeinsulted.lower(
-        ) or 'soda' in tobeinsulted.lower() or 'soda' in checkforbot.lower():
+        if '@' in tobeinsulted or '0' in tobeinsulted.lower() or '()' in tobeinsulted.lower() or 'soda' in tobeinsulted.lower() or 'soda' in checkforbot.lower():
             msg = _("I'm not insulting myself")
         elif 's' in tobeinsulted.lower() and 'o' in tobeinsulted.lower() and 'd' in tobeinsulted.lower() and 'a' in tobeinsulted.lower():
             msg = _("I'm not insulting myself")

@@ -29,13 +29,7 @@ def _remove_invite(bot, invite_code):
         logger.debug("_remove_invite: nothing removed")
 
 
-def _issue_invite(
-        bot,
-        user_id,
-        group_id,
-        uses=1,
-        expire_in=2592000,
-        expiry=None):
+def _issue_invite(bot, user_id, group_id, uses=1, expire_in=2592000, expiry=None):
     if not bot.memory.exists(["invites"]):
         bot.memory["invites"] = {}
 
@@ -43,12 +37,10 @@ def _issue_invite(
 
     # find existing unexpired invitation by user and group - exact match only
     for _key, _invitation in bot.memory["invites"].items():
-        if _invitation["user_id"] == user_id and _invitation[
-                "group_id"] == group_id and _invitation["expiry"] > time.time():
+        if _invitation["user_id"] == user_id and _invitation["group_id"] == group_id and _invitation["expiry"] > time.time():
             invitation = _invitation
             logger.debug(
-                "_issue_invite: found existing invite id: {}".format(
-                    invitation["id"]))
+                "_issue_invite: found existing invite id: {}".format(invitation["id"]))
             break
 
     # create new invitation if no match found
@@ -92,8 +84,7 @@ def _claim_invite(bot, invite_code, user_id):
         return
 
     invitation = bot.memory.get_by_path(memory_path)
-    if invitation["user_id"] in (
-            "*", user_id) and invitation["expiry"] > time.time():
+    if invitation["user_id"] in ("*", user_id) and invitation["expiry"] > time.time():
 
         try:
             logger.debug("_claim_invite: adding {} to {}".format(
@@ -152,8 +143,7 @@ def _get_invites(bot, filter_active=True, filter_user=False):
                 continue
             if not filter_active and time.time() < invite_data["expiry"]:
                 continue
-            if filter_user and invite_data[
-                    "user_id"] not in ("*", filter_user):
+            if filter_user and invite_data["user_id"] not in ("*", filter_user):
                 continue
             invites[invite_id] = invite_data
     return invites
@@ -200,7 +190,7 @@ def invite(bot, event, *args):
 
     elif parameters[0].isdigit():
         """wildcard invites can be used by any user with access to the bot
-        note: wildcard invite command can still be superseded by specifying a "users" list
+        note: wildcard invite command can still be superseded by specifying a "users" list 
           as a parameter
         """
         wildcards = int(parameters[0])
@@ -246,9 +236,8 @@ def invite(bot, event, *args):
 
                 expiry_in_days = round(
                     (invite["expiry"] - time.time()) / 86400, 1)
-                lines.append(
-                    "<i><pre>{}</pre></i> to <b><pre>{}</pre></b> ... {} ({} days left)".format(
-                        user_id, conversation_name, invite["id"], expiry_in_days))
+                lines.append("<i><pre>{}</pre></i> to <b><pre>{}</pre></b> ... {} ({} days left)".format(
+                    user_id, conversation_name, invite["id"], expiry_in_days))
 
         else:
             lines.append(_("<em>no invites found</em>"))
@@ -362,13 +351,8 @@ def invite(bot, event, *args):
 
             invitation_log.append(
                 "shortlisted: {}/{}".format(len(shortlisted), len(sourceconv_users)))
-            logger.info(
-                "convtools_invitations: shortlisted {}/{} from {}, everyone={}, list_users=[{}]".format(
-                    len(shortlisted),
-                    len(sourceconv_users),
-                    sourceconv,
-                    everyone,
-                    len(list_users)))
+            logger.info("convtools_invitations: shortlisted {}/{} from {}, everyone={}, list_users=[{}]".format(
+                len(shortlisted), len(sourceconv_users), sourceconv, everyone, len(list_users)))
 
         else:
             shortlisted = list_users
@@ -392,8 +376,7 @@ def invite(bot, event, *args):
             else:
                 invitation_log.append("excluding existing: {}".format(uid))
                 logger.info(
-                    "convtools_invitations: rejecting {}, already in {}".format(
-                        uid, targetconv))
+                    "convtools_invitations: rejecting {}, already in {}".format(uid, targetconv))
         invited_users = list(set(invited_users))
 
         logger.info("convtools_invitations: inviting {} to {}".format(
@@ -430,11 +413,7 @@ def invite(bot, event, *args):
             if not test:
                 # invites are not created in test mode
                 invitation_ids.append(
-                    _issue_invite(
-                        bot,
-                        invite["user_id"],
-                        targetconv,
-                        invite["uses"]))
+                    _issue_invite(bot, invite["user_id"], targetconv, invite["uses"]))
 
         if len(invitation_ids) > 0:
             yield from bot.coro_send_message(event.conv_id,

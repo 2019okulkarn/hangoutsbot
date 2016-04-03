@@ -60,11 +60,8 @@ def meme(bot, event, *args):
             image_data = urllib.request.urlopen(jpg_link)
             filename = os.path.basename(jpg_link)
 
-            legacy_segments = [
-                hangups.ChatMessageSegment(
-                    instance_link,
-                    hangups.SegmentType.LINK,
-                    link_target=instance_link)]
+            legacy_segments = [hangups.ChatMessageSegment(
+                instance_link, hangups.SegmentType.LINK, link_target=instance_link)]
 
             logger.debug("uploading {} from {}".format(filename, jpg_link))
             photo_id = yield from bot._client.upload_image(image_data, filename=filename)

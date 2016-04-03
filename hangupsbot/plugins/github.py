@@ -40,11 +40,8 @@ def postissue(event, url, args):
         else:
             desc = "No description provided."
             title = text[0]
-        issue = {
-            'title': title,
-            'body': 'Issue created by {}. \n {}'.format(
-                event.user.full_name,
-                desc)}
+        issue = {'title': title,
+                 'body': 'Issue created by {}. \n {}'.format(event.user.full_name, desc)}
         # Add the issue to our repository
         r = session.post(url, json.dumps(issue))
         get = requests.get(url)

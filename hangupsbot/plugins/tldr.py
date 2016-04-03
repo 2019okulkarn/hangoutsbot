@@ -35,7 +35,9 @@ def tldr(bot, event, *args):
         for num, timestamp in enumerate(sorted(conv_tldr, key=float)):
             if display is True or display == num:
                 html.append(_("{}. {} <b>{} ago</b>").format(str(num + 1),
-                                                             conv_tldr[timestamp], _time_ago(float(timestamp))))
+                                                             conv_tldr[
+                                                                 timestamp],
+                                                             _time_ago(float(timestamp))))
 
         if len(html) == 0:
             html.append(_("TL;DR not found"))

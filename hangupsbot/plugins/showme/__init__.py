@@ -38,13 +38,13 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 #logger = logging.getLogger(__name__)
 #
-# def _initalize(bot):
+#def _initalize(bot):
 #    if bot.get_config_option("showme") is not None:
 #        plugins.register_user_command(["showme"])
 #    else:
 #        logger.error('SHOWME: config["showme"] dict required')
 #
-# def sendSource(bot, event, name, imgLink):
+#def sendSource(bot, event, name, imgLink):
 #    logger.info("Getting {}".format(imgLink))
 #    r = yield from aiohttp.request("get", imgLink)
 #    raw = yield from r.read()
@@ -60,7 +60,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #    else:
 #        yield from bot.coro_send_message(event.conv.id_, None, image_id=image_id)
 #
-# def showme(bot, event, *args):
+#def showme(bot, event, *args):
 #    """Retrieve images from showme sources by saying: "/bot showme SOURCE" or list sources by saying "/bot showme sources" or all sources by saying "/bot showme all" """
 #    sources = bot.get_config_option("showme")
 #    if not len(args):

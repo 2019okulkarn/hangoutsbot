@@ -1,5 +1,5 @@
 """
-example plugin demonstrating various levels of sending handler suppression
+example plugin demonstrating various levels of sending handler suppression 
 """
 
 

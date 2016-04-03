@@ -37,8 +37,7 @@ def convfilter(bot, event, *args):
                                          _("<em>supply 1 parameter</em>"))
     else:
         lines = []
-        for convid, convdata in bot.conversations.get(
-                filter=posix_args[0]).items():
+        for convid, convdata in bot.conversations.get(filter=posix_args[0]).items():
             lines.append("`{}` <b>{}</b> ({})".format(convid,
                                                       convdata["title"], len(convdata["participants"])))
         lines.append(_('<b>Total: {}</b>').format(len(lines)))
@@ -63,8 +62,7 @@ def convecho(bot, event, *args):
             text = ' '.join(posix_args[1:])
             test_segments = simple_parse_to_segments(text)
             if test_segments:
-                if test_segments[0].text.lower().strip().startswith(
-                        tuple([cmd.lower() for cmd in bot._handlers.bot_command])):
+                if test_segments[0].text.lower().strip().startswith(tuple([cmd.lower() for cmd in bot._handlers.bot_command])):
                     """detect and reject attempts to exploit botalias"""
                     text = _("<em>command echo blocked</em>")
                     convlist = bot.conversations.get(filter=event.conv_id)
@@ -125,8 +123,7 @@ def convusers(bot, event, *args):
         message = _("<em>retrieving ALL conversations blocked</em>")
     else:
         chunks = []  # one "chunk" = info for 1 hangout
-        for convid, convdata in bot.conversations.get(
-                filter=posix_args[0]).items():
+        for convid, convdata in bot.conversations.get(filter=posix_args[0]).items():
             lines = []
             lines.append(
                 '<b>{}</b>'.format(convdata["title"], len(convdata["participants"])))
