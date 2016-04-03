@@ -133,17 +133,19 @@ def screenshot(bot, event, *args):
             yield from bot.coro_send_message(event.conv_id, "<i>error getting screenshot</i>")
             logger.exception("screencap failed".format(url))
             _externals["running"] = False
-<<<<<<< HEAD:hangupsbot/image_screenshot/__init__.py
+<< << << < HEAD:
+    hangupsbot / image_screenshot / __init__.py
 
-=======
-            return
-            
->>>>>>> 4416ec7499a72f294326130559e28a0e59d6dccf:hangupsbot/plugins/image_screenshot/__init__.py
-        try:
-            image_id = yield from bot._client.upload_image(image_data, filename=filename)
-            yield from bot._client.sendchatmessage(event.conv.id_, None, image_id=image_id)
-        except Exception as e:
-            yield from bot.coro_send_message(event.conv_id, "<i>error uploading screenshot</i>")
-            logger.exception("upload failed".format(url))
-        finally:
-            _externals["running"] = False
+== == == =
+    return
+
+>>>>>> > 4416ec7499a72f294326130559e28a0e59d6dccf:
+    hangupsbot / plugins / image_screenshot / __init__.py
+    try:
+        image_id = yield from bot._client.upload_image(image_data, filename=filename)
+        yield from bot._client.sendchatmessage(event.conv.id_, None, image_id=image_id)
+    except Exception as e:
+        yield from bot.coro_send_message(event.conv_id, "<i>error uploading screenshot</i>")
+        logger.exception("upload failed".format(url))
+    finally:
+        _externals["running"] = False

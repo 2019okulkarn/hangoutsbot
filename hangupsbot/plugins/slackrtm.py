@@ -57,7 +57,7 @@ import plugins
 import emoji
 from websocket import WebSocketConnectionClosedException
 from slackclient import SlackClient
-import html # for html.unescape
+import html  # for html.unescape
 
 logger = logging.getLogger(__name__)
 
@@ -220,7 +220,8 @@ class SlackMessage(object):
                     text = match.group(1)
                     file_attachment = match.group(2)
 
-        # text now contains the real message, but html entities have to be dequoted still
+        # text now contains the real message, but html entities have to be
+        # dequoted still
         text = html.unescape(text)
 
         username4ho = username
@@ -401,15 +402,17 @@ class SlackRTM(object):
 
     def get_slackDM(self, userid):
         if not userid in self.dminfos:
-<<<<<<< HEAD
+<< << << < HEAD
             self.dminfos[userid] = json.loads(self.slack.api_call(
                 'im.open', user=userid).decode("utf-8"))['channel']
-=======
+== == == =
             try:
-                self.dminfos[userid] = json.loads(self.slack.api_call('im.open', user = userid).decode("utf-8"))['channel']
+                self.dminfos[userid] = json.loads(self.slack.api_call(
+                    'im.open', user=userid).decode("utf-8"))['channel']
             except AttributeError:
-                self.dminfos[userid] = json.loads(self.slack.api_call('im.open', user = userid))['channel']
->>>>>>> 4416ec7499a72f294326130559e28a0e59d6dccf
+                self.dminfos[userid] = json.loads(
+                    self.slack.api_call('im.open', user=userid))['channel']
+>>>>>> > 4416ec7499a72f294326130559e28a0e59d6dccf
         return self.dminfos[userid]['id']
 
     def update_userinfos(self, users=None):
