@@ -74,7 +74,8 @@ def _start_slack_sinks(bot):
 def _slack_repeater_cleaner(bot, event, id):
     event_tokens = event.text.split(":", maxsplit=1)
     event_text = event_tokens[1].strip()
-    if event_text.lower().startswith(tuple([cmd.lower() for cmd in bot._handlers.bot_command])):
+    if event_text.lower().startswith(
+            tuple([cmd.lower() for cmd in bot._handlers.bot_command])):
         event_text = bot._handlers.bot_command[0] + " [REDACTED]"
     event.text = event_text
     event.from_bot = False
@@ -166,7 +167,8 @@ class SlackAsyncListener(AsyncRequestHandler):
                     label = data[type_str]["name"]
                     self._slack_cache[type_str][id] = label
                     logger.debug(
-                        "slack label resolved from API: {} = {}".format(id, label))
+                        "slack label resolved from API: {} = {}".format(
+                            id, label))
 
             except Exception as e:
                 logger.exception(
@@ -211,19 +213,21 @@ def _handle_slackout(bot, event, command):
                     slack_api_params = {'username': fullname,
                                         'icon_url': photo_url}
 
-                    if "link_names" not in sinkConfig or sinkConfig["link_names"]:
+                    if "link_names" not in sinkConfig or sinkConfig[
+                            "link_names"]:
                         logger.debug("slack api link_names is active")
                         slack_api_params["link_names"] = 1
 
-                    if bot.conversations.catalog[event.conv_id]["history"] or "otr_privacy" not in sinkConfig or not sinkConfig["otr_privacy"]:
+                    if bot.conversations.catalog[event.conv_id][
+                            "history"] or "otr_privacy" not in sinkConfig or not sinkConfig["otr_privacy"]:
                         client.chat_post_message(
                             channel, event.text, **slack_api_params)
 
             except Exception as e:
-                logger.exception("Could not handle slackout with key {} between {} and {}."
-                                 " Is config.json properly configured?".format(slackkey,
-                                                                               channel,
-                                                                               convlist))
+                logger.exception(
+                    "Could not handle slackout with key {} between {} and {}."
+                    " Is config.json properly configured?".format(
+                        slackkey, channel, convlist))
 
 
 def slackusers(bot, event, *args):
@@ -243,8 +247,8 @@ def slackusers(bot, event, *args):
                 chan_id = client.channel_name_to_id(channel)
                 slack_api_params = {'channel': chan_id}
                 info = client._make_request('channels.info', slack_api_params)
-                msg = "Slack channel {}: {}".format(info['channel']['name'],
-                                                    info['channel']['topic']['value'])
+                msg = "Slack channel {}: {}".format(
+                    info['channel']['name'], info['channel']['topic']['value'])
                 users = {}
                 for uid in info['channel']['members']:
                     slack_api_params = {'user': uid}

@@ -18,7 +18,12 @@ logger = logging.getLogger(__name__)
 class Config(collections.MutableMapping):
     """Configuration JSON storage class"""
 
-    def __init__(self, filename, default=None, failsafe_backups=0, save_delay=0):
+    def __init__(
+            self,
+            filename,
+            default=None,
+            failsafe_backups=0,
+            save_delay=0):
         self.filename = filename
         self.default = None
         self.config = {}
@@ -125,7 +130,10 @@ class Config(collections.MutableMapping):
 
     def get_by_path(self, keys_list):
         """Get item from config by path (list of keys)"""
-        return functools.reduce(lambda d, k: d[int(k) if isinstance(d, list) else k], keys_list, self)
+        return functools.reduce(
+            lambda d, k: d[
+                int(k) if isinstance(
+                    d, list) else k], keys_list, self)
 
     def set_by_path(self, keys_list, value):
         """Set item in config by path (list of keys)"""

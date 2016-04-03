@@ -20,8 +20,13 @@ def choose(bot, event, *args):
             chosen = choice(listchoices)
             while chosen == ' or ':
                 chosen = choice(listchoices)
-            action = ['draws a slip of paper from a hat and gets...', 'says eenie, menie, miney, moe and chooses...', 'picks a random number and gets...',
-                      'rolls dice and gets...', 'asks a random person and gets...', 'plays rock, paper, scissors, lizard, spock and gets...']
+            action = [
+                'draws a slip of paper from a hat and gets...',
+                'says eenie, menie, miney, moe and chooses...',
+                'picks a random number and gets...',
+                'rolls dice and gets...',
+                'asks a random person and gets...',
+                'plays rock, paper, scissors, lizard, spock and gets...']
             chosenaction = choice(action)
             msg = _("{} {}").format(chosenaction, chosen)
         else:

@@ -53,7 +53,7 @@ def _watch_for_music_link(bot, event, command):
 
     # Start with Spotify off.
     enabled = bot.conversation_memory_get(event.conv_id, "spotify_enabled")
-    if enabled == None:
+    if enabled is None:
         bot.conversation_memory_set(event.conv_id, "spotify_enabled", False)
         return
 
@@ -105,7 +105,7 @@ def spotify(bot, event, *args):
     """
     # Start with Spotify off.
     enabled = bot.conversation_memory_get(event.conv_id, "spotify_enabled")
-    if enabled == None:
+    if enabled is None:
         enabled = False
         bot.conversation_memory_set(event.conv_id, "spotify_enabled", enabled)
 
@@ -210,10 +210,24 @@ def _clean(query):
     unrelated to the song title/artist. Returns a list of groups."""
 
     # Blacklists.
-    bl_exact = ["official", "audio", "audio\s+stream", "lyric", "lyrics",
-                "with\s+lyrics?", "explicit", "clean", "explicit\s+version",
-                "clean\s+version", "original\s+version", "hq", "hd", "mv", "m/v",
-                "interscope", "4ad"]
+    bl_exact = [
+        "official",
+        "audio",
+        "audio\s+stream",
+        "lyric",
+        "lyrics",
+        "with\s+lyrics?",
+        "explicit",
+        "clean",
+        "explicit\s+version",
+        "clean\s+version",
+        "original\s+version",
+        "hq",
+        "hd",
+        "mv",
+        "m/v",
+        "interscope",
+        "4ad"]
     bl_following = ["official\s+video", "official\s+music", "official\s+audio",
                     "official\s+lyric", "official\s+lyrics", "official\s+clip",
                     "video\s+lyric", "video\s+lyrics", "video\s+clip",

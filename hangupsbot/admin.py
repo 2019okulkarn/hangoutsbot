@@ -5,6 +5,7 @@ def is_admin(bot, event, other=None):
     else:
         return False
 
+
 def is_tag(bot, event, tag=None):
     tags = bot.user_memory_get(event.user.id_.chat_id, 'tags')
     if tags:

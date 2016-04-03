@@ -53,7 +53,8 @@ def _periodic_watermark_update(bot, config_botalive):
         yield from asyncio.sleep(5)
 
         """every 15 minutes: update watermark of global admin 1-on-1s"""
-        if "admins" in config_botalive and timestamp - last_run[0] > config_botalive["admins"]:
+        if "admins" in config_botalive and timestamp - \
+                last_run[0] > config_botalive["admins"]:
             admins = bot.get_config_option('admins')
             for admin in admins:
                 if bot.memory.exists(["user_data", admin, "1on1"]):
@@ -64,7 +65,8 @@ def _periodic_watermark_update(bot, config_botalive):
             last_run[0] = timestamp
 
         """every 3 hours: update watermark of all groups"""
-        if "groups" in config_botalive and timestamp - last_run[1] > config_botalive["groups"]:
+        if "groups" in config_botalive and timestamp - \
+                last_run[1] > config_botalive["groups"]:
             for conv_id, conv_data in bot.conversations.get().items():
                 if conv_data["type"] == "GROUP":
                     watermarkUpdater.add(conv_id)

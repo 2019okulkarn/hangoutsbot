@@ -64,7 +64,7 @@ class BaseBotRequestHandler(BaseHTTPRequestHandler):
         path should contain a conversation id e.g. http://localhost/XXXXXXXXXXX/
         content is a valid json string with keys:
             echo                html string
-            image 
+            image
                 base64encoded   base64-encoded image data
                 filename        optional filename (else determined automatically via imghdr)
         """
@@ -75,7 +75,8 @@ class BaseBotRequestHandler(BaseHTTPRequestHandler):
         conversation_id = path[1]
         if not conversation_id:
             logger.error(
-                "{}: conversation id must be provided as part of path".format(self.sinkname))
+                "{}: conversation id must be provided as part of path".format(
+                    self.sinkname))
             return
 
         html = None
@@ -104,7 +105,12 @@ class BaseBotRequestHandler(BaseHTTPRequestHandler):
         yield from self.send_data(conversation_id, html, image_data=image_data, image_filename=image_filename)
 
     @asyncio.coroutine
-    def send_data(self, conversation_id, html, image_data=None, image_filename=None):
+    def send_data(
+            self,
+            conversation_id,
+            html,
+            image_data=None,
+            image_filename=None):
         """sends html and/or image to a conversation
         image_filename is recommended but optional, fallbacks to <timestamp>.jpg if undefined
         process_request() should determine the image extension prior to this
@@ -205,7 +211,13 @@ class AsyncRequestHandler:
         return results
 
     @asyncio.coroutine
-    def send_data(self, conversation_id, html, image_data=None, image_filename=None, context=None):
+    def send_data(
+            self,
+            conversation_id,
+            html,
+            image_data=None,
+            image_filename=None,
+            context=None):
         """sends html and/or image to a conversation
         image_filename is recommended but optional, fallbacks to <timestamp>.jpg if undefined
         process_request() should determine the image extension prior to this

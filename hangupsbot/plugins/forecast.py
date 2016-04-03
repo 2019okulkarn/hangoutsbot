@@ -81,8 +81,14 @@ def _format_current_weather(weather):
         weatherStrings.append("Feels Like: {0}°{1}".format(
             round(weather['feelsLike'], 2), weather['units']['temperature']))
     if 'windspeed' in weather:
-        weatherStrings.append("Wind: {0} {1} from {2}".format(round(weather['windspeed'], 2), weather[
-                              'units']['windSpeed'], _get_wind_direction(weather['windbearing'])))
+        weatherStrings.append(
+            "Wind: {0} {1} from {2}".format(
+                round(
+                    weather['windspeed'],
+                    2),
+                weather['units']['windSpeed'],
+                _get_wind_direction(
+                    weather['windbearing'])))
     if 'humidity' in weather:
         weatherStrings.append("Humidity: {0}%".format(weather['humidity']))
     if 'pressure' in weather:

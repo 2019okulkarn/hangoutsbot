@@ -93,7 +93,8 @@ def tagscommand(bot, event, *args):
             config_root = set()
             config_commands_tagged = bot.get_config_option(
                 'commands_tagged') or {}
-            if command_name in config_commands_tagged and config_commands_tagged[command_name]:
+            if command_name in config_commands_tagged and config_commands_tagged[
+                    command_name]:
                 config_root = set([frozenset(value if isinstance(value, list) else [value])
                                    for value in config_commands_tagged[command_name]])
                 ALL_TAGS = ALL_TAGS | config_root
@@ -101,12 +102,14 @@ def tagscommand(bot, event, *args):
             config_conv = {}
             if bot.config.exists(["conversations"]):
                 for convid in bot.config["conversations"]:
-                    if bot.config.exists(["conversations", convid, "commands_tagged"]):
+                    if bot.config.exists(
+                            ["conversations", convid, "commands_tagged"]):
                         conv_tagged = bot.config.get_by_path(
                             ["conversations", convid, "commands_tagged"])
-                        if command_name in conv_tagged and conv_tagged[command_name]:
-                            config_conv[convid] = set([frozenset(value if isinstance(value, list) else [value])
-                                                       for value in conv_tagged[command_name]])
+                        if command_name in conv_tagged and conv_tagged[
+                                command_name]:
+                            config_conv[convid] = set([frozenset(value if isinstance(value, list) else [
+                                                      value]) for value in conv_tagged[command_name]])
                             ALL_TAGS = ALL_TAGS | config_conv[convid]
 
             dict_tags = {}
@@ -135,7 +138,8 @@ def tagscommand(bot, event, *args):
                     "<b><pre>COMMAND: {}</pre></b> has no tags".format(command_name))
             else:
                 lines.insert(
-                    0, _("<b><pre>COMMAND: {}</pre></b>, match <b>ANY</b>:".format(command_name)))
+                    0, _(
+                        "<b><pre>COMMAND: {}</pre></b>, match <b>ANY</b>:".format(command_name)))
                 message = "<br />".join(lines)
 
     else:

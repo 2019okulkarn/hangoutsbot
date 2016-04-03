@@ -50,12 +50,14 @@ def _watch_new_adds(bot, event, command):
             # The mods are likely not configured. Continuing...
             pass
 
-        html = _("<b>!!! WARNING !!!</b><br />"
-                 "<br />"
-                 "<b>{0}</b> invited <b>{1}</b> without authorization.<br />"
-                 "<br />"
-                 "<b>{1}</b>: Please leave this hangout and ask a moderator to add you. "
-                 "Thank you for your understanding.").format(event.user.full_name, names)
+        html = _(
+            "<b>!!! WARNING !!!</b><br />"
+            "<br />"
+            "<b>{0}</b> invited <b>{1}</b> without authorization.<br />"
+            "<br />"
+            "<b>{1}</b>: Please leave this hangout and ask a moderator to add you. "
+            "Thank you for your understanding.").format(
+            event.user.full_name, names)
 
         yield from bot.coro_send_message(event.conv, html)
 
@@ -63,7 +65,7 @@ def _watch_new_adds(bot, event, command):
 def addmod(bot, event, *args):
     """add user id(s) to the whitelist of who can add to a hangout"""
     mod_ids = list(args)
-    if(bot.get_config_suboption(event.conv_id, 'mods') != None):
+    if(bot.get_config_suboption(event.conv_id, 'mods') is not None):
         for mod in bot.get_config_suboption(event.conv_id, 'mods'):
             mod_ids.append(mod)
         bot.config.set_by_path(["mods"], mod_ids)

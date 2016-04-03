@@ -19,7 +19,8 @@ def plugininfo(bot, event, *args):
 
     for module_path, plugin in plugins.tracking.list.items():
         lines = []
-        if len(args) == 0 or args[0] in plugin["metadata"]["module"] or args[0] in module_path:
+        if len(args) == 0 or args[0] in plugin["metadata"][
+                "module"] or args[0] in module_path:
             lines.append(
                 "<b>[ {} ]</b>".format(plugin["metadata"]["module.path"]))
 
@@ -57,15 +58,16 @@ def plugininfo(bot, event, *args):
                 from sinks import aiohttp_list
                 filtered = aiohttp_list(plugin["aiohttp.web"])
                 if len(filtered) > 0:
-                    lines.append('<br />'.join(['... {}'.format(constructors[0].sockets[0].getsockname())
-                                                for constructors in filtered]))
+                    lines.append('<br />'.join(['... {}'.format(constructors[0].sockets[
+                                 0].getsockname()) for constructors in filtered]))
                 else:
                     lines.append('<em>no running aiohttp.web listeners</em>')
 
             """tagged"""
             if len(plugin["commands"]["tagged"]) > 0:
                 lines.append("<b>tagged via plugin module:</b>")
-                for command_name, type_tags in plugin["commands"]["tagged"].items():
+                for command_name, type_tags in plugin[
+                        "commands"]["tagged"].items():
                     if 'admin' in type_tags:
                         plugin_tagsets = type_tags['admin']
                     else:

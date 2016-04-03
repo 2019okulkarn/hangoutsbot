@@ -192,8 +192,12 @@ def interceptMail(maildata):
     # notify alarm system in all cases
     if ALARMNOTURL and (location in CAMURLS):
         try:
-            r = requests.get(ALARMNOTURL % {'location': location}, auth=HTTPBasicAuth(
-                ALARMSYSUSR, ALARMSYSPWD))
+            r = requests.get(
+                ALARMNOTURL % {
+                    'location': location},
+                auth=HTTPBasicAuth(
+                    ALARMSYSUSR,
+                    ALARMSYSPWD))
         except:
             logger.exception('cannot notify alarm system')
     # do not chat if alarm system is not active
