@@ -8,21 +8,24 @@ import json
 
 
 def getlyrics(title, artist):
-    response = get("https://musixmatchcom-musixmatch.p.mashape.com/wsr/1.1/track.search?f_has_lyrics=1&page=1&page_size=1&q_track=" + sanitize(title) + "&q_artist=" + sanitize(artist),
-                   headers={
-        "X-Mashape-Key": mashape,
-        "Accept": "application/json"
-    }
-    )
+    response = get(
+        "https://musixmatchcom-musixmatch.p.mashape.com/wsr/1.1/track.search?f_has_lyrics=1&page=1&page_size=1&q_track=" +
+        sanitize(title) +
+        "&q_artist=" +
+        sanitize(artist),
+        headers={
+            "X-Mashape-Key": mashape,
+            "Accept": "application/json"})
     data = json.loads(response.text)
     name = data[0]["track_name"]
     artst = data[0]["artist_name"]
     trackid = data[0]["track_id"]
-    lyrget = get("https://musixmatchcom-musixmatch.p.mashape.com/wsr/1.1/track.lyrics.get?track_id=" + str(trackid), headers={
-        "X-Mashape-Key": mashape,
-        "Accept": "application/json"
-    }
-    )
+    lyrget = get(
+        "https://musixmatchcom-musixmatch.p.mashape.com/wsr/1.1/track.lyrics.get?track_id=" +
+        str(trackid),
+        headers={
+            "X-Mashape-Key": mashape,
+            "Accept": "application/json"})
     data2 = json.loads(lyrget.text)
     lyrics = data2["lyrics_body"]
     url = 'https://www.musixmatch.com/lyrics/' + \

@@ -220,9 +220,8 @@ class Cleverbot:
 
     def _parse(self):
         """Parses Cleverbot's response"""
-        parsed = [
-            item.split('\r') for item in self.resp.decode('utf-8').split('\r\r\r\r\r\r')[:-1]
-        ]
+        parsed = [item.split('\r') for item in self.resp.decode(
+            'utf-8').split('\r\r\r\r\r\r')[:-1]]
         parsed_dict = {
             'answer': parsed[0][0],
             'conversation_id': parsed[0][1],
@@ -248,7 +247,9 @@ def _handle_incoming_message(bot, event, command):
     if not event.text:
         return
 
-    if not bot.get_config_suboption(event.conv_id, 'cleverbot_percentage_replies'):
+    if not bot.get_config_suboption(
+            event.conv_id,
+            'cleverbot_percentage_replies'):
         return
 
     percentage = bot.get_config_suboption(

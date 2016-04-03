@@ -3,8 +3,10 @@ from control import *
 from admin import is_admin
 from collections import Counter
 
+
 def _initialize():
     plugins.register_user_command(["poll"])
+
 
 def add(bot, name):
     if not bot.memory.exists(["polls"]):
@@ -17,6 +19,7 @@ def add(bot, name):
         msg = _("Poll '{}' already exists").format(name)
     return msg
 
+
 def delete(bot, name):
     path = bot.memory.get_by_path(['polls'])
     if name in path:
@@ -27,6 +30,7 @@ def delete(bot, name):
     else:
         msg = _('There is no poll by the name "{}"').format(name)
     return msg
+
 
 def vote(bot, event, vote_, name, pollnum):
     mem = bot.memory
@@ -48,6 +52,7 @@ def vote(bot, event, vote_, name, pollnum):
     msg = _('Your vote for {} has been recorded as {}').format(poll, vote_)
     return msg
 
+
 def set_help(bot, pollnum, help_text):
     mem = bot.memory
     path = mem.get_by_path(["polls"])
@@ -61,6 +66,7 @@ def set_help(bot, pollnum, help_text):
     bot.memory.set_by_path(['polls', poll], path)
     bot.memory.save()
     return "Help for <b>{}</b> set to '{}'".format(poll, help_text)
+
 
 def get_help(bot, name, pollnum):
     mem = bot.memory
@@ -80,6 +86,7 @@ def get_help(bot, name, pollnum):
     else:
         help_text = "None"
     return "Help for <b>{}:</b>\n{}".format(poll, str(help_text))
+
 
 def results(bot, poll):
     votes = []
@@ -113,6 +120,7 @@ def results(bot, poll):
     msg = ''.join(mesg)
     return msg
 
+
 def list(bot):
     path = bot.memory.get_by_path(['polls'])
     polls = []
@@ -124,6 +132,7 @@ def list(bot):
         msg = '<br>'.join(polls)
     return msg
 
+
 def submit_for_approval(bot, event):
     if not bot.memory.exists(["requests"]):
         bot.memory.set_by_path(["requests"], {})
@@ -134,9 +143,15 @@ def submit_for_approval(bot, event):
     path = bot.memory.get_by_path(["requests", "polls"])
     requestnum = len(path) + 1
     text = str(event.conv_id) + " " + event.text
-    bot.memory.set_by_path(["requests", "polls", str(requestnum)], text) 
+    bot.memory.set_by_path(["requests", "polls", str(requestnum)], text)
     bot.memory.save()
-    return ["Poll request {} submitted for approval".format(requestnum), "New poll requested by {} -- {}\nTo approve this poll, do ! approve poll {}".format(event.user.first_name, event.text, requestnum)]
+    return [
+        "Poll request {} submitted for approval".format(requestnum),
+        "New poll requested by {} -- {}\nTo approve this poll, do ! approve poll {}".format(
+            event.user.first_name,
+            event.text,
+            requestnum)]
+
 
 def poll(bot, event, *args):
     '''Creates a poll. Format is /bot poll [--add, --delete, --list, --vote] [pollnum, pollname] [vote]'''
@@ -162,7 +177,7 @@ def poll(bot, event, *args):
             else:
                 vote_ = ' '.join(args[1:]).split(' - ')[0]
                 name = ' '.join(args[1:]).split(' - ')[1]
-                msg = vote(bot, event, vote_, name , -1)
+                msg = vote(bot, event, vote_, name, -1)
         elif args[0] == '--list':
             msg = list(bot)
         elif args[0] == '--results':
@@ -186,7 +201,7 @@ def poll(bot, event, *args):
                     pollnum = int(args[2]) - 1
                     msg = set_help(bot, pollnum, ' '.join(args[3:]))
                 else:
-                    msg = _("What number poll do you want to add help for?") 
+                    msg = _("What number poll do you want to add help for?")
             elif args[1] == '--set' and not is_admin(bot, event):
                 request = submit_for_approval(bot, event)
                 msg = request[0]
@@ -204,8 +219,9 @@ def poll(bot, event, *args):
             else:
                 vote_ = ' '.join(args).split(' - ')[0]
                 name = ' '.join(args).split(' - ')[1]
-                msg = vote(bot, event, vote_, name , -1)
+                msg = vote(bot, event, vote_, name, -1)
     else:
-        msg = _("Creates a poll. Format is /bot poll [--add, --delete, --list, --vote, --results] [pollnum, pollname] [vote]")
+        msg = _(
+            "Creates a poll. Format is /bot poll [--add, --delete, --list, --vote, --results] [pollnum, pollname] [vote]")
     yield from bot.coro_send_message(event.conv, msg)
     bot.memory.save()

@@ -40,7 +40,8 @@ def _handle_keyword(bot, event, command):
 
     for user in users_in_chat:
         try:
-            if _internal.keywords[user.id_.chat_id] and not user.id_.chat_id in event.user.id_.chat_id:
+            if _internal.keywords[
+                    user.id_.chat_id] and not user.id_.chat_id in event.user.id_.chat_id:
                 for phrase in _internal.keywords[user.id_.chat_id]:
                     regexphrase = "\\b" + phrase + "\\b"
                     if re.search(regexphrase, event.text, re.IGNORECASE):
@@ -150,8 +151,10 @@ def subscribe(bot, event, *args):
             _("Note: You will not be able to trigger your own subscriptions. To test, please ask somebody else to test this for you."))
 
     # Save to file
-    bot.memory.set_by_path(["user_data", event.user.id_.chat_id,
-                            "keywords"], _internal.keywords[event.user.id_.chat_id])
+    bot.memory.set_by_path(["user_data",
+                            event.user.id_.chat_id,
+                            "keywords"],
+                           _internal.keywords[event.user.id_.chat_id])
     bot.memory.save()
 
     yield from bot.coro_send_message(
@@ -178,6 +181,8 @@ def unsubscribe(bot, event, *args):
             event.conv, _("Error: keyword not found"))
 
     # Save to file
-    bot.memory.set_by_path(["user_data", event.user.id_.chat_id,
-                            "keywords"], _internal.keywords[event.user.id_.chat_id])
+    bot.memory.set_by_path(["user_data",
+                            event.user.id_.chat_id,
+                            "keywords"],
+                           _internal.keywords[event.user.id_.chat_id])
     bot.memory.save()

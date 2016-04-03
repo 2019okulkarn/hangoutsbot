@@ -60,5 +60,11 @@ def forecast(bot, event, *args):
     url = links.shorten(
         'http://www.weather.com/weather/today/l/' + location_id)
     msg = _("<b>Forecast for {} on {}:</b><br>Conditions: Day - {}; Night - {}<br>High: {}<br>Low: {}<br>For more information visit {}").format(
-        place, date, day, night, high, low, url)
+        place,
+        date,
+        day,
+        night,
+        high,
+        low,
+        url)
     yield from bot.coro_send_message(event.conv, msg)

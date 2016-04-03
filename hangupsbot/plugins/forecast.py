@@ -21,12 +21,13 @@ def _initialize(bot):
         plugins.register_user_command(['weather', 'forecast'])
         plugins.register_admin_command(['setweatherlocation'])
     else:
-<<<<<<< HEAD
+<< << << < HEAD
         logger.info(
             'not enabled, need forecast.io API key in config["forecast_api_key"]')
-=======
+== == == =
         logger.error('WEATHER: config["forecast_api_key"] required')
->>>>>>> 4416ec7499a72f294326130559e28a0e59d6dccf
+>>>>>> > 4416ec7499a72f294326130559e28a0e59d6dccf
+
 
 def setweatherlocation(bot, event, *args):
     """Sets the Lat Long default coordinates for this hangout when polling for weather data
@@ -41,9 +42,11 @@ def setweatherlocation(bot, event, *args):
         yield from bot.coro_send_message(event.conv_id, _('Unable to find the specified location.'))
 
     if bot.memory.exists(["conv_data", event.conv.id_]):
-        bot.memory.set_by_path(["conv_data", event.conv.id_, "default_weather_location"], {'lat': location['lat'], 'lng': location['lng']})
+        bot.memory.set_by_path(["conv_data", event.conv.id_, "default_weather_location"], {
+                               'lat': location['lat'], 'lng': location['lng']})
         bot.memory.save()
         yield from bot.coro_send_message(event.conv_id, _('This hangouts default location has been set to {}.'.format(location)))
+
 
 def weather(bot, event, *args):
     """Returns weather information from Forecast.io
@@ -56,6 +59,7 @@ def weather(bot, event, *args):
     else:
         yield from bot.coro_send_message(event.conv_id, 'There was an error retrieving the weather, guess you need to look outside.')
 
+
 def forecast(bot, event, *args):
     """Returns a brief textual forecast from Forecast.io
     <b>/bot weather <location></b> Get location's current forecast.
@@ -67,25 +71,45 @@ def forecast(bot, event, *args):
     else:
         yield from bot.coro_send_message(event.conv_id, 'There was an error retrieving the weather, guess you need to look outside.')
 
+
 def _format_current_weather(weather):
     """
     Formats the current weather data for the user.
     """
     weatherStrings = []
     if 'temperature' in weather:
-        weatherStrings.append("It is currently: <b>{0}°{1}</b>".format(round(weather['temperature'],2),weather['units']['temperature']))
+        weatherStrings.append("It is currently: <b>{0}°{1}</b>".format(
+            round(weather['temperature'], 2), weather['units']['temperature']))
     if 'summary' in weather:
         weatherStrings.append("<i>{0}</i>".format(weather['summary']))
     if 'feelsLike' in weather:
-        weatherStrings.append("Feels Like: {0}°{1}".format(round(weather['feelsLike'],2),weather['units']['temperature']))
+        weatherStrings.append(
+    "Feels Like: {0}°{1}".format(
+        round(
+            weather['feelsLike'],
+            2),
+             weather['units']['temperature']))
     if 'windspeed' in weather:
-        weatherStrings.append("Wind: {0} {1} from {2}".format(round(weather['windspeed'],2), weather['units']['windSpeed'], _get_wind_direction(weather['windbearing'])))
+        weatherStrings.append(
+    "Wind: {0} {1} from {2}".format(
+        round(
+            weather['windspeed'],
+            2),
+            weather['units']['windSpeed'],
+            _get_wind_direction(
+                weather['windbearing'])))
     if 'humidity' in weather:
         weatherStrings.append("Humidity: {0}%".format(weather['humidity']))
     if 'pressure' in weather:
-        weatherStrings.append("Pressure: {0} {1}".format(round(weather['pressure'],2), weather['units']['pressure']))
+        weatherStrings.append(
+    "Pressure: {0} {1}".format(
+        round(
+            weather['pressure'],
+            2),
+             weather['units']['pressure']))
 
     return "<br/>".join(weatherStrings)
+
 
 def _format_forecast_weather(weather):
     """
@@ -93,11 +117,14 @@ def _format_forecast_weather(weather):
     """
     weatherStrings = []
     if 'hourly' in weather:
-        weatherStrings.append("<b>Next 24 Hours</b><br/>{}". format(weather['hourly']))
+        weatherStrings.append(
+            "<b>Next 24 Hours</b><br/>{}". format(weather['hourly']))
     if 'daily' in weather:
-        weatherStrings.append("<b>Next 7 Days</b><br/>{}". format(weather['daily']))
+        weatherStrings.append(
+            "<b>Next 7 Days</b><br/>{}". format(weather['daily']))
 
     return "<br/>".join(weatherStrings)
+
 
 def _lookup_address(location):
     """
@@ -120,39 +147,41 @@ def _lookup_address(location):
                      resp.status_code, resp.json())
         return None
 
+
 def _lookup_weather(coords):
     """
     Retrieve the current forecast for the specified coordinates from forecast.io
     Limit of 1,000 requests a day
     """
 
-    forecast_io_url = 'https://api.forecast.io/forecast/{0}/{1},{2}?units=auto'.format(_internal['forecast_api_key'],coords['lat'], coords['lng'])
+    forecast_io_url = 'https://api.forecast.io/forecast/{0}/{1},{2}?units=auto'.format(
+        _internal['forecast_api_key'], coords['lat'], coords['lng'])
     r = requests.get(forecast_io_url)
 
     try:
         j = r.json()
         current = {
-            'time' : j['currently']['time'],
+            'time': j['currently']['time'],
             'summary': j['currently']['summary'],
             'temperature': Decimal(j['currently']['temperature']),
             'feelsLike': Decimal(j['currently']['apparentTemperature']),
             'units': _get_forcast_units(j),
-            'humidity': int(j['currently']['humidity']*100),
-            'windspeed' : Decimal(j['currently']['windSpeed']),
-            'windbearing' : j['currently']['windBearing'],
-            'pressure' : j['currently']['pressure']
+            'humidity': int(j['currently']['humidity'] * 100),
+            'windspeed': Decimal(j['currently']['windSpeed']),
+            'windbearing': j['currently']['windBearing'],
+            'pressure': j['currently']['pressure']
         }
         if current['units']['pressure'] == 'kPa':
-            current['pressure'] = Decimal(current['pressure']/10)
+            current['pressure'] = Decimal(current['pressure'] / 10)
 
-<<<<<<< HEAD
+<< << << < HEAD
     unit = _internal.get('unit', 'F')
     temperature = j['temperature'] if unit == 'F' else to_celsius(j[
                                                                   'temperature'])
 
     return _('<em>In {}, it is currently {}, {:.0f}{} and {:.0f}% humidity.</em>').format(
         coords['address'], j['summary'].lower(), round(temperature, 0), unit, j['humidity'] * 100)
-=======
+== == == =
         if 'hourly' in j:
             current['hourly'] = j['hourly']['summary']
         if 'daily' in j:

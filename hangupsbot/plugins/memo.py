@@ -22,9 +22,11 @@ def get_id(bot, name):
         if name in userdata.full_name.lower():
             return user
 
+
 def get_name(bot, id_):
     user = bot.get_hangups_user(id_)
     return user.full_name
+
 
 def create_memory(bot, name):
     user_id = get_id(bot, name)

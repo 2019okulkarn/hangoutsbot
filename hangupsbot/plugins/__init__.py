@@ -69,8 +69,11 @@ class tracker:
 
         # sync tagged commands to the command dispatcher
         if self._current["commands"]["tagged"]:
-            for command_name, type_tags in self._current["commands"]["tagged"].items():
-                for type in ["admin", "user"]:  # prioritse admin-linked tags if both exist
+            for command_name, type_tags in self._current[
+                    "commands"]["tagged"].items():
+                for type in [
+                        "admin",
+                        "user"]:  # prioritse admin-linked tags if both exist
                     if type in type_tags:
                         command.register_tags(command_name, type_tags[type])
                         break
@@ -121,8 +124,8 @@ class tracker:
         if type not in self._current["commands"]["tagged"][command_name]:
             self._current["commands"]["tagged"][command_name][type] = set()
 
-        tagsets = set(
-            [frozenset(item if isinstance(item, list) else [item]) for item in tags])
+        tagsets = set([frozenset(item if isinstance(
+            item, list) else [item]) for item in tags])
 
         # registration might be called repeatedly, so only add the tagsets if
         # it doesnt exist
@@ -210,7 +213,7 @@ def retrieve_all_plugins(plugin_path=None, must_start_with=False):
     """recursively loads all plugins from the standard plugins path
     * a plugin file or folder must not begin with . or _
     * a subfolder containing a plugin must have an __init__.py file
-    * sub-plugin files (additional plugins inside a subfolder) must be prefixed with the 
+    * sub-plugin files (additional plugins inside a subfolder) must be prefixed with the
       plugin/folder name for it to be automatically loaded
     """
 
@@ -240,7 +243,8 @@ def retrieve_all_plugins(plugin_path=None, must_start_with=False):
             if not os.path.isfile(os.path.join(full_path, "__init__.py")):
                 continue
 
-            for sm in retrieve_all_plugins(full_path, must_start_with=node_name):
+            for sm in retrieve_all_plugins(
+                    full_path, must_start_with=node_name):
                 module_names.append(module_names[0] + "." + sm)
 
         plugin_list.extend(module_names)
@@ -386,17 +390,19 @@ def load(bot, module_path, module_name=None):
                 else:
                     try:
                         # legacy support, pre-2.4
-                        logger.info("[LEGACY] upgrade {1}.{0}(handlers, bot) to {0}(bot) and use bot._handlers internally"
-                                    .format(the_function.__name__, module_path))
+                        logger.info(
+                            "[LEGACY] upgrade {1}.{0}(handlers, bot) to {0}(bot) and use bot._handlers internally" .format(
+                                the_function.__name__, module_path))
 
                         _return = the_function(bot._handlers, bot)
                     except TypeError as e:
                         # DEPRECATED: ancient plugins
-                        logger.warning("[DEPRECATED] upgrade {1}.{0}(handlers) to {0}(bot) and use bot._handlers internally"
-                                       .format(the_function.__name__, module_path))
+                        logger.warning(
+                            "[DEPRECATED] upgrade {1}.{0}(handlers) to {0}(bot) and use bot._handlers internally" .format(
+                                the_function.__name__, module_path))
 
                         _return = the_function(bot._handlers)
-                if type(_return) is list:
+                if isinstance(_return, list):
                     available_commands = _return
             elif function_name.startswith("_"):
                 pass
@@ -421,7 +427,7 @@ def load(bot, module_path, module_name=None):
 
     """
     pass 2: register filtered functions
-    tracking.current() and the CommandDispatcher registers might be out of sync if a 
+    tracking.current() and the CommandDispatcher registers might be out of sync if a
     combination of decorators and register_user_command/register_admin_command is used since
     decorators execute immediately upon import
     """

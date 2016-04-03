@@ -57,7 +57,7 @@ import plugins
 import emoji
 from websocket import WebSocketConnectionClosedException
 from slackclient import SlackClient
-import html # for html.unescape
+import html  # for html.unescape
 
 logger = logging.getLogger(__name__)
 
@@ -135,7 +135,15 @@ class SlackMessage(object):
         if 'type' not in reply:
             raise ParseError('no "type" in reply: %s' % str(reply))
 
-        if reply['type'] in ['pong', 'presence_change', 'user_typing', 'file_shared', 'file_public', 'file_comment_added', 'file_comment_deleted', 'message_deleted']:
+        if reply['type'] in [
+    'pong',
+    'presence_change',
+    'user_typing',
+    'file_shared',
+    'file_public',
+    'file_comment_added',
+    'file_comment_deleted',
+     'message_deleted']:
             # we ignore pong's as they are only answers for our pings
             raise ParseError(
                 'not a "message" type reply: type=%s' % reply['type'])
@@ -150,7 +158,8 @@ class SlackMessage(object):
         # only used during parsing
         user = ''
         is_bot = False
-        if reply['type'] == 'message' and 'subtype' in reply and reply['subtype'] == 'message_changed':
+        if reply['type'] == 'message' and 'subtype' in reply and reply[
+            'subtype'] == 'message_changed':
             if 'edited' in reply['message']:
                 edited = '(Edited)'
                 user = reply['message']['edited']['user']
@@ -172,7 +181,8 @@ class SlackMessage(object):
             user = reply['comment']['user']
             text = reply['comment']['comment']
         else:
-            if reply['type'] == 'message' and 'subtype' in reply and reply['subtype'] == 'bot_message' and 'user' not in reply:
+            if reply['type'] == 'message' and 'subtype' in reply and reply[
+                'subtype'] == 'bot_message' and 'user' not in reply:
                 is_bot = True
                 # this might be a HO relayed message, check if username is set
                 # and use it as username
@@ -220,7 +230,8 @@ class SlackMessage(object):
                     text = match.group(1)
                     file_attachment = match.group(2)
 
-        # text now contains the real message, but html entities have to be dequoted still
+        # text now contains the real message, but html entities have to be
+        # dequoted still
         text = html.unescape(text)
 
         username4ho = username
@@ -250,7 +261,8 @@ class SlackMessage(object):
             raise ParseError('no channel found in reply:\n%s' %
                              pprint.pformat(reply))
 
-        if reply['type'] == 'message' and 'subtype' in reply and reply['subtype'] in ['channel_join', 'channel_leave', 'group_join', 'group_leave']:
+        if reply['type'] == 'message' and 'subtype' in reply and reply['subtype'] in [
+            'channel_join', 'channel_leave', 'group_join', 'group_leave']:
             is_joinleave = True
 
         self.text = text
@@ -269,7 +281,15 @@ class SlackMessage(object):
 
 class SlackRTMSync(object):
 
-    def __init__(self, channelid, hangoutid, hotag, slacktag, sync_joins=True, image_upload=True, showslackrealnames=False):
+    def __init__(
+    self,
+    channelid,
+    hangoutid,
+    hotag,
+    slacktag,
+    sync_joins=True,
+    image_upload=True,
+     showslackrealnames=False):
         self.channelid = channelid
         self.hangoutid = hangoutid
         self.hotag = hotag
@@ -291,9 +311,17 @@ class SlackRTMSync(object):
         else:
             slacktag = 'NOT_IN_CONFIG'
         realnames = True
-        if 'showslackrealnames' in sync_dict and not sync_dict['showslackrealnames']:
+        if 'showslackrealnames' in sync_dict and not sync_dict[
+            'showslackrealnames']:
             realnames = False
-        return SlackRTMSync(sync_dict['channelid'], sync_dict['hangoutid'], sync_dict['hotag'], slacktag, sync_joins, image_upload, realnames)
+        return SlackRTMSync(
+    sync_dict['channelid'],
+    sync_dict['hangoutid'],
+    sync_dict['hotag'],
+    slacktag,
+    sync_joins,
+    image_upload,
+     realnames)
 
     def toDict(self):
         return {
@@ -383,7 +411,8 @@ class SlackRTM(object):
             if sync.slacktag == 'NOT_IN_CONFIG':
                 sync.slacktag = self.get_teamname()
             self.syncs.append(sync)
-        if 'synced_conversations' in self.config and len(self.config['synced_conversations']):
+        if 'synced_conversations' in self.config and len(
+            self.config['synced_conversations']):
             logger.warning(
                 'defining synced_conversations in config is deprecated')
             for conv in self.config['synced_conversations']:
@@ -401,15 +430,18 @@ class SlackRTM(object):
 
     def get_slackDM(self, userid):
         if not userid in self.dminfos:
-<<<<<<< HEAD
+<< << << < HEAD
             self.dminfos[userid] = json.loads(self.slack.api_call(
                 'im.open', user=userid).decode("utf-8"))['channel']
-=======
+== == == =
             try:
-                self.dminfos[userid] = json.loads(self.slack.api_call('im.open', user = userid).decode("utf-8"))['channel']
+                self.dminfos[userid] = json.loads(self.slack.api_call(
+                    'im.open', user=userid).decode("utf-8"))['channel']
             except AttributeError:
-                self.dminfos[userid] = json.loads(self.slack.api_call('im.open', user = userid))['channel']
->>>>>>> 4416ec7499a72f294326130559e28a0e59d6dccf
+                self.dminfos[userid] = json.loads(
+    self.slack.api_call(
+        'im.open', user=userid))['channel']
+>>>>>> > 4416ec7499a72f294326130559e28a0e59d6dccf
         return self.dminfos[userid]['id']
 
     def update_userinfos(self, users=None):

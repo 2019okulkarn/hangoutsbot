@@ -37,8 +37,9 @@ def start(bot):
             try:
                 module = sinkConfig["module"].split(".")
                 if len(module) < 3:
-                    logger.error("config.jsonrpc[{}].module should have at least 3 packages {}".format(
-                        itemNo, module))
+                    logger.error(
+                        "config.jsonrpc[{}].module should have at least 3 packages {}".format(
+                            itemNo, module))
                     continue
 
                 module_name = ".".join(module[0:-1])
@@ -56,7 +57,8 @@ def start(bot):
 
                 if not os.path.isfile(certfile):
                     logger.error(
-                        "config.jsonrpc[{}].certfile not available at {}".format(itemNo, certfile))
+                        "config.jsonrpc[{}].certfile not available at {}".format(
+                            itemNo, certfile))
                     continue
 
                 name = sinkConfig["name"]
@@ -108,7 +110,14 @@ def start(bot):
         logger.info("{} aiohttp web listener(s)".format(aiohttpcount))
 
 
-def start_listening(bot=None, loop=None, name="", port=8000, certfile=None, webhookReceiver=BaseHTTPRequestHandler, friendlyName="UNKNOWN"):
+def start_listening(
+        bot=None,
+        loop=None,
+        name="",
+        port=8000,
+        certfile=None,
+        webhookReceiver=BaseHTTPRequestHandler,
+        friendlyName="UNKNOWN"):
     if loop:
         asyncio.set_event_loop(loop)
 
@@ -153,7 +162,14 @@ def start_listening(bot=None, loop=None, name="", port=8000, certfile=None, webh
         httpd.socket.close()
 
 
-def aiohttp_start(bot, name, port, certfile, RequestHandlerClass, group, callback=None):
+def aiohttp_start(
+        bot,
+        name,
+        port,
+        certfile,
+        RequestHandlerClass,
+        group,
+        callback=None):
     RequestHandler = RequestHandlerClass(bot)
 
     app = web.Application()
@@ -167,11 +183,13 @@ def aiohttp_start(bot, name, port, certfile, RequestHandlerClass, group, callbac
     loop = asyncio.get_event_loop()
     server = loop.create_server(handler, name, port, ssl=sslcontext)
 
-    asyncio.async(server).add_done_callback(functools.partial(aiohttp_started,
-                                                              handler=handler,
-                                                              app=app,
-                                                              group=group,
-                                                              callback=callback))
+    asyncio.async(server).add_done_callback(
+        functools.partial(
+            aiohttp_started,
+            handler=handler,
+            app=app,
+            group=group,
+            callback=callback))
 
     tracking.register_aiohttp_web(group)
 
