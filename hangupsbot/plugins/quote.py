@@ -13,8 +13,9 @@ def _initialise():
     conn.commit()
     conn.close()
 
-def add(conn, quote, author, admin=True):
+def add(conn, q, author, admin=True):
     c = conn.cursor()
+    quote = q.replace("**", "\*\*").replace("*", "\*").replace("__", "\_\_").replace("_", "\_") #wtf is this lmfao
     if admin:
         c.execute("INSERT INTO quotes(author, quote) VALUES (?, ?)", [author.lower(), quote])
         conn.commit()
