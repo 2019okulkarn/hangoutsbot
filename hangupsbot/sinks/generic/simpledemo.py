@@ -27,7 +27,8 @@ class webhookReceiver(BaseHTTPRequestHandler):
         path = path.split("/")
         conversation_id = path[1]
         if conversation_id is None:
-            print("{}: conversation id must be provided as part of path".format(sinkname))
+            print(
+                "{}: conversation id must be provided as part of path".format(sinkname))
             return
 
         image_id = None

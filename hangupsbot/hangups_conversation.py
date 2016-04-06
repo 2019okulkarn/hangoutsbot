@@ -85,11 +85,12 @@ class HangupsConversation(hangups.conversation.Conversation):
             hangups_user = bot.get_hangups_user(chat_id)
 
             UserID = hangups.user.UserID(
-                chat_id=hangups_user.id_.chat_id, gaia_id=hangups_user.id_.gaia_id)
+                chat_id=hangups_user.id_.chat_id,
+                gaia_id=hangups_user.id_.gaia_id)
             current_participant.append(UserID)
 
-            ParticipantInfo = ParticipantData(fallback_name=hangups_user.full_name,
-                                              id_=UserID)
+            ParticipantInfo = ParticipantData(
+                fallback_name=hangups_user.full_name, id_=UserID)
 
             participant_data.append(ParticipantInfo)
 
@@ -115,26 +116,31 @@ class HangupsConversation(hangups.conversation.Conversation):
 
         conversation_id = ConversationID(id_=conv_id)
 
-        self_conversation_state = SelfConversationState(active_timestamp=timestamp_now,
-                                                        invite_timestamp=timestamp_now,
-                                                        inviter_id=hangups.user.UserID(chat_id=bot_user["chat_id"],
-                                                                                       gaia_id=bot_user["chat_id"]),
-                                                        notification_level=hangups.schemas.ClientNotificationLevel.RING,
-                                                        self_read_state=LatestRead(latest_read_timestamp=latest_read_timestamp,
-                                                                                   participant_id=hangups.user.UserID(chat_id=bot_user["chat_id"],
-                                                                                                                      gaia_id=bot_user["chat_id"])),
-                                                        sort_timestamp=sort_timestamp,
-                                                        status=hangups.schemas.ClientConversationStatus.ACTIVE,
-                                                        view=hangups.schemas.ClientConversationView.INBOX_VIEW)
+        self_conversation_state = SelfConversationState(
+            active_timestamp=timestamp_now,
+            invite_timestamp=timestamp_now,
+            inviter_id=hangups.user.UserID(
+                chat_id=bot_user["chat_id"],
+                gaia_id=bot_user["chat_id"]),
+            notification_level=hangups.schemas.ClientNotificationLevel.RING,
+            self_read_state=LatestRead(
+                latest_read_timestamp=latest_read_timestamp,
+                participant_id=hangups.user.UserID(
+                    chat_id=bot_user["chat_id"],
+                    gaia_id=bot_user["chat_id"])),
+            sort_timestamp=sort_timestamp,
+            status=hangups.schemas.ClientConversationStatus.ACTIVE,
+            view=hangups.schemas.ClientConversationView.INBOX_VIEW)
 
-        self._conversation = ClientConversation(conversation_id=conversation_id,
-                                                current_participant=current_participant,
-                                                name=permamem_conv["title"],
-                                                otr_status=otr_status,
-                                                participant_data=participant_data,
-                                                read_state=read_state,
-                                                self_conversation_state=self_conversation_state,
-                                                type_=type_)
+        self._conversation = ClientConversation(
+            conversation_id=conversation_id,
+            current_participant=current_participant,
+            name=permamem_conv["title"],
+            otr_status=otr_status,
+            participant_data=participant_data,
+            read_state=read_state,
+            self_conversation_state=self_conversation_state,
+            type_=type_)
 
         # initialise blank
         self._user_list = []
@@ -144,7 +150,9 @@ class HangupsConversation(hangups.conversation.Conversation):
 
     @property
     def users(self):
-        return [self.bot.get_hangups_user(part.id_.chat_id) for part in self._conversation.participant_data]
+        return [
+            self.bot.get_hangups_user(
+                part.id_.chat_id) for part in self._conversation.participant_data]
 
 
 class FakeConversation(object):

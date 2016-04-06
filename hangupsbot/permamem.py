@@ -68,7 +68,8 @@ class conversation_memory:
                 count_user = count_user + 1
                 if "_hangups" in self.bot.memory["user_data"][chat_id]:
                     count_user_cached = count_user_cached + 1
-                    if self.bot.memory["user_data"][chat_id]["_hangups"]["is_definitive"]:
+                    if self.bot.memory["user_data"][chat_id][
+                            "_hangups"]["is_definitive"]:
                         count_user_cached_definitive = count_user_cached_definitive + 1
 
             logger.info("total users: {} cached: {} definitive (at start): {}".format(
@@ -116,8 +117,10 @@ class conversation_memory:
                     if self.bot.memory.exists(["user_data"]):
                         """inefficient one-off search"""
                         for chat_id in self.bot.memory["user_data"]:
-                            if self.bot.memory.exists(["user_data", chat_id, "1on1"]):
-                                if self.bot.memory["user_data"][chat_id]["1on1"] == conv_id:
+                            if self.bot.memory.exists(
+                                    ["user_data", chat_id, "1on1"]):
+                                if self.bot.memory["user_data"][
+                                        chat_id]["1on1"] == conv_id:
                                     conv["type"] = "ONE_TO_ONE"
                                     attribute_modified = True
                                     break
@@ -148,7 +151,8 @@ class conversation_memory:
             for convid in convs:
                 self.catalog[convid] = convs[convid]
 
-                if "participants" in self.catalog[convid] and len(self.catalog[convid]["participants"]) > 0:
+                if "participants" in self.catalog[convid] and len(
+                        self.catalog[convid]["participants"]) > 0:
                     for _chat_id in self.catalog[convid]["participants"]:
                         try:
                             UserID = hangups.user.UserID(
@@ -161,11 +165,13 @@ class conversation_memory:
 
                         except KeyError:
                             cached = False
-                            if self.bot.memory.exists(["user_data", _chat_id, "_hangups"]):
+                            if self.bot.memory.exists(
+                                    ["user_data", _chat_id, "_hangups"]):
                                 cached = self.bot.memory.get_by_path(
                                     ["user_data", _chat_id, "_hangups"])
                                 if cached["is_definitive"]:
-                                    if cached["full_name"].upper() == "UNKNOWN" and cached["full_name"] == cached["first_name"]:
+                                    if cached["full_name"].upper() == "UNKNOWN" and cached[
+                                            "full_name"] == cached["first_name"]:
                                         # XXX: crappy way to detect hangups
                                         # unknown users
                                         logger.debug(
@@ -243,7 +249,8 @@ class conversation_memory:
                         User.id_.chat_id, User.full_name))
                     self.bot._user_list._user_dict[User.id_] = User
 
-                    if self.store_user_memory(User, is_definitive=True, automatic_save=False):
+                    if self.store_user_memory(
+                            User, is_definitive=True, automatic_save=False):
                         updated_users = updated_users + 1
 
             except hangups.exceptions.NetworkError as e:
@@ -260,7 +267,11 @@ class conversation_memory:
 
         return updated_users
 
-    def store_user_memory(self, User, automatic_save=True, is_definitive=False):
+    def store_user_memory(
+            self,
+            User,
+            automatic_save=True,
+            is_definitive=False):
         """update user memory based on supplied hangups User
         conservative writing: on User attribute changes only
         returns True on User change, False on no changes
@@ -277,7 +288,8 @@ class conversation_memory:
         if self.bot.memory.exists(["user_data", User.id_.chat_id, "_hangups"]):
             cached = self.bot.memory.get_by_path(
                 ["user_data", User.id_.chat_id, "_hangups"])
-            if "is_definitive" in cached and cached["is_definitive"] and is_definitive == False:
+            if "is_definitive" in cached and cached[
+                    "is_definitive"] and is_definitive == False:
                 if self.log_info_unchanged:
                     logger.info("skipped user update: {} ({})".format(
                         cached["full_name"], cached["chat_id"]))
@@ -302,10 +314,12 @@ class conversation_memory:
             # XXX: no way to detect hangups fallback users reliably,
             # XXX:   prioritise existing cached attributes
 
-            if not user_dict["photo_url"] and "photo_url" in cached and cached["photo_url"]:
+            if not user_dict[
+                    "photo_url"] and "photo_url" in cached and cached["photo_url"]:
                 user_dict["photo_url"] = cached["photo_url"]
 
-            if not user_dict["emails"] and "emails" in cached and cached["emails"]:
+            if not user_dict[
+                    "emails"] and "emails" in cached and cached["emails"]:
                 user_dict["emails"] = cached["emails"]
 
             """scan for differences between supplied and cached"""
@@ -434,22 +448,25 @@ class conversation_memory:
             for key in ["title", "type", "history", "participants"]:
                 try:
                     if key == "participants":
-                        if set(original["participants"]) != set(memory["participants"]):
-                            logger.info("conv participants changed {} ({})".format(
-                                conv_title, conv.id_))
+                        if set(
+                                original["participants"]) != set(
+                                memory["participants"]):
+                            logger.info(
+                                "conv participants changed {} ({})".format(
+                                    conv_title, conv.id_))
                             conv_changed = True
                             break
 
                     else:
                         if original[key] != memory[key]:
                             logger.info("conv {} changed {} ({})".format(
-                                key,  conv_title, conv.id_))
+                                key, conv_title, conv.id_))
                             conv_changed = True
                             break
 
                 except KeyError as e:
                     logger.info("conv missing {} {} ({})".format(
-                        key,  conv_title, conv.id_))
+                        key, conv_title, conv.id_))
                     conv_changed = True
                     break
         else:
@@ -524,7 +541,8 @@ class conversation_memory:
                     raw_filter = tokens[1][raw_filter.index('('):].strip()
                 else:
                     raise ValueError(
-                        "invalid boolean operator near \"{}\"".format(raw_filter.strip()))
+                        "invalid boolean operator near \"{}\"".format(
+                            raw_filter.strip()))
 
         if raw_filter or len(terms) == 0:
             # second condition is to ensure at least one term, even if blank
@@ -574,7 +592,8 @@ class conversation_memory:
                 # return all conversations with the tag
                 filter_tag = term[4:]
                 if filter_tag in self.bot.tags.indices["tag-convs"]:
-                    for conv_id in self.bot.tags.indices["tag-convs"][filter_tag]:
+                    for conv_id in self.bot.tags.indices[
+                            "tag-convs"][filter_tag]:
                         if conv_id in sourcelist:
                             matched[conv_id] = sourcelist[conv_id]
 

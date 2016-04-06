@@ -33,16 +33,21 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 __author__ = "Daniel Casner <www.artificelab.com>"
 
 import time
-import aiohttp, asyncio, io, logging
+import aiohttp
+import asyncio
+import io
+import logging
 import plugins
 
 logger = logging.getLogger(__name__)
+
 
 def _initalize(bot):
     if bot.get_config_option("showme") is not None:
         plugins.register_user_command(["showme"])
     else:
         logger.error('SHOWME: config["showme"] dict required')
+
 
 def sendSource(bot, event, name, imgLink):
     logger.info("Getting {}".format(imgLink))
@@ -59,6 +64,7 @@ def sendSource(bot, event, name, imgLink):
         yield from bot.coro_send_message(event.conv, _("I'm sorry, I couldn't upload a {} image".format(ext)))
     else:
         yield from bot.coro_send_message(event.conv.id_, None, image_id=image_id)
+
 
 def showme(bot, event, *args):
     """Retrieve images from showme sources by saying: "/bot showme SOURCE" or list sources by saying "/bot showme sources" or all sources by saying "/bot showme all" """

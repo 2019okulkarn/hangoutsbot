@@ -98,7 +98,8 @@ class BridgeInstance(WebFramework):
                             text_message = "unrecognised telegram update: {}".format(
                                 message)
 
-                        for mapped in self.configuration[0]["conversation_map"]:
+                        for mapped in self.configuration[
+                                0]["conversation_map"]:
                             telegram = mapped["telegram"]
                             if str(message["chat"]["id"]) in telegram:
                                 for conv_id in mapped["hangouts"]:

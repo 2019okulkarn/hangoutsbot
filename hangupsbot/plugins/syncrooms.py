@@ -45,8 +45,7 @@ def _migrate_syncroom_v1(bot):
             if "sync_rooms" in parameters:
                 old_sync_rooms = parameters["sync_rooms"]
                 old_sync_rooms.append(conv_id)
-                old_sync_rooms = list(set(old_sync_rooms))
-                old_sync_rooms.sort()
+                old_sync_rooms = sorted(set(old_sync_rooms))
                 ref_key = "-".join(old_sync_rooms)
                 _newdict[ref_key] = old_sync_rooms  # prevent duplicates
 
@@ -145,13 +144,15 @@ def _handle_incoming_message(bot, event, command):
             else:
                 sameroom = False
 
-            if (not sameroom or timeout or not sameuser) and \
-                    (bot.memory.exists(['user_data', event.user_id.chat_id, "nickname"])):
+            if (not sameroom or timeout or not sameuser) and (
+                    bot.memory.exists(['user_data', event.user_id.chat_id, "nickname"])):
                 # Now check if there is a nickname set
 
                 try:
-                    fullname = '{0} ({1})'.format(event.user.full_name.split(' ', 1)[
-                        0], bot.get_memory_suboption(event.user_id.chat_id, 'nickname'))
+                    fullname = '{0} ({1})'.format(
+                        event.user.full_name.split(
+                            ' ', 1)[0], bot.get_memory_suboption(
+                            event.user_id.chat_id, 'nickname'))
                 except TypeError:
                     fullname = event.user.full_name
             elif sameroom and sameuser and not timeout:

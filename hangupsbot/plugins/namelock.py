@@ -50,12 +50,12 @@ def _watch_rename(bot, event, command):
         if event.conv_event.new_name != topic:
             hangups_user = bot.get_hangups_user(event.user_id.chat_id)
             logger.warning(
-                "unauthorised topic change by {} ({}) in {}, resetting: {} to: {}"
-                .format(hangups_user.full_name,
-                        event.user_id.chat_id,
-                        event.conv_id,
-                        event.conv_event.new_name,
-                        topic))
+                "unauthorised topic change by {} ({}) in {}, resetting: {} to: {}" .format(
+                    hangups_user.full_name,
+                    event.user_id.chat_id,
+                    event.conv_id,
+                    event.conv_event.new_name,
+                    topic))
 
             yield from bot._client.setchatname(event.conv_id, topic)
 

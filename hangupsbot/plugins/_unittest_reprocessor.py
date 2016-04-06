@@ -28,5 +28,8 @@ def coro_reprocess_the_event(bot, event, id):
 def reprocess_the_event(bot, event, id):
     asyncio.async(
         bot.coro_send_message(
-            event.conv_id, '<em>non-coroutine responding to message with uuid: {}</em><br />VISIBLE CONTENT WAS: "{}"'.format(id, event.text))
-    ).add_done_callback(lambda future: future.result())
+            event.conv_id,
+            '<em>non-coroutine responding to message with uuid: {}</em><br />VISIBLE CONTENT WAS: "{}"'.format(
+                id,
+                event.text))).add_done_callback(
+        lambda future: future.result())
