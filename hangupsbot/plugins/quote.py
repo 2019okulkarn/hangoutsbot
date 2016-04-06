@@ -18,7 +18,7 @@ def add(conn, quote, author, admin=True):
     if admin:
         c.execute("INSERT INTO quotes(author, quote) VALUES (?, ?)", [author.lower(), quote])
         conn.commit()
-        rply = "Successfully added quote!"
+        rply = "Successfully added quote {}!".format(c.lastrowid)
     else:
         c.execute("INSERT INTO unapp_quotes(author, quote) VALUES (?, ?)", [author.lower(), quote])
         conn.commit()
