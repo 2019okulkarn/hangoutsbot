@@ -80,6 +80,13 @@ def format_quote(q):
     return quote
 
 def quote(bot, event, *args):
+    '''Manipulate quotes. Format is /bot quote [-a, -l]
+To add quotes: /bot quote -a quote - author
+To list all quotes: /bot quote -l
+To list specific person's quotes: /bot quote -l name
+To get a specific quote: /bot quote quote_number
+To get a random quote: /bot quote
+To get a random quote for a specifc author: /bot quote name'''
     msg = None
     try:
         conn = sqlite3.connect('bot.db')
