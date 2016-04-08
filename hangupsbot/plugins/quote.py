@@ -24,7 +24,7 @@ def add(conn, q, author, admin=True):
         c.execute("INSERT INTO unapp_quotes(author, quote) VALUES (?, ?)", [author.lower(), quote])
         conn.commit()
         rply = ["Quote submitted for approval.",
-            "New quote submitted for approval. To approve, do\n! approve quote {}".format(c.lastrowid)]
+            "New quote submitted for approval. \n<b>Quote {}:</b> {} - {}\nTo approve, do <b>! approve quote {}</b>".format(c.lastrowid, author.lower(), quote, c.lastrowid)]
     return rply
 
 def retrieve(conn, id_, author, full=True):
@@ -47,11 +47,11 @@ def retrieve(conn, id_, author, full=True):
         rply = format_quote(q)
     elif author:
         if not full:
-            c.execute('SELECT * FROM quotes WHERE author = ? ORDER BY RANDOM() LIMIT 1', [id_])
+            c.execute('SELECT * FROM quotes WHERE author like ? ORDER BY RANDOM() LIMIT 1', [id_])
             q = c.fetchone() 
             rply = format_quote(q)
         elif id_:
-            c.execute('SELECT * FROM quotes WHERE author = ?', [id_])
+            c.execute('SELECT * FROM quotes WHERE author like ?', [id_])
             q = c.fetchall()
             quotes = []
             for i in q:
