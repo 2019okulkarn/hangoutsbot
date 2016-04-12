@@ -30,7 +30,7 @@ def search(term):
         }
 
 
-def imagesearch(term):
+def imagesearch(term, num):
     r = get(
         'https://www.googleapis.com/customsearch/v1',
         params={
