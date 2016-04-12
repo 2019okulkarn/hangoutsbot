@@ -37,12 +37,12 @@ def imagesearch(term, num):
             'key': gapi,
             'cx': image,
             'q': term,
-            'defaultToImageSearch': 'True'})
+            'fileType': 'jpg'})
     data = json.loads(r.text)
     if 'items' not in data:
         return 'No Images Found'
     else:
-        link = data['items'][num - 1]['pagemap']['cse_image'][0]['src']
+        link = data['items'][num - 1]['link']['cse_image'][0]['src']
         return link
 
 
