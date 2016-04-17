@@ -60,7 +60,7 @@ def _listen_for_score(bot, event, command):
         if word.endswith('++') and not word == '++':
             name_to_add = word.replace('++', '')
             names_to_add.append(name_to_add)
-        if word.endswith('--') and not word == '--'::
+        if word.endswith('--') and not word == '--':
             name_to_add = word.replace('--', '')
             names_to_subtract.append(name_to_add)
     for name in names_to_add:
