@@ -1,5 +1,6 @@
 import plugins
 import asyncio
+from admin import is_admin
 
 def _initialize():
     plugins.register_handler(_listen_for_score, type="message")
@@ -19,6 +20,12 @@ def increment_score(bot, name, val):
     bot.memory.set_by_path(["scores", name], new_score)
     bot.memory.save()
 
+def set_score(bot, name, val):
+    create_memory(bot, name)
+    bot.memory.set_by_path(["scores", name], val)
+    bot.memory.save()
+    return "Set score for {} to {}".format(name.title(), val)
+
 def get_score(bot, name):
     if not bot.memory.exists(["scores", name]):
         return "Nobody cares about {}".format(name.title())
@@ -36,6 +43,10 @@ def score(bot, event, *args):
         else:
             name = args[0].lower()
             msg = get_score(bot, name)
+    elif args[0].lower() == '--set' and len(args) == 3 and is_admin(bot, event):
+        name = args[1].lower()
+        val = args[2].lower()
+        msg = set_score(bot, name, int(val))
     else:
         msg = _("Wrong number of arguments!")
     yield from bot.coro_send_message(event.conv, msg)
