@@ -27,7 +27,7 @@ def get_score(bot, name):
 
 def score(bot, event, *args):
     '''Get the score for a user. Format is /bot score <name>
-       To increment scores, do <name>++ or <name>--'''
+   To increment scores, do <name>++ or <name>--'''
     if len(args) == 1:
         if args[0].lower() == '--high':
             msg = get_high_score(bot)
