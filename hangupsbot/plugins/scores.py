@@ -1,6 +1,5 @@
 import plugins
 import asyncio
-import operator
 
 def _initialize():
     plugins.register_handler(_listen_for_score, type="message")
