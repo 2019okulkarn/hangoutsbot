@@ -26,8 +26,11 @@ def get_score(bot, name):
     return "Score for {}: {}".format(name.title(), score)
 
 def score(bot, event, *args):
-    name = args[0].lower()
-    msg = get_score(bot, name)
+    if len(args) == 1:
+        name = args[0].lower()
+        msg = get_score(bot, name)
+    else:
+        msg = _("Wrong number of arguments!")
     yield from bot.coro_send_message(event.conv, msg)
 
 @asyncio.coroutine
