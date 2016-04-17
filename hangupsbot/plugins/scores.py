@@ -57,10 +57,10 @@ def _listen_for_score(bot, event, command):
     names_to_add = []
     names_to_subtract = []
     for word in event.text.lower().split():
-        if word.endswith('++'):
+        if word.endswith('++') and not word == '++':
             name_to_add = word.replace('++', '')
             names_to_add.append(name_to_add)
-        if word.endswith('--'):
+        if word.endswith('--') and not word == '--'::
             name_to_add = word.replace('--', '')
             names_to_subtract.append(name_to_add)
     for name in names_to_add:
