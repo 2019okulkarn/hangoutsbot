@@ -52,8 +52,12 @@ def _scan_for_triggers(bot, event, command):
             if "gfycat.com/" in image_link:
                 r = yield from aiohttp.request('get', image_link)
                 raw = yield from r.read()
+<<<<<<< HEAD
                 image_link = re.search(
                     "href=\"(.*?)\">GIF</a>", str(raw, 'utf-8')).group(1)
+=======
+                image_link = re.search("href=\"(.*?)\">GIF</a>", str(raw, 'utf-8')).group(1)
+>>>>>>> dc7ec1d... Merge pull request #556 from hangoutsbot/staging
             filename = os.path.basename(image_link)
             r = yield from aiohttp.request('get', image_link)
             raw = yield from r.read()
