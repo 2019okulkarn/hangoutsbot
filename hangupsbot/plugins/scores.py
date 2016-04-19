@@ -75,7 +75,9 @@ def _listen_for_score(bot, event, command):
             name_to_add = word.replace('--', '')
             names_to_subtract.append(name_to_add)
     for name in names_to_add:
-        if name == event.user.first_name.lower() or name in event.user.full_name.lower():
+        if not bot.user_memory_get(event.user.id_.chat_id, "nicknames"):
+            bot.user_memory_set(event.user.id_.chat_id, "nicknames", [])
+        if name == event.user.first_name.lower() or name in event.user.full_name.lower() or name in bot.user_memory_get(event.user.id_.chat_id, "nicknames"):
             increment_score(bot, name, -10)
         else:
             increment_score(bot, name, 1)
