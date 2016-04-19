@@ -19,7 +19,9 @@ def get_id(bot, name):
         all_users[person] = hangupsuser
     for user in all_users:
         userdata = all_users[user]
-        if name in userdata.full_name.lower():
+        if not bot.user_memory_get(user, "nicknames"):
+            bot.user_memory_set(user, "nicknames", [])
+        if name in userdata.full_name.lower() or name in bot.user_memory_get(user, "nicknames"):
             return user
 
 
