@@ -67,6 +67,8 @@ def get_low_score(bot):
 def _listen_for_score(bot, event, command):
     names_to_add = []
     names_to_subtract = []
+    if not bot.user_memory_get(event.user.id_.chat_id, "nicknames"):
+        bot.user_memory_set(event.user.id_.chat_id, "nicknames", [])
     for word in event.text.lower().split():
         if word.endswith('++') and not word == '++':
             name_to_add = word.replace('++', '')
@@ -75,8 +77,6 @@ def _listen_for_score(bot, event, command):
             name_to_add = word.replace('--', '')
             names_to_subtract.append(name_to_add)
     for name in names_to_add:
-        if not bot.user_memory_get(event.user.id_.chat_id, "nicknames"):
-            bot.user_memory_set(event.user.id_.chat_id, "nicknames", [])
         if name == event.user.first_name.lower() or name in event.user.full_name.lower() or name in bot.user_memory_get(event.user.id_.chat_id, "nicknames"):
             increment_score(bot, name, -10)
         else:
