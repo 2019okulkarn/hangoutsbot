@@ -9,6 +9,7 @@ import plugins
 
 from utils import remove_accents
 
+from admin import is_admin
 
 logger = logging.getLogger(__name__)
 
@@ -186,7 +187,7 @@ def mention(bot, event, *args):
                         event.user.id_.chat_id))
                 all_whitelist = bot.get_config_suboption(
                     event.conv_id, 'mentionallwhitelist')
-                if all_whitelist is None or event.user_id.chat_id not in all_whitelist:
+                if not is_admin(bot, event):
 
                     logger.warning(
                         "@all in {}: user {} ({}) blocked".format(
