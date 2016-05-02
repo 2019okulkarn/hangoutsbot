@@ -9,6 +9,8 @@ import plugins
 
 from utils import remove_accents
 
+from admin import is_admin
+
 
 logger = logging.getLogger(__name__)
 
