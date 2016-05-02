@@ -172,7 +172,7 @@ def mention(bot, event, *args):
             logger.debug(
                 "@all in {}: disabled/unset global/per-conversation".format(event.conv.id_))
             admins_list = bot.get_config_suboption(event.conv_id, 'admins')
-            if event.user_id.chat_id not in admins_list:
+            if not is_admin(bot, event):
 
                 """initiator is not an admin, check whitelist"""
                 logger.debug("@all in {}: user {} ({}) is not admin".format(
@@ -230,7 +230,7 @@ def mention(bot, event, *args):
             username_upper in _normalised_full_name_upper.replace(" ", "_") or
 
                 username_lower == nickname_lower or
-                username in u.full_name.split(" ")):
+                username in u.full_name.split(" ")) and is_admin(bot, event):
 
             logger.info("user {} ({}) is present".format(
                 u.full_name, u.id_.chat_id))
