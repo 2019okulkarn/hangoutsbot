@@ -14,8 +14,7 @@ def shorten(url):
     except exceptions.MissingSchema:
         shorten("http://" + url)
     except:
-        error = "Could not create shortened link for {}".format(url)
-        return error
+        return url
 
 # Code for get_title is borrowed from http://github.com/tjcsl/cslbot/
 
@@ -52,4 +51,4 @@ def get_title(url):
                 title = "Title Not Found"
         return title
     except:
-        return "Title not found for {}".format(url)
+        return "Title Nout Found
