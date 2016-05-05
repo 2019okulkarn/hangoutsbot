@@ -29,15 +29,12 @@ def _watch_image_link(bot, event, command):
 
         probable_image_link = False
         event_text_lower = event.text.lower()
-        not_image_but_link = False
         if re.match("^(https?://)?([a-z0-9.]*?\.)?imgur.com/", event_text_lower, re.IGNORECASE):
             """imgur links can be supplied with/without protocol and extension"""
             probable_image_link = True
-
         elif event_text_lower.startswith(("http://", "https://")) and event_text_lower.endswith((".png", ".gif", ".gifv", ".jpg", ".jpeg")):
             """other image links must have protocol and end with valid extension"""
             probable_image_link = True
-
         if probable_image_link and "googleusercontent" in event_text_lower:
             """reject links posted by google to prevent endless attachment loop"""
             logger.debug(
@@ -67,25 +64,19 @@ def _watch_image_link(bot, event, command):
             image_id = yield from bot._client.upload_image(image_data, filename=filename)
 
             yield from bot.coro_send_message(event.conv.id_, None, image_id=image_id)
-        words = str(event.text).split()
-        for i in range(len(words)):
-            if 'http' in words[i]:
-                parsedurl = str(words[i])
-                not_image_but_link = True
-                break
-            else:
-                not_image_but_link = False
-        if not_image_but_link and not probable_image_link:
-            if 'goo.gl' in parsedurl:
-                longurl = lengthen(parsedurl)
-                link = shorten(longurl)
-            else:
-                link = shorten(parsedurl)
-            title = get_title(parsedurl)
-            msg = _("** {} ** -- {}").format(title, link)
-            yield from bot.coro_send_message(event.conv, msg)
+        else:
+            urls = get_all_urls(event.text)
+            for url in urls:
+                link = shorten(url)
+                title = get_title(url)
+                msg = _("** {} **\n{}").format(title, link)
+                yield from bot.coro_send_message(event.conv, msg)
     except BaseException as e:
         simple = _('An Error Occurred')
         msg = _('{} -- {}').format(str(e), event.text)
         yield from bot.coro_send_message(CONTROL, msg)
         yield from bot.coro_send_message(event.conv, simple)
+
+def get_all_urls(text):
+    url_regex = re.compile(r"""(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?....]))""")
+    return [x[0] for x in url_regex.findall(text)]
