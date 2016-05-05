@@ -51,4 +51,4 @@ def get_title(url):
                 title = "Title Not Found"
         return title
     except:
-        return "Title Nout Found
+        return "Title Not Found"
