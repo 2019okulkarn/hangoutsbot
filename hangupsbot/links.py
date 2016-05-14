@@ -49,6 +49,6 @@ def get_title(url):
                 title = ctype
             else:
                 title = "Title Not Found"
-        return title
+        return title.strip()
     except:
         return "Title Not Found"
