@@ -33,7 +33,7 @@ def convert(strlist):
         for char in string:
             toappend += chr(0xFEE0 + ord(char))
         toreturn.append(toappend)
-    return ' '.join(toreturn)
+    return '  '.join(toreturn)
 
 def fullwidth(bot, event, *args):
     if args:
