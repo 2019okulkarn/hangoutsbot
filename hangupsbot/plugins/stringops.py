@@ -31,7 +31,7 @@ def convert(strlist):
     for string in strlist:
         toappend = ""
         for char in string:
-            toappend += chr(0xFEE0 + ord(asciichar))
+            toappend += chr(0xFEE0 + ord(char))
         toreturn.append(toappend)
     return ' '.join(toappend)
 
