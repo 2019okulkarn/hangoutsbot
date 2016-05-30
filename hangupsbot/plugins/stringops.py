@@ -2,7 +2,7 @@ import plugins
 import re
 
 def _initialise():
-    plugins.register_user_command(["oodle", "boaty"])
+    plugins.register_user_command(["oodle", "boaty", "fullwidth"])
 
 
 def oodle(bot, event, *args):
@@ -24,4 +24,20 @@ def boaty(bot, event, *args):
         msg = _("{}y Mc{}face").format(boaty.title(), boaty.title())
     else:
         msg = _("What should I boaty?")
+    yield from bot.coro_send_message(event.conv, msg)
+
+def convert(strlist):
+    toreturn = []
+    for string in strlist:
+        toappend = ""
+        for char in string:
+            toappend += unichr(0xFEE0 + ord(asciichar))
+        toreturn.append(toappend)
+    return ' '.join(toappend)
+
+def fullwidth(bot, event, *args):
+    if args:
+        msg = convert(args)
+    else:
+        msg = convert("What should I convert to fullwidth?".split())
     yield from bot.coro_send_message(event.conv, msg)
