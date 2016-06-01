@@ -14,7 +14,7 @@ def _initialize():
     plugins.register_user_command(["meme"])
 
 def meme(bot, event, *args):
-    #try:
+    try:
         client = ImgurClient(imgur_client, imgur_secret)
         funny = client.subreddit_gallery('funny')
         link_image = random.choice(funny).link
@@ -25,6 +25,6 @@ def meme(bot, event, *args):
         image_data = io.BytesIO(raw)
         image_id = yield from bot._client.upload_image(image_data, filename=filename)
         yield from bot.coro_send_message(event.conv.id_, None, image_id=image_id)
-    #except Exception e:
-        #msg = _('{} -- {}').format(str(e), event.text)
-        #yield from bot.coro_send_message(CONTROL, msg)
+    except Exception e:
+        msg = _('{} -- {}').format(str(e), event.text)
+        yield from bot.coro_send_message(CONTROL, msg)
