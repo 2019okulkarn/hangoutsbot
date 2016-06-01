@@ -24,7 +24,7 @@ def add(conn, q, author, admin=True):
         c.execute("INSERT INTO unapp_quotes(author, quote) VALUES (?, ?)", [author.lower(), quote])
         conn.commit()
         rply = ["Quote submitted for approval.",
-            "New quote submitted for approval. To approve, do\n! approve quote {}".format(c.lastrowid)]
+            "New quote submitted for approval. To approve, do\n! approve quote {}\n<b>Quote {}:</b> {} -- {}".format(c.lastrowid, c.lastrowid, quote, author)]
     return rply
 
 def retrieve(conn, id_, author, full=True):
