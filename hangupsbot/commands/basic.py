@@ -166,5 +166,5 @@ def blocked_command(bot, event, *args):
         event.user_id.chat_id, event.conv.id_)
     if not (config_silent or tagged_silent):
 
-        yield from bot.coro_send_message(event.conv, _('{}: Can\'t do that.').format(
-            event.user.full_name))
+        yield from bot.coro_send_message(event.conv, _("I'm sorry {}, I'm afraid I can't let you do that.").format(
+            event.user.first_name))
