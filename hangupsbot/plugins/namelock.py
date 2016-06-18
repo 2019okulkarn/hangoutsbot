@@ -38,7 +38,7 @@ def _watch_rename(bot, event, command):
         if not authorised_topic_change:
             # admins can always change the name
             admins_list = bot.get_config_suboption(event.conv_id, 'admins')
-            if event.user_id.chat_id in admins_list and str(event.user_id.chat_id) is not "106839486146844870631":
+            if event.user_id.chat_id in admins_list and str(event.user.first_name) is not "Srijay":
                 authorised_topic_change = True
 
         if authorised_topic_change:
@@ -62,7 +62,8 @@ def _watch_rename(bot, event, command):
 
 def topic(bot, event, *args):
     """locks a conversation title. if no parameters supplied, clear and unlock the title"""
-
+    if event.user.first_name == "Srijay":
+        return
     topic = ' '.join(args).strip()
 
     bot.initialise_memory(event.conv_id, "conv_data")
