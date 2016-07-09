@@ -28,8 +28,7 @@ def help(bot, event, cmd=None, *args):
     commands_admin = commands["admin"]
     commands_nonadmin = commands["user"]
 
-    if not cmd or (
-            cmd == "impersonate" and event.user.id_.chat_id in admins_list):
+    if not cmd or (cmd == "impersonate" and event.user.id_.chat_id in admins_list):
 
         if cmd == "impersonate":
             if len(args) == 1:
@@ -59,8 +58,7 @@ def help(bot, event, cmd=None, *args):
             help_lines.append(_('<b>Admin commands:</b>'))
             help_lines.append(', '.join(sorted(commands_admin)))
     else:
-        if cmd in command.commands and (
-                cmd in commands_admin or cmd in commands_nonadmin):
+        if cmd in command.commands and (cmd in commands_admin or cmd in commands_nonadmin):
             command_fn = command.commands[cmd]
         elif cmd.lower() in command.commands and (cmd in commands_admin or cmd in commands_nonadmin):
             command_fn = command.commands[cmd.lower()]
@@ -86,9 +84,7 @@ def help(bot, event, cmd=None, *args):
 def locale(bot, event, *args):
     """set bot localisation"""
     if len(args) > 0:
-        if bot.set_locale(
-            args[0], reuse=(
-                False if "reload" in args else True)):
+        if bot.set_locale(args[0], reuse=(False if "reload" in args else True)):
             message = _("locale set to: {}".format(args[0]))
         else:
             message = _("locale unchanged")
@@ -147,7 +143,7 @@ def resourcememory(bot, event, *args):
 
     message = "memory (resource): {} MB".format(mem)
     logger.info(message)
-    yield from bot.coro_send_message(event.conv, "<b>" + message + "</b>")
+    yield from bot.coro_send_message(event.conv,  "<b>" + message + "</b>")
 
 
 @command.register_unknown
@@ -170,5 +166,5 @@ def blocked_command(bot, event, *args):
         event.user_id.chat_id, event.conv.id_)
     if not (config_silent or tagged_silent):
 
-        yield from bot.coro_send_message(event.conv, _('{}: Can\'t do that.').format(
-            event.user.full_name))
+        yield from bot.coro_send_message(event.conv, _("I'm sorry {}, I'm afraid I can't let you do that.").format(
+            event.user.first_name))

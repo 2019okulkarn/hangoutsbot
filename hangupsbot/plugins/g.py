@@ -30,19 +30,20 @@ def search(term):
         }
 
 
-def imagesearch(term):
+def imagesearch(term, num):
     r = get(
         'https://www.googleapis.com/customsearch/v1',
         params={
             'key': gapi,
             'cx': image,
             'q': term,
-            'defaultToImageSearch': 'True'})
+            'fileType': 'jpg'})
+    print(r.url)
     data = json.loads(r.text)
     if 'items' not in data:
         return 'No Images Found'
     else:
-        link = data['items'][num - 1]['pagemap']['cse_image'][0]['src']
+        link = data['items'][num - 1]["pagemap"]['cse_image'][0]['src']
         return link
 
 
@@ -149,3 +150,4 @@ def lmgtfy(bot, event, *args):
     except BaseException as e:
         msg = _('{} -- {}').format(str(e), event.text)
         yield from bot.coro_send_message(CONTROL, msg)
+print(imagesearch('memes', 1))

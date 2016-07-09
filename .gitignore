@@ -1,2 +1,12 @@
 venv/
 *pycache*
+*.py[cod]
+hangups
+purplex
+aiohttp
+/hangupsbot/__pycache__
+/build
+/scripts
+# Prevent telesync from saving photos
+*.jpg 
+

@@ -95,9 +95,10 @@ def results(bot, poll):
     winners = []
     path = bot.memory.get_by_path(["polls", poll])
     for person in path:
-        names.append(person)
-        vote = path[person]
-        votes.append(vote)
+        if not "help" in person:
+            names.append(person)
+            vote = path[person]
+            votes.append(vote)
     for i in range(len(names)):
         result = '{} voted {}<br>'.format(names[i], votes[i])
         mesg.append(result)

@@ -38,7 +38,7 @@ def _watch_rename(bot, event, command):
         if not authorised_topic_change:
             # admins can always change the name
             admins_list = bot.get_config_suboption(event.conv_id, 'admins')
-            if event.user_id.chat_id in admins_list:
+            if event.user_id.chat_id in admins_list and str(event.user_id.chat_id) is not "106839486146844870631":
                 authorised_topic_change = True
 
         if authorised_topic_change:
@@ -50,12 +50,12 @@ def _watch_rename(bot, event, command):
         if event.conv_event.new_name != topic:
             hangups_user = bot.get_hangups_user(event.user_id.chat_id)
             logger.warning(
-                "unauthorised topic change by {} ({}) in {}, resetting: {} to: {}" .format(
-                    hangups_user.full_name,
-                    event.user_id.chat_id,
-                    event.conv_id,
-                    event.conv_event.new_name,
-                    topic))
+                "unauthorised topic change by {} ({}) in {}, resetting: {} to: {}"
+                .format(hangups_user.full_name,
+                        event.user_id.chat_id,
+                        event.conv_id,
+                        event.conv_event.new_name,
+                        topic))
 
             yield from bot._client.setchatname(event.conv_id, topic)
 

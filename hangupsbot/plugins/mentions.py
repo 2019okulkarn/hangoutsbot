@@ -9,6 +9,7 @@ import plugins
 
 from utils import remove_accents
 
+from admin import is_admin
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +44,7 @@ def _migrate_mention_config_to_memory(bot):
 
 def _handle_mention(bot, event, command):
     """handle @mention"""
-    occurrences = [word for word in event.text.split() if word.startswith('@')]
+    occurrences = [word for word in set(event.text.split()) if word.startswith('@')]
     if len(occurrences) > 0:
         for word in occurrences:
             # strip all special characters
@@ -176,7 +177,7 @@ def mention(bot, event, *args):
             logger.debug(
                 "@all in {}: disabled/unset global/per-conversation".format(event.conv.id_))
             admins_list = bot.get_config_suboption(event.conv_id, 'admins')
-            if event.user_id.chat_id not in admins_list:
+            if not is_admin(bot, event):
 
                 """initiator is not an admin, check whitelist"""
                 logger.debug(
@@ -186,7 +187,7 @@ def mention(bot, event, *args):
                         event.user.id_.chat_id))
                 all_whitelist = bot.get_config_suboption(
                     event.conv_id, 'mentionallwhitelist')
-                if all_whitelist is None or event.user_id.chat_id not in all_whitelist:
+                if not is_admin(bot, event):
 
                     logger.warning(
                         "@all in {}: user {} ({}) blocked".format(
@@ -241,7 +242,7 @@ def mention(bot, event, *args):
             username_upper in _normalised_full_name_upper.replace(" ", "_") or
 
                 username_lower == nickname_lower or
-                username in u.full_name.split(" ")):
+                username in u.full_name.split(" ")) and is_admin(bot, event):
 
             logger.info("user {} ({}) is present".format(
                 u.full_name, u.id_.chat_id))
