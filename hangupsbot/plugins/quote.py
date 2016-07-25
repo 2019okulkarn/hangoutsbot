@@ -92,7 +92,7 @@ def quote(bot, event, *args):
     try:
         conn = sqlite3.connect('bot.db')
         if not args:
-            msg = retrieve(conn, None, False)
+            msg = retrieve(conn, None, None, full=False)
         elif args[0] not in ['-a', '-d', '-l', '-e'] and args[0].startswith('-'):
             msg = "Invalid Flag"
         elif args[0] in ['-d', '-e']:
